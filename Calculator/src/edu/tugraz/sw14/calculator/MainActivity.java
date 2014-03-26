@@ -1,23 +1,80 @@
 package edu.tugraz.sw14.calculator;
 
-import java.util.ArrayList;
-
-import android.os.Bundle;
 import android.app.Activity;
-import android.database.DataSetObserver;
+import android.os.Bundle;
 import android.util.Log;
-import android.view.Menu;
 import android.view.View;
-import android.view.ViewGroup;
-import android.widget.ArrayAdapter;
-import android.widget.ListAdapter;
-import android.widget.ListView;
+import android.view.View.OnClickListener;
+import android.widget.Button;
+import android.widget.EditText;
+import android.widget.TextView;
 
-public class MainActivity extends Activity {
+public class MainActivity extends Activity implements OnClickListener {
+
+	private EditText txtNum1;
+	private EditText txtNum2;
+	private Button btnAdd;
+	private Button btnSub;
+	private TextView lblResult;
 	
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+        txtNum1 = (EditText) findViewById(R.id.txtNum1);
+        txtNum2 = (EditText) findViewById(R.id.txtNum2);
+        btnAdd = (Button) findViewById(R.id.btnAdd);
+        btnSub = (Button) findViewById(R.id.btnSub);
+        lblResult = (TextView) findViewById(R.id.lblResult);
+
+        btnAdd.setOnClickListener(this);
+        btnSub.setOnClickListener(this);
     }
+
+	@Override
+	public void onClick(View v) {
+		switch (v.getId()) {
+		case R.id.btnAdd:
+			btnAddClicked();
+			break;
+			
+		case R.id.btnSub:
+			btnSubClicked();
+			break;
+
+		default:
+			break;
+		}
+	}
+
+	private void btnAddClicked() {
+		String num1Str = txtNum1.getText().toString();
+		String num2Str = txtNum2.getText().toString();
+
+		float num1 = Float.valueOf(num1Str);
+		float num2 = Float.valueOf(num2Str);
+		float result = num1 + num2;
+		
+		String resultText = getResources().getString(R.string.lblResult);
+		resultText += " " + String.valueOf(result);
+		
+		lblResult.setText(resultText);
+	}
+	
+
+	private void btnSubClicked() {
+
+		String num1Str = txtNum1.getText().toString();
+		String num2Str = txtNum2.getText().toString();
+
+		float num1 = Float.valueOf(num1Str);
+		float num2 = Float.valueOf(num2Str);
+		float result = num1 - num2;
+		
+		String resultText = getResources().getString(R.string.lblResult);
+		resultText += " " + String.valueOf(result);
+		
+		lblResult.setText(resultText);
+	}
 }

@@ -11,16 +11,17 @@
     tools:context=".MainActivity" >
 
     <TextView
-        android:id="@+id/TextView01"
+        android:id="@+id/lblNum1"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/lblNum1" />
 
     <EditText
-        android:id="@+id/EditText01"
+        android:id="@+id/txtNum1"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:ems="10" />
+        android:ems="10"
+        android:inputType="numberDecimal" />
 
     <TextView
         android:id="@+id/lblNum2"
@@ -32,7 +33,8 @@
         android:id="@+id/txtNum2"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:ems="10" />
+        android:ems="10"
+        android:inputType="numberDecimal" />
 
     <LinearLayout
         android:layout_width="match_parent"
@@ -40,14 +42,16 @@
 
         <Button
             android:id="@+id/btnAdd"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_weight="0.5"
             android:text="@string/btnAdd" />
 
         <Button
             android:id="@+id/btnSub"
-            android:layout_width="wrap_content"
+            android:layout_width="0dp"
             android:layout_height="wrap_content"
+            android:layout_weight="0.5"
             android:text="@string/btnSub" />
 
     </LinearLayout>
@@ -56,6 +60,7 @@
         android:id="@+id/lblResult"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:layout_marginTop="20dp"
         android:text="@string/lblResult" />
 
 </LinearLayout>
