@@ -8,8 +8,10 @@
     <string name="btnNum0">0</string>
     <string name="lblNum1">First Number:</string>
     <string name="lblNum2">Second Number:</string>
-    <string name="btnAdd">Add</string>
-    <string name="btnSub">Subtract</string>
+    <string name="btnAdd">+</string>
+    <string name="btnSub">-</string>
     <string name="lblResult">Result:</string>
+    <string name="btnMul">*</string>
+    <string name="btnDiv">/</string>
 
 </resources>
