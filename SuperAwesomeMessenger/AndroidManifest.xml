@@ -59,6 +59,9 @@
             android:name="edu.tugraz.sw14.xp04.ActivityLogin"
             android:label="@string/title_activity_activity_login" >
         </activity>
+        <activity
+            android:name="edu.tugraz.sw14.xp04.ActivityRegistration"
+            android:label="@string/title_activity_activity_registration" >
+        </activity>
     </application>
-
 </manifest>
