@@ -142,6 +142,5 @@ public class ActivityMain extends Activity {
 
 	private void storeRegistrationId(Context context, String regid) {
 		ShPref.setShPrefString(context, ShPref.REG_ID, regid);
-
 	}
 }
