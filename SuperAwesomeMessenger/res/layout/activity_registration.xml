@@ -14,7 +14,7 @@
         android:id="@+id/a_login_lbl_registration"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="@string/lblRegistration"
+        android:text="@string/a_registration_lbl_registration"
         android:textAppearance="?android:attr/textAppearanceMedium" />
 
     <LinearLayout
@@ -27,7 +27,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:ems="10"
-            android:hint="@string/txtEmail" />
+            android:hint="@string/a_registration_txt_email" />
     </LinearLayout>
 
     <LinearLayout
@@ -40,7 +40,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:ems="10"
-            android:hint="@string/txtPassword"
+            android:hint="@string/a_registration_txt_password"
             android:inputType="textPassword" >
 
             <requestFocus />
@@ -57,7 +57,7 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:ems="10"
-            android:hint="@string/txtReenterPassword"
+            android:hint="@string/a_registration_txt_reenter_password"
             android:inputType="textPassword" >
 
             <requestFocus />
@@ -74,7 +74,7 @@
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="50"
-            android:text="@string/btnRegister" />
+            android:text="@string/a_registration_btn_register" />
     </LinearLayout>
 
 </LinearLayout>
