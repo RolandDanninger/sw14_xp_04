@@ -4,5 +4,8 @@
     <string name="app_name">SuperAwesomeMessenger</string>
     <string name="action_settings">Settings</string>
     <string name="hello_world">Hello world!</string>
+    <string name="title_activity_activity_launch">ActivityLaunch</string>
+    <string name="title_activity_activity_main">ActivityMain</string>
+    <string name="title_activity_activity_login">ActivityLogin</string>
 
 </resources>
