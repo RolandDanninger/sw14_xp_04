@@ -7,15 +7,18 @@
     <string name="title_activity_activity_launch">ActivityLaunch</string>
     <string name="title_activity_activity_main">ActivityMain</string>
     <string name="title_activity_activity_login">ActivityLogin</string>
-    <string name="lblWelcome">Welcome to SAM!</string>
-    <string name="lblID">ID</string>
-    <string name="btnLogin">Login</string>
-    <string name="btnRegister">Register</string>
-    <string name="txtEmail">Email</string>
-    <string name="txtPassword">Password</string>
     <string name="title_activity_activity_registration">ActivityRegistration</string>
-    <string name="lblRegistration">Register new user</string>
-    <string name="txtReenterPassword">Re-enter Password</string>
     <string name="title_activity_activity_home">ActivityHome</string>
-
+    
+    <string name="a_login_lbl_welcome">Welcome to SAM!</string>
+    <string name="a_login_txt_email">Email</string>
+    <string name="a_login_txt_password">Password</string>
+    <string name="a_login_btn_login">Login</string>
+    <string name="a_login_btn_register">Register</string>
+    
+    <string name="a_registration_lbl_registration">Register new user</string>
+    <string name="a_registration_txt_email">Email</string>
+    <string name="a_registration_txt_password">Password</string>
+    <string name="a_registration_txt_reenter_password">Re-enter Password</string>
+    <string name="a_registration_btn_register">Register</string>
 </resources>
