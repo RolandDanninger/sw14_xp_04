@@ -70,6 +70,8 @@ public class ServerConnection {
 
 		return res;
 	}
+	
+	
 	public RegistrationResponse registration(RegistrationRequest request) {
 		String entityJson = "";
 		try {

@@ -132,7 +132,7 @@ public class ActivityLogin extends Activity {
 		protected void onPostExecute(LoginResponse response) {
 			super.onPostExecute(response);
 			if (dialog != null) dialog.dismiss();
-			if(response == null) MToast.errorLogin(context, true);
+			if(response == null) MToast.error(context, true);
 			else {
 				if(response.isError()) MToast.errorLoginEmail(context, true);
 				else {
