@@ -10,10 +10,17 @@ import android.view.View.OnClickListener;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
+import edu.tugraz.sw14.xp04.gcm.GCM;
+import edu.tugraz.sw14.xp04.helpers.MApp;
 import edu.tugraz.sw14.xp04.helpers.MToast;
+import edu.tugraz.sw14.xp04.helpers.UserInfo;
+import edu.tugraz.sw14.xp04.server.ServerConnection;
+import edu.tugraz.sw14.xp04.stubs.LoginRequest;
 import edu.tugraz.sw14.xp04.stubs.LoginResponse;
 
 public class ActivityLogin extends Activity {
+	
+	private static final String SERVER_URL = "http://ip_adresse";
 
 	private Context context;
 	private EditText etEmail;
@@ -74,7 +81,7 @@ public class ActivityLogin extends Activity {
 	}
 
 	private void handlerBtnRegister() {
-
+		MApp.goToActivity(this, ActivityRegistration.class,	true);
 	}
 
 	private void doLogin(String email, String password) {
@@ -103,6 +110,19 @@ public class ActivityLogin extends Activity {
 
 		@Override
 		protected LoginResponse doInBackground(Void... params) {
+			LoginRequest request = new LoginRequest();
+			UserInfo info = GCM.loadIdPair(context);
+			if(info == null) return null;
+			String gmcId = info.getGcmRegId();
+			if(gmcId == null) return null;
+			request.setGcmId(gmcId);
+			request.setId(email);
+			request.setPassword(password);
+			
+			ServerConnection connection = new ServerConnection(SERVER_URL);
+			if(connection != null){
+				return connection.login(request);
+			}
 			return null;
 
 		}

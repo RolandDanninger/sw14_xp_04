@@ -25,19 +25,16 @@ public class ActivityLoginTest extends
 	}
 
 	public void testRegistrationSuccessfull() {
-		EditText txtID = (EditText) solo.getView(R.id.a_registration_txt_id);
+		EditText txtID = (EditText) solo.getView(R.id.a_login_txt_email);
 		EditText txtPassword = (EditText) solo
-				.getView(R.id.a_registration_txt_password);
-		EditText txtReenterPassword = (EditText) solo
-				.getView(R.id.a_registration_txt_reenter_password);
+				.getView(R.id.a_login_txt_password);
 
-		solo.enterText(txtID, "test@gmail.com");
+		solo.enterText(txtID, "fail@user.sw");
 		solo.enterText(txtPassword, "1234");
-		solo.enterText(txtReenterPassword, "1234");
 
-		solo.clickOnButton(solo.getString(R.string.a_registration_btn_register));
+		solo.clickOnButton(solo.getString(R.string.a_login_btn_login));
 
-		assertTrue(solo.waitForText("Registration successfull!"));
+		assertTrue(solo.waitForText("Email oder Passwort falsch!"));
 	}
 
 	public void testLoginFailedIDMissing() {
