@@ -10,6 +10,8 @@
     <string name="title_activity_activity_registration">ActivityRegistration</string>
     <string name="title_activity_activity_home">ActivityHome</string>
     
+    <string name="error">Error occured!</string>
+    
     <string name="a_login_lbl_welcome">Welcome to SAM!</string>
     <string name="a_login_txt_email">Email</string>
     <string name="a_login_txt_password">Password</string>

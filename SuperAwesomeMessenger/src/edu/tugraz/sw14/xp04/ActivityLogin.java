@@ -132,13 +132,13 @@ public class ActivityLogin extends Activity {
 		protected void onPostExecute(LoginResponse response) {
 			super.onPostExecute(response);
 			if (dialog != null) dialog.dismiss();
-			
-			if(response.isError()){
-				MToast.errorLoginEmail(context, true);
-			}
+			if(response == null) MToast.errorLogin(context, true);
 			else {
-				MToast.errorLoginEmail(context, true);
-				MApp.goToActivity((Activity)context, ActivityMain.class, true);
+				if(response.isError()) MToast.errorLoginEmail(context, true);
+				else {
+					MToast.errorLoginEmail(context, true);
+					MApp.goToActivity((Activity)context, ActivityMain.class, true);
+				}
 			}
 		}
 
