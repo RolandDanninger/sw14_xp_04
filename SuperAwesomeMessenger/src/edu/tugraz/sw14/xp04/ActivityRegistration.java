@@ -4,13 +4,25 @@ import android.app.Activity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.widget.Button;
+import android.widget.EditText;
 
 public class ActivityRegistration extends Activity {
+
+	private EditText txtId = null;
+	private EditText txtPassword = null;
+	private EditText txtPasswordRepeat = null;
+	private Button btnRegister = null;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_registration);
+
+		txtId = (EditText) findViewById(R.id.a_registration_txt_id);
+		txtPassword = (EditText) findViewById(R.id.a_registration_txt_password);
+		txtPasswordRepeat = (EditText) findViewById(R.id.a_registration_txt_reenter_password);
+		btnRegister = (Button) findViewById(R.id.a_registration_btn_register);
 	}
 
 	@Override
