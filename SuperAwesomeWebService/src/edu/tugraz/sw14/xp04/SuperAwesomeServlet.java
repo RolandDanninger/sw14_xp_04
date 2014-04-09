@@ -4,11 +4,10 @@ import java.io.IOException;
 
 import javax.persistence.EntityManager;
 import javax.servlet.ServletException;
-import javax.servlet.http.*;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
-import com.fasterxml.jackson.core.JsonGenerationException;
-import com.fasterxml.jackson.core.JsonParseException;
-import com.fasterxml.jackson.databind.JsonMappingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import edu.tugraz.sw14.xp04.entities.User;
@@ -61,27 +60,34 @@ public class SuperAwesomeServlet extends HttpServlet {
 		if (action == null) {
 			return;
 		}
-		if (action.compareTo("login") == 0) {
-			login(request, response);
+
+		try {
+			if (action.compareTo("login") == 0) {
+				login(request, response);
+			}
+		} catch (ServerException e) {
+
+		} catch (UserException e) {
+
 		}
 	}
 
-	private void login(HttpServletRequest request, HttpServletResponse response) {
+	private void login(HttpServletRequest request, HttpServletResponse response)
+			throws ServerException {
 		try {
 			LoginRequest req = jsonMapper.readValue(request.getInputStream(),
 					LoginRequest.class);
 		} catch (Exception e) {
-			e.printStackTrace();
+			throw new ServerException("Failed to parse LoginRequest.", e);
 		}
 
 		LoginResponse res = new LoginResponse();
-		res.setError(true);
 
 		try {
 			jsonMapper.writeValue(response.getOutputStream(), res);
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			throw new ServerException("Failed to parse LoginResponse to JSON.",
+					e);
 		}
 
 	}
