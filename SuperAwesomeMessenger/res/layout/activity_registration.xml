@@ -12,69 +12,57 @@
 
     <TextView
         android:id="@+id/a_registration_lbl_registration"
-        android:layout_width="wrap_content"
+        android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:text="@string/a_registration_lbl_registration"
         android:textAppearance="?android:attr/textAppearanceMedium" />
 
-    <LinearLayout
+    <TextView
+        android:id="@+id/a_registration_lbl_error"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/textfield_margin" >
+        android:layout_marginTop="@dimen/textfield_margin"
+        android:textColor="@color/error_text_fg"
+        android:visibility="gone" />
 
-        <EditText
-            android:id="@+id/a_registration_txt_id"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:ems="10"
-            android:hint="@string/a_registration_txt_email" />
-    </LinearLayout>
-
-    <LinearLayout
+    <EditText
+        android:id="@+id/a_registration_txt_id"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/textfield_margin" >
+        android:layout_marginTop="@dimen/textfield_margin"
+        android:ems="10"
+        android:inputType="textEmailAddress"
+        android:hint="@string/a_registration_txt_email" />
 
-        <EditText
-            android:id="@+id/a_registration_txt_password"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:ems="10"
-            android:hint="@string/a_registration_txt_password"
-            android:inputType="textPassword" >
-
-            <requestFocus />
-        </EditText>
-    </LinearLayout>
-
-    <LinearLayout
+    <EditText
+        android:id="@+id/a_registration_txt_password"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/textfield_margin" >
+        android:layout_marginTop="@dimen/textfield_margin"
+        android:ems="10"
+        android:hint="@string/a_registration_txt_password"
+        android:inputType="textPassword" >
 
-        <EditText
-            android:id="@+id/a_registration_txt_reenter_password"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:ems="10"
-            android:hint="@string/a_registration_txt_reenter_password"
-            android:inputType="textPassword" >
+        <requestFocus />
+    </EditText>
 
-            <requestFocus />
-        </EditText>
-    </LinearLayout>
-
-    <LinearLayout
+    <EditText
+        android:id="@+id/a_registration_txt_reenter_password"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/textfield_margin" >
+        android:layout_marginTop="@dimen/textfield_margin"
+        android:ems="10"
+        android:hint="@string/a_registration_txt_reenter_password"
+        android:inputType="textPassword" >
 
-        <Button
-            android:id="@+id/a_registration_btn_register"
-            android:layout_width="0dp"
-            android:layout_height="wrap_content"
-            android:layout_weight="50"
-            android:text="@string/a_registration_btn_register" />
-    </LinearLayout>
+        <requestFocus />
+    </EditText>
+
+    <Button
+        android:id="@+id/a_registration_btn_register"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:layout_marginTop="@dimen/textfield_margin"
+        android:text="@string/a_registration_btn_register" />
 
 </LinearLayout>
