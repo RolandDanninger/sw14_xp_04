@@ -11,7 +11,7 @@
     tools:context=".RegistrationActivity" >
 
     <TextView
-        android:id="@+id/a_login_lbl_registration"
+        android:id="@+id/a_registration_lbl_registration"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="@string/a_registration_lbl_registration"
@@ -23,7 +23,7 @@
         android:layout_marginTop="@dimen/textfield_margin" >
 
         <EditText
-            android:id="@+id/a_login_txt_id"
+            android:id="@+id/a_registration_txt_id"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:ems="10"
@@ -36,7 +36,7 @@
         android:layout_marginTop="@dimen/textfield_margin" >
 
         <EditText
-            android:id="@+id/a_login_txt_password"
+            android:id="@+id/a_registration_txt_password"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:ems="10"
@@ -53,7 +53,7 @@
         android:layout_marginTop="@dimen/textfield_margin" >
 
         <EditText
-            android:id="@+id/a_login_txt_reenter_password"
+            android:id="@+id/a_registration_txt_reenter_password"
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:ems="10"
@@ -70,7 +70,7 @@
         android:layout_marginTop="@dimen/textfield_margin" >
 
         <Button
-            android:id="@+id/a_login_btn_register"
+            android:id="@+id/a_registration_btn_register"
             android:layout_width="0dp"
             android:layout_height="wrap_content"
             android:layout_weight="50"
