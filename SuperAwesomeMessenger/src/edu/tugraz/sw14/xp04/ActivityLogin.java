@@ -20,8 +20,6 @@ import edu.tugraz.sw14.xp04.stubs.LoginResponse;
 
 public class ActivityLogin extends Activity {
 	
-	private static final String SERVER_URL = "http://ip_adresse";
-
 	private Context context;
 	private EditText etEmail;
 	private EditText etPassword;
@@ -120,7 +118,7 @@ public class ActivityLogin extends Activity {
 			request.setId(email);
 			request.setPassword(password);
 			
-			ServerConnection connection = new ServerConnection(SERVER_URL);
+			ServerConnection connection = new ServerConnection(ServerConnection.SERVER_URL);
 			if(connection != null){
 				response = connection.login(request);
 			}

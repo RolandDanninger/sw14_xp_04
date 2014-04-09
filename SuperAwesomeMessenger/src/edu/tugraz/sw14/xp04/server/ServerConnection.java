@@ -17,7 +17,11 @@ import edu.tugraz.sw14.xp04.stubs.LoginResponse;
 import edu.tugraz.sw14.xp04.stubs.RegistrationRequest;
 import edu.tugraz.sw14.xp04.stubs.RegistrationResponse;
 
+
 public class ServerConnection {
+	
+	public static final String SERVER_URL = "http://vernal-verve-538.appspot.com/";
+	
 	private String url = null;
 	private HttpClient httpClient = null;
 	private ObjectMapper jsonMapper;
@@ -72,7 +76,7 @@ public class ServerConnection {
 	}
 	
 	
-	public RegistrationResponse registration(RegistrationRequest request) {
+	public RegistrationResponse register(RegistrationRequest request) {
 		String entityJson = "";
 		try {
 			entityJson = jsonMapper.writeValueAsString(request);
