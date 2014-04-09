@@ -27,5 +27,8 @@
     <string name="a_registration_error_passwords_mismatch">The entered passwords do not match!</string>
     <string name="a_registration_error_invalid_id">The entered id is not a valid email address!</string>
     <string name="a_registration_success">Registration Successful!</string>
-    <string name="error_login">Email oder Passwort falsch!</string>
+    <string name="a_login_error_login">Login failed</string>
+    <string name="a_login_error_login_email">Please enter an email address in the ID field!</string>
+    <string name="a_login_error_login_password">Please enter a password!</string>
+    <string name="a_login_success_login">Logged in</string>
 </resources>
