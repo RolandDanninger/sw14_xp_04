@@ -3,19 +3,19 @@ package edu.tugraz.sw14.xp04;
 import java.io.IOException;
 import java.util.concurrent.atomic.AtomicInteger;
 
-import com.google.android.gms.common.ConnectionResult;
-import com.google.android.gms.common.GooglePlayServicesUtil;
-import com.google.android.gms.gcm.GoogleCloudMessaging;
-
-import edu.tugraz.sw14.xp04.gcm.GCM;
-import edu.tugraz.sw14.xp04.gcm.IdPair;
-import edu.tugraz.sw14.xp04.helpers.MApp;
-import edu.tugraz.sw14.xp04.helpers.ShPref;
 import android.app.Activity;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
+
+import com.google.android.gms.common.ConnectionResult;
+import com.google.android.gms.common.GooglePlayServicesUtil;
+import com.google.android.gms.gcm.GoogleCloudMessaging;
+
+import edu.tugraz.sw14.xp04.gcm.GCM;
+import edu.tugraz.sw14.xp04.helpers.MApp;
+import edu.tugraz.sw14.xp04.helpers.UserInfo;
 
 public class ActivityLaunch extends Activity {
 
@@ -35,7 +35,7 @@ public class ActivityLaunch extends Activity {
 
 		if (checkPlayServices()) {
 			gcm = GoogleCloudMessaging.getInstance(context);
-			IdPair pair = GCM.loadIdPair(context);
+			UserInfo pair = GCM.loadIdPair(context);
 			if (pair == null)
 				regid = null;
 			else
@@ -44,12 +44,11 @@ public class ActivityLaunch extends Activity {
 				registerInBackground();
 			else {
 				Log.d("gcm", regid);
-				MApp.goToActivity(this, ActivityMain.class, true);
+				goToTarget();
 			}
 		} else {
 			Log.i("checkPlayService", "No valid google play apk found.");
-			// TODO
-			// MApp.goToActivity(this, ActivityNoPlayService.class, true);
+			goToError();
 		}
 
 	}
@@ -73,7 +72,6 @@ public class ActivityLaunch extends Activity {
 						PLAY_SERVICES_RESOLUTION_REQUEST).show();
 			} else {
 				Log.i("checkPlayService", "This device is not supported.");
-				// finish();
 			}
 			return false;
 		}
@@ -96,24 +94,9 @@ public class ActivityLaunch extends Activity {
 				regid = gcm.register(GCM.PROJECT_NUMBER);
 				msg = "Device registered, registration ID=" + regid;
 
-				// You should send the registration ID to your server over HTTP,
-				// so it can use GCM/HTTP or CCS to send messages to your app.
-				// The request to your server should be authenticated if your
-				// app
-				// is using accounts.
-				// sendRegistrationIdToBackend();
-
-				// For this demo: we don't need to send it because the device
-				// will send upstream messages to a server that echo back the
-				// message using the 'from' address in the message.
-
-				// Persist the regID - no need to register again.
 				storeRegistrationId(context, regid);
 			} catch (IOException ex) {
 				msg = "Error :" + ex.getMessage();
-				// If there is an error, don't just keep trying to register.
-				// Require the user to click a button again, or perform
-				// exponential back-off.
 			}
 			return msg;
 
@@ -122,18 +105,39 @@ public class ActivityLaunch extends Activity {
 		@Override
 		protected void onPostExecute(String result) {
 			super.onPostExecute(result);
-			Log.d("gcm", result);
+			if (result != null) {
+				goToTarget();
+				Log.d("gcm", result);
+			} else {
+				goToError();
+			}
 		}
 
 	}
 
 	private void storeRegistrationId(Context context, String regid) {
-		IdPair pair = GCM.loadIdPair(context);
+		UserInfo pair = GCM.loadIdPair(context);
 		if (pair == null) {
-			pair = new IdPair(regid);
+			pair = new UserInfo(regid);
 		}
 
 		pair.setDeviceServerId(regid);
 		GCM.storeIdPair(context, pair);
+	}
+
+	private boolean isLoggedIn() {
+		return false;
+	}
+
+	private void goToTarget() {
+		if (isLoggedIn())
+			MApp.goToActivity(this, ActivityMain.class, true);
+		else
+			MApp.goToActivity(this, ActivityLogin.class, true);
+	}
+
+	private void goToError() {
+		// TODO
+		// MApp.goToActivity(this, ActivityNoPlayService, true);
 	}
 }
