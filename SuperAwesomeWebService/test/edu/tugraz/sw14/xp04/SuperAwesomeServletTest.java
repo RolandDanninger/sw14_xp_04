@@ -1,22 +1,32 @@
 package edu.tugraz.sw14.xp04;
-import static org.easymock.EasyMock.createMock;
+
+import static org.easymock.EasyMock.createMock;
 import static org.easymock.EasyMock.expect;
-import static org.easymock.EasyMock.expectLastCall;
 
 import java.io.IOException;
 import java.io.PrintWriter;
 
 import javax.servlet.ServletException;
+import javax.servlet.ServletInputStream;
+import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 import junit.framework.TestCase;
 
 import org.easymock.EasyMock;
+import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
-import edu.tugraz.sw14.xp04.SuperAwesomeServlet;
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.appengine.tools.development.testing.LocalDatastoreServiceTestConfig;
+import com.google.appengine.tools.development.testing.LocalServiceTestHelper;
+
+import edu.tugraz.sw14.xp04.entities.dao.UserDAO;
+import edu.tugraz.sw14.xp04.stubs.RegistrationRequest;
 
 public class SuperAwesomeServletTest extends TestCase {
 
@@ -31,6 +41,9 @@ public class SuperAwesomeServletTest extends TestCase {
 		}
 	}
 	
+	private final LocalServiceTestHelper helper =
+            new LocalServiceTestHelper(new LocalDatastoreServiceTestConfig());
+	
 	private ServletTest servlet = new ServletTest();
 	private HttpServletResponse responseMock;
 	private HttpServletRequest requestMock;
@@ -38,10 +51,17 @@ public class SuperAwesomeServletTest extends TestCase {
 	
 	@Before
 	public void setUp() {
+		helper.setUp();
+		
 		responseMock = createMock(HttpServletResponse.class);
 		requestMock  = createMock(HttpServletRequest.class);
 		
 		printWriterMock = createMock(PrintWriter.class);
+	}
+	
+	@After
+	public void tearDown() {
+		helper.tearDown();
 	}
 	
 	@Test
@@ -57,79 +77,103 @@ public class SuperAwesomeServletTest extends TestCase {
 	}
 	
 	@Test
-	public void testEmptyRegistrationRequest() throws IOException, ServletException {
-
+	public void testRegistrationRequest() throws IOException, ServletException {
 		// Fixture Setup
+		final String email = "email@email.com";
+		final String name  = "asdf";
+		final String password = "pw"; 
+		
+		RegistrationRequest request = new RegistrationRequest();
+		request.setId(email);
+		request.setName(name);
+		request.setPassword(password);
 		
 		// Request
 		expect(requestMock.getParameter("action")).andReturn("register");
-		expect(requestMock.getInputStream()).andReturn(null);
+		expect(requestMock.getInputStream()).andReturn(createInputStream(request));
 		
 		// Response
-		expect(responseMock.getOutputStream()).andReturn(null);
-		printWriterMock.println("{\"error\":true,\"errorMessage\":\"no registration data\"}");
-		expectLastCall();
+		expect(responseMock.getOutputStream()).andReturn(createEmptyServletOutputStream());
 		
 		EasyMock.replay(requestMock);
 		EasyMock.replay(responseMock);
-		EasyMock.replay(printWriterMock);
 			
 		// Exercise
 		servlet.doPost(requestMock, responseMock);
 		
 		// Verify
+		UserDAO dao = new UserDAO();
+		Assert.assertTrue(dao.userExistsByEmail(email));
 		EasyMock.verify(requestMock);
 		EasyMock.verify(responseMock);
-		EasyMock.verify(printWriterMock);
 	}
 	
-	@Test
-	public void testInvalidRegistrationRequest() throws IOException, ServletException {
-
-		// Fixture Setup
-		
-		// Request
-		expect(requestMock.getParameter("action")).andReturn("register");
-		expect(requestMock.getParameter("registrationData")).andReturn("{\"horst\": true}");
-		
-		EasyMock.replay(requestMock);
-		
-		// Exercise
-		servlet.doPost(requestMock, responseMock);
-		
-		// Verify
-		EasyMock.verify(requestMock);
-		
-		//TODO: implement testcase and server logic
-		fail();
-	}
+//	@Test
+//	public void testLoginRequest() throws IOException, ServletException {
+//		// Fixture Setup
+//		final String email = "email@email.com";
+//		final String name  = "asdf";
+//		final String password = "pw"; 
+//		
+//		LoginRequest request = new LoginRequest();
+//		request.setId(email);
+//		request.setPassword(password);
+//		
+//		// Request
+//		expect(requestMock.getParameter("action")).andReturn("register");
+//		expect(requestMock.getInputStream()).andReturn(createInputStream(request));
+//		
+//		// Response
+//		expect(responseMock.getOutputStream()).andReturn(createEmptyServletOutputStream());
+//		
+//		EasyMock.replay(requestMock);
+//		EasyMock.replay(responseMock);
+//			
+//		// Exercise
+//		servlet.doPost(requestMock, responseMock);
+//		
+//		// Verify
+//		UserDAO dao = new UserDAO();
+//		Assert.assertTrue(dao.userExistsByEmail(email));
+//		EasyMock.verify(requestMock);
+//		EasyMock.verify(responseMock);
+//	}
 	
-	@Test
-	public void testRegistration() throws IOException, ServletException {
-
-		// Fixture Setup
-		
-		// Request
-		expect(requestMock.getParameter("action")).andReturn("register");
-		//TODO: replace with real JSON
-		expect(requestMock.getParameter("registrationData")).andReturn("{asdasdasdas}"); 
-		
-		// Response
-		expect(responseMock.getWriter()).andReturn(printWriterMock);
-		printWriterMock.println("{\"error\":false,\"errorMessage\":null}");
-		expectLastCall();
-		
-		EasyMock.replay(requestMock);
-		EasyMock.replay(responseMock);
-		EasyMock.replay(printWriterMock);
+	private ServletInputStream createInputStream(final String input) {
+		return new ServletInputStream() {
+			int i = 0;
+			String json = input;
 			
-		// Exercise
-		servlet.doPost(requestMock, responseMock);
-		
-		// Verify
-		EasyMock.verify(requestMock);
-		EasyMock.verify(responseMock);
-		EasyMock.verify(printWriterMock);
+			@Override
+			public int read() throws IOException {
+				if(i >= json.length()) {
+					return -1;
+				}
+				int charCode = (int)json.charAt(i);
+				i++;
+				return charCode;
+			}
+		};
 	}
 	
+	private ServletInputStream createInputStream(RegistrationRequest request) {
+		ObjectMapper mapper = new ObjectMapper();
+		String json;
+		try {
+			json = mapper.writeValueAsString(request);
+			return createInputStream(json);
+		} catch (JsonProcessingException e) {
+		}
+		
+		fail("couldn't parse request");
+		return null;
+	}
+	
+	private ServletOutputStream createEmptyServletOutputStream() {
+		return new ServletOutputStream() {
+			@Override
+			public void write(int b) throws IOException {
+			}
+		};
+	}
 }

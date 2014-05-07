@@ -2,15 +2,11 @@ package edu.tugraz.sw14.xp04.controller;
 
 import static org.easymock.EasyMock.createMock;
 import static org.easymock.EasyMock.expect;
-
-import javax.servlet.http.HttpServletResponse;
-
-import org.easymock.EasyMock;
-import org.junit.Assert;
-
 import junit.framework.TestCase;
 
+import org.easymock.EasyMock;
 import org.junit.After;
+import org.junit.Assert;
 import org.junit.Before;
 import org.junit.Test;
 
