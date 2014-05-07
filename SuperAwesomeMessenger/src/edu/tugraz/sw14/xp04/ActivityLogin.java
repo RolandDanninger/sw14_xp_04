@@ -20,8 +20,6 @@ import edu.tugraz.sw14.xp04.stubs.LoginResponse;
 
 public class ActivityLogin extends Activity {
 	
-	private static final String SERVER_URL = "http://ip_adresse";
-
 	private Context context;
 	private EditText etEmail;
 	private EditText etPassword;
@@ -68,11 +66,11 @@ public class ActivityLogin extends Activity {
 		String password = etPassword.getText().toString();
 
 		if (email == null || email.isEmpty()) {
-			MToast.errorLogin(context, true);
+			MToast.errorLoginEmail(context, true);
 			return;
 		}
 		if (password == null || password.isEmpty()) {
-			MToast.errorLogin(context, true);
+			MToast.errorLoginPassword(context, true);
 			return;
 		}
 
@@ -110,6 +108,7 @@ public class ActivityLogin extends Activity {
 
 		@Override
 		protected LoginResponse doInBackground(Void... params) {
+			LoginResponse response = null;
 			LoginRequest request = new LoginRequest();
 			UserInfo info = GCM.loadIdPair(context);
 			if(info == null) return null;
@@ -119,21 +118,29 @@ public class ActivityLogin extends Activity {
 			request.setId(email);
 			request.setPassword(password);
 			
-			ServerConnection connection = new ServerConnection(SERVER_URL);
+			ServerConnection connection = new ServerConnection(ServerConnection.SERVER_URL);
 			if(connection != null){
-				return connection.login(request);
+				response = connection.login(request);
 			}
-			return null;
+			return response;
 
 		}
 
 		@Override
-		protected void onPostExecute(LoginResponse result) {
-			super.onPostExecute(result);
-			if (dialog != null)
-				dialog.dismiss();
-
+		protected void onPostExecute(LoginResponse response) {
+			super.onPostExecute(response);
+			if (dialog != null) dialog.dismiss();
+			if(response == null) MToast.error(context, true);
+			else {
+				if(response.isError()) MToast.errorLoginEmail(context, true);
+				else {
+					MToast.errorLoginEmail(context, true);
+					MApp.goToActivity((Activity)context, ActivityMain.class, true);
+				}
+			}
 		}
 
 	}
 }
+
+	

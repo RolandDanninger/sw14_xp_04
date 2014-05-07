@@ -24,7 +24,7 @@ public class ActivityLoginTest extends
 		solo.finishOpenedActivities();
 	}
 
-	public void testRegistrationSuccessfull() {
+	public void testLoginOnFail() {
 		EditText txtID = (EditText) solo.getView(R.id.a_login_txt_email);
 		EditText txtPassword = (EditText) solo
 				.getView(R.id.a_login_txt_password);
@@ -34,7 +34,20 @@ public class ActivityLoginTest extends
 
 		solo.clickOnButton(solo.getString(R.string.a_login_btn_login));
 
-		assertTrue(solo.waitForText("Email oder Passwort falsch!"));
+		assertTrue(solo.waitForText(solo.getString(R.string.a_login_error_login)));
+	}
+	
+	public void testLoginOnSuccess() {
+		EditText txtID = (EditText) solo.getView(R.id.a_login_txt_email);
+		EditText txtPassword = (EditText) solo
+				.getView(R.id.a_login_txt_password);
+
+		solo.enterText(txtID, "success@user.sw");
+		solo.enterText(txtPassword, "1234");
+
+		solo.clickOnButton(solo.getString(R.string.a_login_btn_login));
+
+		assertTrue(solo.waitForText(solo.getString(R.string.a_login_success_login)));
 	}
 
 	public void testLoginFailedIDMissing() {
@@ -47,7 +60,7 @@ public class ActivityLoginTest extends
 
 		solo.clickOnButton(solo.getString(R.string.a_login_btn_login));
 
-		assertTrue(solo.waitForText("Email oder Passwort falsch!"));
+		assertTrue(solo.waitForText(solo.getString(R.string.a_login_error_login_email)));
 	}
 
 	public void testLoginFailedPasswordMissing() {
@@ -60,7 +73,7 @@ public class ActivityLoginTest extends
 
 		solo.clickOnButton(solo.getString(R.string.a_login_btn_login));
 
-		assertTrue(solo.waitForText("Email oder Passwort falsch!"));
+		assertTrue(solo.waitForText(solo.getString(R.string.a_login_error_login_password)));
 	}
 
 }
