@@ -41,12 +41,12 @@ public class SuperAwesomeServlet extends HttpServlet {
 //	UserDAO user_dao = new UserDAO();
 //
 //
-//		try {
-//			register(request, response);
-//		} catch (ServerException | UserException e1) {
-//			// TODO Auto-generated catch block
-//			e1.printStackTrace();
-//		}
+		try {
+			login(request, response);
+		} catch (ServerException | UserException e1) {
+			// TODO Auto-generated catch block
+			e1.printStackTrace();
+		}
 //		
 //		User newUser = new User();
 //		newUser.setName(action);
@@ -110,7 +110,6 @@ public class SuperAwesomeServlet extends HttpServlet {
 		} else {
 			String req_pw = req.getPassword();
 			if (req_pw.compareTo(user_dao.getUserByEmail(req.getId()).getPassword()) == 0) {
-				// DO LOGIN STUFF
 				res.setError(false);
 				res.setId(req.getId());
 			} else {
@@ -145,7 +144,7 @@ public class SuperAwesomeServlet extends HttpServlet {
 			throw new ServerException("Failed to parse LoginRequest.", e);
 		}
 		
-		if (checkInput(req, res))
+		if (checkRegistrationInput(req, res))
 		{
 			user_dao.insertUser(req.getName(), req.getId(), req.getPassword());
 		}
@@ -157,7 +156,7 @@ public class SuperAwesomeServlet extends HttpServlet {
 		}
 	}
 	
-	private boolean checkInput(Request req, Response res)
+	private boolean checkRegistrationInput(RegistrationRequest req, Response res)
 	{
 		UserDAO userDao = new UserDAO();
 		if (req.getPassword() == null || req.getPassword().equals(""))
