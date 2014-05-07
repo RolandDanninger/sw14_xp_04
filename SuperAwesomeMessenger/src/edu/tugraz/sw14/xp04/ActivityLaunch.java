@@ -38,12 +38,13 @@ public class ActivityLaunch extends Activity {
 			UserInfo pair = GCM.loadIdPair(context);
 			if (pair == null)
 				regid = null;
-			else
+			else {
 				regid = pair.getGcmRegId();
+			}
 			if (regid == null)
 				registerInBackground();
 			else {
-				Log.d("gcm", regid);
+				Log.d("gcm", "registration id loaded: " + regid);
 				goToTarget();
 			}
 		} else {
