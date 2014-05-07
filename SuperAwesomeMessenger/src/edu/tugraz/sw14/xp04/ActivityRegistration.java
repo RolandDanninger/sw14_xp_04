@@ -149,9 +149,10 @@ public class ActivityRegistration extends Activity implements OnClickListener {
 				return null;
 			request.setId(email);
 			request.setPassword(password);
+			request.setName(email);
 
-			ServerConnection connection = new ServerConnection(
-					ServerConnection.SERVER_URL);
+			MApp app = MApp.getApp(context);
+			ServerConnection connection = app.getServerConnection();
 			if (connection != null) {
 				try {
 					response = connection.register(request);

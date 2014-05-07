@@ -1,7 +1,5 @@
 package edu.tugraz.sw14.xp04;
 
-import org.apache.http.protocol.ResponseServer;
-
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -123,8 +121,8 @@ public class ActivityLogin extends Activity {
 			request.setId(email);
 			request.setPassword(password);
 
-			ServerConnection connection = new ServerConnection(
-					ServerConnection.SERVER_URL);
+			MApp app = MApp.getApp(context);
+			ServerConnection connection = app.getServerConnection();
 			if (connection != null) {
 				try {
 					response = connection.login(request);
@@ -147,11 +145,10 @@ public class ActivityLogin extends Activity {
 				MToast.error(context, true);
 			else {
 				if (response.isError())
-					MToast.errorLoginEmail(context, true);
+					MToast.errorLogin(context, true);
 				else {
-					MToast.errorLoginEmail(context, true);
-					MApp.goToActivity((Activity) context, ActivityMain.class,
-							true);
+					MApp.goToActivity((Activity) context,
+							ActivitySendTestMessage.class, true);
 				}
 			}
 		}
