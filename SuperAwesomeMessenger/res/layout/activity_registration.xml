@@ -17,6 +17,12 @@
         android:text="@string/a_registration_lbl_registration"
         android:textAppearance="?android:attr/textAppearanceMedium" />
 
+    <ImageView
+        android:id="@+id/a_registration_img_logo"
+        android:layout_width="wrap_content"
+        android:layout_height="@dimen/logo_height"
+        android:src="@drawable/logo_sam" />
+    
     <TextView
         android:id="@+id/a_registration_lbl_error"
         android:layout_width="match_parent"

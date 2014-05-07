@@ -17,39 +17,35 @@
         android:text="@string/a_login_lbl_welcome"
         android:textAppearance="?android:attr/textAppearanceMedium" />
 
-    <LinearLayout
+    <ImageView
+        android:id="@+id/a_login_img_logo"
+        android:layout_width="wrap_content"
+        android:layout_height="@dimen/logo_height"
+        android:src="@drawable/logo_sam" />
+
+    <EditText
+        android:id="@+id/a_login_txt_email"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/textfield_margin" >
+        android:ems="10"
+        android:inputType="textEmailAddress"
+        android:hint="@string/a_login_txt_email" />
 
-        <EditText
-            android:id="@+id/a_login_txt_email"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:ems="10"
-            android:hint="@string/a_login_txt_email" />
-    </LinearLayout>
-
-    <LinearLayout
+    <EditText
+        android:id="@+id/a_login_txt_password"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
-        android:layout_marginTop="@dimen/textfield_margin" >
+        android:ems="10"
+        android:hint="@string/a_login_txt_password"
+        android:inputType="textPassword" >
 
-        <EditText
-            android:id="@+id/a_login_txt_password"
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:ems="10"
-            android:hint="@string/a_login_txt_password"
-            android:inputType="textPassword" >
-
-            <requestFocus />
-        </EditText>
-    </LinearLayout>
+        <requestFocus />
+    </EditText>
 
     <LinearLayout
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:orientation="horizontal"
         android:layout_marginTop="@dimen/textfield_margin" >
 
         <Button
@@ -67,7 +63,6 @@
             android:layout_height="wrap_content"
             android:layout_weight="50"
             android:text="@string/a_login_btn_register" />
-
     </LinearLayout>
 
 </LinearLayout>
