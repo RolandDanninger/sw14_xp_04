@@ -9,28 +9,30 @@
     <string name="title_activity_activity_login">ActivityLogin</string>
     <string name="title_activity_activity_registration">ActivityRegistration</string>
     <string name="title_activity_activity_home">ActivityHome</string>
-    
     <string name="error">Error occured!</string>
-    
     <string name="a_login_lbl_welcome">Welcome to SAM!</string>
     <string name="a_login_txt_email">Email</string>
     <string name="a_login_txt_password">Password</string>
     <string name="a_login_btn_login">Login</string>
     <string name="a_login_btn_register">Register</string>
-    
     <string name="a_registration_lbl_registration">Register new user</string>
     <string name="a_registration_txt_email">Email</string>
     <string name="a_registration_txt_password">Password</string>
     <string name="a_registration_txt_reenter_password">Re-enter Password</string>
     <string name="a_registration_btn_register">Register</string>
-    
     <string name="a_registration_error_missing_id">Please enter an email address in the ID field!</string>
     <string name="a_registration_error_missing_password">Please enter a password!</string>
     <string name="a_registration_error_passwords_mismatch">The entered passwords do not match!</string>
     <string name="a_registration_error_invalid_id">The entered id is not a valid email address!</string>
     <string name="a_registration_success">Registration Successful!</string>
+    <string name="a_registration_error_registration">Registration failed!</string>
     <string name="a_login_error_login">Login failed</string>
     <string name="a_login_error_login_email">Please enter an email address in the ID field!</string>
     <string name="a_login_error_login_password">Please enter a password!</string>
     <string name="a_login_success_login">Logged in</string>
+    <string name="title_activity_activity_send_test_message">ActivitySendTestMessage</string>
+    <string name="a_sendtestmessage_txt_id">ID...</string>
+    <string name="a_sendtestmessage_txt_message_hint">Message...</string>
+    <string name="a_sendtestmessage_btn_send">Send</string>
+
 </resources>

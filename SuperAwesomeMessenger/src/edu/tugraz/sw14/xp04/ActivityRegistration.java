@@ -19,13 +19,14 @@ import edu.tugraz.sw14.xp04.helpers.MApp;
 import edu.tugraz.sw14.xp04.helpers.MToast;
 import edu.tugraz.sw14.xp04.helpers.UserInfo;
 import edu.tugraz.sw14.xp04.server.ServerConnection;
+import edu.tugraz.sw14.xp04.server.ServerConnectionException;
 import edu.tugraz.sw14.xp04.stubs.RegistrationRequest;
 import edu.tugraz.sw14.xp04.stubs.RegistrationResponse;
 
 public class ActivityRegistration extends Activity implements OnClickListener {
-	
+
 	private Context context;
-	
+
 	private EditText txtId = null;
 	private EditText txtPassword = null;
 	private EditText txtPasswordRepeat = null;
@@ -37,7 +38,7 @@ public class ActivityRegistration extends Activity implements OnClickListener {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_registration);
 		context = this;
-		
+
 		txtId = (EditText) findViewById(R.id.a_registration_txt_id);
 		txtPassword = (EditText) findViewById(R.id.a_registration_txt_password);
 		txtPasswordRepeat = (EditText) findViewById(R.id.a_registration_txt_reenter_password);
@@ -76,8 +77,8 @@ public class ActivityRegistration extends Activity implements OnClickListener {
 			break;
 		}
 	}
-	
-	private void handlerBtnRegister(){
+
+	private void handlerBtnRegister() {
 		String id = txtId.getText().toString();
 		String password = txtPassword.getText().toString();
 		String passwordRepeat = txtPasswordRepeat.getText().toString();
@@ -97,7 +98,7 @@ public class ActivityRegistration extends Activity implements OnClickListener {
 			lblError.setVisibility(View.VISIBLE);
 			return;
 		}
-		
+
 		boolean idValid = android.util.Patterns.EMAIL_ADDRESS.matcher(id)
 				.matches();
 		if (!idValid) {
@@ -110,12 +111,13 @@ public class ActivityRegistration extends Activity implements OnClickListener {
 		Toast.makeText(this, R.string.a_registration_success,
 				Toast.LENGTH_SHORT).show();
 	}
-	
+
 	private void doRegister(String email, String password) {
 		new RegisterTask(email, password).execute((Void[]) null);
 	}
 
-	private class RegisterTask extends AsyncTask<Void, Void, RegistrationResponse> {
+	private class RegisterTask extends
+			AsyncTask<Void, Void, RegistrationResponse> {
 
 		private ProgressDialog dialog;
 		private final String email;
@@ -140,30 +142,41 @@ public class ActivityRegistration extends Activity implements OnClickListener {
 			RegistrationResponse response = null;
 			RegistrationRequest request = new RegistrationRequest();
 			UserInfo info = GCM.loadIdPair(context);
-			if(info == null) return null;
+			if (info == null)
+				return null;
 			String gmcId = info.getGcmRegId();
-			if(gmcId == null) return null;
+			if (gmcId == null)
+				return null;
 			request.setId(email);
 			request.setPassword(password);
-			
-			ServerConnection connection = new ServerConnection(ServerConnection.SERVER_URL);
-			if(connection != null){
-				response = connection.register(request);
+
+			ServerConnection connection = new ServerConnection(
+					ServerConnection.SERVER_URL);
+			if (connection != null) {
+				try {
+					response = connection.register(request);
+					return response;
+				} catch (ServerConnectionException e) {
+					e.printStackTrace();
+				}
 			}
-			return response;
+			return null;
 
 		}
 
 		@Override
 		protected void onPostExecute(RegistrationResponse response) {
 			super.onPostExecute(response);
-			if (dialog != null) dialog.dismiss();
-			if(response == null) MToast.error(context, true);
+			if (dialog != null)
+				dialog.dismiss();
+			if (response == null)
+				MToast.error(context, true);
 			else {
-				if(response.isError()) MToast.errorLoginEmail(context, true);
+				if (response.isError())
+					MToast.errorRegister(context, true);
 				else {
-					MToast.errorLoginEmail(context, true);
-					MApp.goToActivity((Activity)context, ActivityMain.class, true);
+					MApp.goToActivity((Activity) context, ActivityMain.class,
+							true);
 				}
 			}
 		}
