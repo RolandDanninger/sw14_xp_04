@@ -34,4 +34,10 @@ public class MToast {
 				context.getString(R.string.a_login_error_login_password),
 				isShort ? Toast.LENGTH_SHORT : Toast.LENGTH_LONG).show();
 	}
+
+	public static void errorSendMessage(Context context, boolean isShort) {
+		Toast.makeText(context,
+				context.getString(R.string.a_sendmessage_error),
+				isShort ? Toast.LENGTH_SHORT : Toast.LENGTH_LONG).show();
+	}
 }

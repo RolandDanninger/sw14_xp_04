@@ -9,6 +9,9 @@ import org.apache.http.entity.StringEntity;
 import org.apache.http.impl.client.DefaultHttpClient;
 import org.apache.http.message.BasicHeader;
 
+import android.util.Log;
+
+import com.fasterxml.jackson.core.JsonEncoding;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -16,6 +19,8 @@ import edu.tugraz.sw14.xp04.stubs.LoginRequest;
 import edu.tugraz.sw14.xp04.stubs.LoginResponse;
 import edu.tugraz.sw14.xp04.stubs.RegistrationRequest;
 import edu.tugraz.sw14.xp04.stubs.RegistrationResponse;
+import edu.tugraz.sw14.xp04.stubs.SendMessageRequest;
+import edu.tugraz.sw14.xp04.stubs.SendMessageResponse;
 
 public class ServerConnection {
 
@@ -111,6 +116,47 @@ public class ServerConnection {
 		try {
 			res = jsonMapper.readValue(httpResponse.getEntity().getContent(),
 					RegistrationResponse.class);
+		} catch (Exception e) {
+			throw new ServerConnectionException(RES_PARSE_FAILED, e);
+		}
+
+		return res;
+	}
+
+	public SendMessageResponse sendMessage(SendMessageRequest request)
+			throws ServerConnectionException {
+		String entityJson = "";
+		try {
+			entityJson = jsonMapper.writeValueAsString(request);
+		} catch (JsonProcessingException e) {
+			throw new ServerConnectionException(REQ_PARSE_FAILED, e);
+		}
+
+		// entityJson = "{\"receiverId\":\"" + request.getReceiverId()
+		// + "\", \"message\":\"" + request.getMessage() + "\"}";
+
+		StringEntity httpEntity = null;
+		try {
+			httpEntity = new StringEntity(entityJson);
+		} catch (UnsupportedEncodingException e) {
+			throw new ServerConnectionException(ENTITY_CREATION_FAILED, e);
+		}
+
+		HttpPost httpPost = createHttpPost("send", httpEntity);
+
+		HttpResponse httpResponse = null;
+		try {
+			Log.d("post_request", entityJson);
+			httpResponse = httpClient.execute(httpPost);
+
+		} catch (Exception e) {
+			throw new ServerConnectionException(REQ_SEND_FAILED, e);
+		}
+
+		SendMessageResponse res = null;
+		try {
+			res = jsonMapper.readValue(httpResponse.getEntity().getContent(),
+					SendMessageResponse.class);
 		} catch (Exception e) {
 			throw new ServerConnectionException(RES_PARSE_FAILED, e);
 		}
