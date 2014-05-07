@@ -121,7 +121,8 @@ public class SuperAwesomeServlet extends HttpServlet {
 		try {
 			req = jsonMapper.readValue(request.getInputStream(), SendMessageRequest.class);
 		} catch (Exception e) {
-			throw new ServerException("Failed to parse LoginRequest.", e);
+			System.err.println("Failed to parse SendMessageRequest.");
+			throw new ServerException("Failed to parse SendMessageRequest.", e);
 		}
 		
 //		HttpClient client = new DefaultHttpClient();
@@ -135,6 +136,7 @@ public class SuperAwesomeServlet extends HttpServlet {
 			url = new URL("https://android.googleapis.com/gcm/send");
 		}
 		catch(MalformedURLException e) {
+			System.err.println("invalid url sendMessage");
 			throw new ServerException("invalid url sendMessage");
 		}
 		
@@ -183,6 +185,7 @@ public class SuperAwesomeServlet extends HttpServlet {
 	        	bReader.close();
 	        }
 	        else {
+	        	System.err.println("Post failed with error code ");
 	        	throw new IOException("Post failed with error code " + status);
 	        }
 		}
