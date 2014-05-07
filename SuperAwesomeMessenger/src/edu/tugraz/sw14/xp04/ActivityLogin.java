@@ -1,5 +1,7 @@
 package edu.tugraz.sw14.xp04;
 
+import org.apache.http.protocol.ResponseServer;
+
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
@@ -15,11 +17,12 @@ import edu.tugraz.sw14.xp04.helpers.MApp;
 import edu.tugraz.sw14.xp04.helpers.MToast;
 import edu.tugraz.sw14.xp04.helpers.UserInfo;
 import edu.tugraz.sw14.xp04.server.ServerConnection;
+import edu.tugraz.sw14.xp04.server.ServerConnectionException;
 import edu.tugraz.sw14.xp04.stubs.LoginRequest;
 import edu.tugraz.sw14.xp04.stubs.LoginResponse;
 
 public class ActivityLogin extends Activity {
-	
+
 	private Context context;
 	private EditText etEmail;
 	private EditText etPassword;
@@ -79,7 +82,7 @@ public class ActivityLogin extends Activity {
 	}
 
 	private void handlerBtnRegister() {
-		MApp.goToActivity(this, ActivityRegistration.class,	true);
+		MApp.goToActivity(this, ActivityRegistration.class, true);
 	}
 
 	private void doLogin(String email, String password) {
@@ -111,36 +114,47 @@ public class ActivityLogin extends Activity {
 			LoginResponse response = null;
 			LoginRequest request = new LoginRequest();
 			UserInfo info = GCM.loadIdPair(context);
-			if(info == null) return null;
+			if (info == null)
+				return null;
 			String gmcId = info.getGcmRegId();
-			if(gmcId == null) return null;
+			if (gmcId == null)
+				return null;
 			request.setGcmId(gmcId);
 			request.setId(email);
 			request.setPassword(password);
-			
-			ServerConnection connection = new ServerConnection(ServerConnection.SERVER_URL);
-			if(connection != null){
-				response = connection.login(request);
+
+			ServerConnection connection = new ServerConnection(
+					ServerConnection.SERVER_URL);
+			if (connection != null) {
+				try {
+					response = connection.login(request);
+					return response;
+				} catch (ServerConnectionException e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				}
 			}
-			return response;
+			return null;
 
 		}
 
 		@Override
 		protected void onPostExecute(LoginResponse response) {
 			super.onPostExecute(response);
-			if (dialog != null) dialog.dismiss();
-			if(response == null) MToast.error(context, true);
+			if (dialog != null)
+				dialog.dismiss();
+			if (response == null)
+				MToast.error(context, true);
 			else {
-				if(response.isError()) MToast.errorLoginEmail(context, true);
+				if (response.isError())
+					MToast.errorLoginEmail(context, true);
 				else {
 					MToast.errorLoginEmail(context, true);
-					MApp.goToActivity((Activity)context, ActivityMain.class, true);
+					MApp.goToActivity((Activity) context, ActivityMain.class,
+							true);
 				}
 			}
 		}
 
 	}
 }
-
-	

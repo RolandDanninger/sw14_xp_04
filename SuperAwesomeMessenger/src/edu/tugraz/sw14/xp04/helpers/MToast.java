@@ -10,16 +10,28 @@ public class MToast {
 		Toast.makeText(context, context.getString(R.string.error),
 				isShort ? Toast.LENGTH_SHORT : Toast.LENGTH_LONG).show();
 	}
+
 	public static void errorLogin(Context context, boolean isShort) {
-		Toast.makeText(context, context.getString(R.string.a_login_error_login),
+		Toast.makeText(context,
+				context.getString(R.string.a_login_error_login),
 				isShort ? Toast.LENGTH_SHORT : Toast.LENGTH_LONG).show();
 	}
+
+	public static void errorRegister(Context context, boolean isShort) {
+		Toast.makeText(context,
+				context.getString(R.string.a_registration_error_registration),
+				isShort ? Toast.LENGTH_SHORT : Toast.LENGTH_LONG).show();
+	}
+
 	public static void errorLoginEmail(Context context, boolean isShort) {
-		Toast.makeText(context, context.getString(R.string.a_login_error_login_email),
+		Toast.makeText(context,
+				context.getString(R.string.a_login_error_login_email),
 				isShort ? Toast.LENGTH_SHORT : Toast.LENGTH_LONG).show();
 	}
+
 	public static void errorLoginPassword(Context context, boolean isShort) {
-		Toast.makeText(context, context.getString(R.string.a_login_error_login_password),
+		Toast.makeText(context,
+				context.getString(R.string.a_login_error_login_password),
 				isShort ? Toast.LENGTH_SHORT : Toast.LENGTH_LONG).show();
 	}
 }
