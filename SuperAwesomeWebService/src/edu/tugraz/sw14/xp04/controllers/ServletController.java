@@ -1,7 +1,5 @@
 package edu.tugraz.sw14.xp04.controllers;
 
-import javax.persistence.EntityManager;
-
 import edu.tugraz.sw14.xp04.UserException;
 import edu.tugraz.sw14.xp04.entities.User;
 import edu.tugraz.sw14.xp04.entities.dao.UserDAO;
@@ -42,6 +40,8 @@ public class ServletController {
 			if (password.compareTo(userDAO.getUserByEmail(email).getPassword()) == 0) {
 				response.setError(false);
 				response.setId(request.getId());
+				
+				userDAO.updateGcmId(email, request.getGcmId());
 			} else {
 				response.setError(true);
 				response.setErrorMessage(ErrorMessages.PASSWORD_IS_WRONG);
@@ -98,7 +98,7 @@ public class ServletController {
 		}
 	}
 	
-	private User findUserByEmail(String email, EntityManager em) {
-		return null;
+	public User findUserByEmail(String email) {
+		return userDAO.getUserByEmail(email);
 	}
 }

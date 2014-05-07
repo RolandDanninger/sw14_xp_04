@@ -72,13 +72,29 @@ public class UserDAO {
 		return createUserFromEntity(userEntity);
 	}
 	
+	public void updateGcmId(String email, String gcmId) {
+		
+		DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
+		
+		Filter emailFilter = new FilterPredicate("email", FilterOperator.EQUAL, email);
+		
+		Query query = new Query("User").setFilter(emailFilter);
+		PreparedQuery preparedQuery = datastore.prepare(query);
+		
+		Entity userEntity = preparedQuery.asSingleEntity();
+		
+		userEntity.setProperty("gcmId", gcmId);
+		datastore.put(userEntity);
+	}
+	
 	public User createUserFromEntity(Entity userEntity) {
 		
 		Key key = userEntity.getKey();
 		String name = (String)userEntity.getProperty("name");
 		String email = (String)userEntity.getProperty("email");
 		String password = (String)userEntity.getProperty("password");
+		String gcmId = (String)userEntity.getProperty("gcmId");
 		
-		return new User(key, name, password, email);
+		return new User(key, name, password, email, gcmId);
 	}
 }

@@ -40,14 +40,16 @@ public class User {
 	private String name;
 	private String password;
 	private String email;
+	private String gcmId;
 	
 	public User() {}
 
-	public User(Key key, String name, String password, String email) {
+	public User(Key key, String name, String password, String email, String gcmId) {
 		this.key = key;
 		this.name = name;
 		this.password = password;
 		this.email = email;
+		this.gcmId = gcmId;
 	}
 
 	public Key getKey() {
@@ -81,27 +83,12 @@ public class User {
 	public void setEmail(String email) {
 		this.email = email;
 	}
-	
-	public static User findSingleUser(String namedQuery, String param, String value, EntityManager em) {
-		if(value == null || value == "") {
-			return null;
-		}
-		
-		Query query = em.createNamedQuery(namedQuery)
-						.setParameter(param, value);
-		
-		@SuppressWarnings("unchecked")
-		List<User> resultList = query.getResultList();
-		
-		if(!resultList.isEmpty()) {
-			
-			if(resultList.size() > 1) {
-				// UNIQUNESS VIOLATION
-			}
-			
-			return resultList.get(0);
-		}
-		
-		return null;
+
+	public String getGcmId() {
+		return gcmId;
+	}
+
+	public void setGcmId(String gcmId) {
+		this.gcmId = gcmId;
 	}
 }
