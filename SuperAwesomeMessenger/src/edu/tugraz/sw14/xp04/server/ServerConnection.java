@@ -19,11 +19,10 @@ import edu.tugraz.sw14.xp04.stubs.RegistrationResponse;
 
 public class ServerConnection {
 
-	public static final String SERVER_URL = "http://vernal-verve-538.appspot.com/";
+	public static final String SERVER_URL = "http://vernal-verve-538.appspot.com/superawesomewebservice";
 
-	private String url = null;
 	private HttpClient httpClient = null;
-	private ObjectMapper jsonMapper;
+	private final ObjectMapper jsonMapper;
 
 	private static final String REQ_PARSE_FAILED = "Failed to parse request "
 			+ "into JSON format.";
@@ -35,13 +34,12 @@ public class ServerConnection {
 			+ "with JSON body.";
 
 	public ServerConnection(String url) {
-		this.url = url;
 		this.httpClient = new DefaultHttpClient();
 		this.jsonMapper = new ObjectMapper();
 	}
 
 	private HttpPost createHttpPost(String action, StringEntity httpEntity) {
-		HttpPost httpPost = new HttpPost(url + "?action=" + action);
+		HttpPost httpPost = new HttpPost(SERVER_URL + "?action=" + action);
 		httpPost.addHeader(new BasicHeader("Accept", "application/json"));
 		httpPost.addHeader(new BasicHeader("Content-type", "application/json"));
 		httpPost.setEntity(httpEntity);
@@ -70,7 +68,7 @@ public class ServerConnection {
 		try {
 			httpResponse = httpClient.execute(httpPost);
 		} catch (Exception e) {
-			 throw new ServerConnectionException(REQ_SEND_FAILED, e);
+			throw new ServerConnectionException(REQ_SEND_FAILED, e);
 		}
 
 		LoginResponse res = null;
@@ -106,7 +104,7 @@ public class ServerConnection {
 		try {
 			httpResponse = httpClient.execute(httpPost);
 		} catch (Exception e) {
-			 throw new ServerConnectionException(REQ_SEND_FAILED, e);
+			throw new ServerConnectionException(REQ_SEND_FAILED, e);
 		}
 
 		RegistrationResponse res = null;
