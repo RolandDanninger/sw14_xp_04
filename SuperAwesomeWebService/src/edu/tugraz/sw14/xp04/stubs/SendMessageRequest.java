@@ -5,11 +5,11 @@ public class SendMessageRequest {
 	private String message;
 	
 	
-	public String getRecieverId() {
+	public String getReceiverId() {
 		return receiverId;
 	}
-	public void setRecieverId(String recieverId) {
-		this.receiverId = recieverId;
+	public void setReceiverId(String receiverId) {
+		this.receiverId = receiverId;
 	}
 	public String getMessage() {
 		return message;
