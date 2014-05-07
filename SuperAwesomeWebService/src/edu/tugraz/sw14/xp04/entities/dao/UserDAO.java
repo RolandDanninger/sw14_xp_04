@@ -16,9 +16,7 @@ import edu.tugraz.sw14.xp04.entities.User;
 
 public class UserDAO {
 
-	public UserDAO() {
-		
-	}
+	public UserDAO() {}
 	
 	public void insertUser(String name, String email, String password) {
 		DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
