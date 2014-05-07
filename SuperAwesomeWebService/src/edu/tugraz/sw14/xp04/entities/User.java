@@ -11,6 +11,8 @@ import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
 import javax.persistence.Query;
 
+import com.google.appengine.api.datastore.Key;
+
 @Entity
 @NamedQueries({
 		@NamedQuery(
@@ -33,7 +35,7 @@ public class User {
 	
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long key;
+	private Key key;
 	
 	private String name;
 	private String password;
@@ -41,11 +43,18 @@ public class User {
 	
 	public User() {}
 
-	public Long getKey() {
+	public User(Key key, String name, String password, String email) {
+		this.key = key;
+		this.name = name;
+		this.password = password;
+		this.email = email;
+	}
+
+	public Key getKey() {
 		return key;
 	}
 
-	public void setKey(Long key) {
+	public void setKey(Key key) {
 		this.key = key;
 	}
 
