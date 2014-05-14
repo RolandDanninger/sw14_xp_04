@@ -79,11 +79,11 @@ public class GcmIntentService extends IntentService {
 		String sender = extras.getString("sender");
 		String msg = extras.getString("message");
 		Notification.Builder mBuilder = new Notification.Builder(this)
-				.setSmallIcon(R.drawable.logo).setContentTitle(sender)
+				.setSmallIcon(R.drawable.logo_sam).setContentTitle(sender)
 				// .setStyle(new NotificationCompat.BigTextStyle().bigText(msg))
 				.setLargeIcon(
 						BitmapFactory.decodeResource(getResources(),
-								R.drawable.logo)).setContentText(msg);
+								R.drawable.logo_sam)).setContentText(msg);
 
 		mBuilder.setContentIntent(contentIntent);
 		// mNotificationManager.notify(NOTIFICATION_ID, mBuilder.build());

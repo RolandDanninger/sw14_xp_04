@@ -17,4 +17,8 @@
         <!-- All customizations that are NOT specific to a particular API-level can go here. -->
     </style>
 
+    <style name="ThemeQuit" parent="android:Theme.Holo.NoActionBar.Fullscreen">
+        <item name="android:background">@color/bg_app</item>
+    </style>
+    
 </resources>

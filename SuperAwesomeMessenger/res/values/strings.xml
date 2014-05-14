@@ -2,6 +2,7 @@
 <resources>
 
     <string name="app_name">SuperAwesomeMessenger</string>
+    <string name="app_name_short">SAM</string>
     <string name="action_settings">Settings</string>
     <string name="hello_world">Hello world!</string>
     <string name="yes">YES</string>
@@ -43,6 +44,6 @@
     <string name="a_sendtestmessage_txt_message_hint">Message...</string>
     <string name="a_sendtestmessage_btn_send">Send</string>
     <string name="a_main_quit_app_title">QUIT SAM?</string>
-    <string name="a_main_quit_app_desc">Do you wand to quit the app?</string>
+    <string name="a_main_quit_app_desc">Do you want to quit the app?</string>
 
 </resources>

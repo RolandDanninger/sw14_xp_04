@@ -1,4 +1,11 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <color name="error_text_fg">#BB1111</color>
+    
+    <color name="white">#FFFFFFFF</color>
+    <color name="bg_app">#FFDDDDDD</color>
+    <color name="bg_navi">#FFDDDDDD</color>
+    
+    <color name="highlight_light">#33B5E5</color>
+    <color name="highlight_dark">#0099CC</color>
 </resources>

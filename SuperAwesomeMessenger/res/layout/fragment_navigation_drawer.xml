@@ -1,9 +1,27 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    android:orientation="vertical"
+    android:background="@color/bg_navi"
     tools:context="edu.tugraz.sw14.xp04.navigation.NavigationDrawerFragment">
+    
+   <Button
+        android:id="@+id/nav_btn_add"
+        android:layout_width="match_parent"
+        android:layout_height="48dp"
+        android:text="Add Contact"
+        android:paddingLeft="16dp"
+        android:paddingRight="16dp"
+        android:drawableLeft="@drawable/ico_transparent"
+        android:drawableRight="@drawable/ico_w_add_person" 
+        android:background="@drawable/btn_nav"
+        android:textColor="@color/white"/>
+    
+    <ListView
+           android:id="@+id/nav_list" 
+           android:layout_width="match_parent"
+           android:layout_height="match_parent"/>
     
 </LinearLayout>

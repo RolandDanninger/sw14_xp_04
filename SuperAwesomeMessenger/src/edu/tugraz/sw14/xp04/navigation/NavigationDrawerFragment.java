@@ -278,8 +278,8 @@ public class NavigationDrawerFragment extends Fragment {
         if(actionBar != null) {
             actionBar.setDisplayShowTitleEnabled(true);
             actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
-            actionBar.setTitle(R.string.app_name);
-            actionBar.setIcon(R.drawable.ic_launcher);
+            actionBar.setTitle(R.string.app_name_short);
+            actionBar.setIcon(R.drawable.icon_sam);
         }
     }
 
