@@ -48,6 +48,14 @@ public class SendMessageController extends ServletController {
 
 		SendMessageResponse response = new SendMessageResponse();
 
+		try {
+			checkInput(request);
+		} catch (UserException e) {
+			response.setError(true);
+			response.setErrorMessage(e.getMessage());
+			return response;
+		}
+
 		URL url = null;
 
 		try {
@@ -98,6 +106,7 @@ public class SendMessageController extends ServletController {
 				while ((line = bReader.readLine()) != null) {
 					System.err.println(line);
 				}
+				System.err.println(line);
 
 				bReader.close();
 			} else {
@@ -125,7 +134,7 @@ public class SendMessageController extends ServletController {
 		if (req.getMessage() == null || req.getMessage().equals("")) {
 			throw new UserException(ErrorMessages.MESSAGE_IS_EMPTY);
 		}
-		if (userDAO.userExistsByEmail(req.getReceiverId())) {
+		if (!userDAO.userExistsByEmail(req.getReceiverId())) {
 			throw new UserException(ErrorMessages.RECEIVER_DOES_NOT_EXIST);
 		}
 
