@@ -11,6 +11,7 @@ import javax.servlet.ServletInputStream;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 
 import junit.framework.TestCase;
 
@@ -28,6 +29,7 @@ import com.google.appengine.tools.development.testing.LocalServiceTestHelper;
 import edu.tugraz.sw14.xp04.entities.dao.UserDAO;
 import edu.tugraz.sw14.xp04.stubs.LoginRequest;
 import edu.tugraz.sw14.xp04.stubs.RegistrationRequest;
+import edu.tugraz.sw14.xp04.stubs.SendMessageRequest;
 
 public class SuperAwesomeServletTest extends TestCase {
 
@@ -54,6 +56,7 @@ public class SuperAwesomeServletTest extends TestCase {
 	private final ServletTest servlet = new ServletTest();
 	private HttpServletResponse responseMock;
 	private HttpServletRequest requestMock;
+	private HttpSession session;
 
 	@Override
 	@Before
@@ -62,6 +65,7 @@ public class SuperAwesomeServletTest extends TestCase {
 
 		responseMock = createMock(HttpServletResponse.class);
 		requestMock = createMock(HttpServletRequest.class);
+		session = createMock(HttpSession.class);
 
 		createMock(PrintWriter.class);
 	}
@@ -147,6 +151,43 @@ public class SuperAwesomeServletTest extends TestCase {
 		EasyMock.verify(requestMock);
 		EasyMock.verify(responseMock);
 	}
+
+	// @Test
+	// public void testSendMessageRequest() throws IOException, ServletException
+	// {
+	// // Fixture Setup
+	// final String email = "email@email.com";
+	// final String message = "hallo, test message";
+	//
+	// SendMessageRequest request = new SendMessageRequest();
+	//
+	// request.setMessage(message);
+	// request.setReceiverId(email);
+	//
+	// // Request
+	// expect(requestMock.getParameter("action")).andReturn("send");
+	// expect(requestMock.getSession(false)).andReturn(session);
+	// expect(requestMock.getInputStream()).andReturn(
+	// createInputStream(request));
+	//
+	// // Response
+	// expect(responseMock.getOutputStream()).andReturn(
+	// createEmptyServletOutputStream());
+	//
+	// expect(session.getAttribute("id")).andReturn(email);
+	//
+	// EasyMock.replay(requestMock);
+	// EasyMock.replay(responseMock);
+	// EasyMock.replay(session);
+	//
+	// // Exercise
+	// servlet.doPost(requestMock, responseMock);
+	//
+	// // Verify
+	// EasyMock.verify(requestMock);
+	// EasyMock.verify(responseMock);
+	// EasyMock.verify(session);
+	// }
 
 	private ServletInputStream createInputStream(final String input) {
 		return new ServletInputStream() {
