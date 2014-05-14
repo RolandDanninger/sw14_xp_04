@@ -6,6 +6,7 @@ import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.text.Editable;
+import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
@@ -15,6 +16,7 @@ import edu.tugraz.sw14.xp04.helpers.MApp;
 import edu.tugraz.sw14.xp04.helpers.MToast;
 import edu.tugraz.sw14.xp04.server.ServerConnection;
 import edu.tugraz.sw14.xp04.server.ServerConnectionException;
+import edu.tugraz.sw14.xp04.stubs.LoginRequest;
 import edu.tugraz.sw14.xp04.stubs.SendMessageRequest;
 import edu.tugraz.sw14.xp04.stubs.SendMessageResponse;
 
@@ -51,6 +53,11 @@ public class ActivitySendTestMessage extends Activity {
 				}
 			});
 
+	}
+	
+	@Override
+	protected void onResume() {
+		super.onResume();
 	}
 
 	private void sendMsg(String id, String msg) {

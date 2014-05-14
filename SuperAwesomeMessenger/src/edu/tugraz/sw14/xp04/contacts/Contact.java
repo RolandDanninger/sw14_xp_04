@@ -1,0 +1,95 @@
+package edu.tugraz.sw14.xp04.contacts;
+
+import edu.tugraz.sw14.xp04.R;
+import edu.tugraz.sw14.xp04.helpers.MApp;
+import edu.tugraz.sw14.xp04.helpers.MDownloads;
+import android.content.Context;
+import android.graphics.Bitmap;
+import android.os.AsyncTask;
+import android.view.View;
+import android.widget.ImageView;
+
+public class Contact {
+	
+	private String name;
+	private String email;
+	private String imgUrl;
+    private Bitmap img;
+    
+    public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public String getEmail() {
+		return email;
+	}
+
+	public void setEmail(String email) {
+		this.email = email;
+	}
+
+	public String getImgUrl() {
+        return imgUrl;
+    }
+
+    public void setImgUrl(String imgUrl) {
+        this.imgUrl = imgUrl;
+    }
+
+    public Bitmap getImg() {
+        return img;
+    }
+
+    public void setImg(Bitmap img) {
+        this.img = img;
+    }
+
+    public Contact(String name, String email, String imgUrl) {
+		this.name = name;
+		this.email = email;
+		this.imgUrl = imgUrl;
+	}
+
+	// Methods
+    public void downloadOverviewImg(Context context, ImageView target){
+        if(this.img != null){
+            target.setImageBitmap(this.img);
+            target.setVisibility(View.VISIBLE);
+        }
+        else if(this.imgUrl != null){
+        	new DownloadOverviewImgTask(context, target, this.getImgUrl()).execute((Void[]) null);
+        }
+    }
+
+    // Tasks
+    private class DownloadOverviewImgTask extends AsyncTask<Void, Void, Bitmap> {
+        private Context context;
+        private ImageView target;
+        private String url = null;
+
+        public DownloadOverviewImgTask(Context context, ImageView target, String url) {
+            this.context = context;
+            this.target = target;
+            this.url = url;
+        }
+
+        protected Bitmap doInBackground(Void... args) {
+           if(!MApp.isNetworkAvailable(context)) return null;
+           return MDownloads.downloadBitmapFromUrl(this.context, this.url);
+        }
+
+        protected void onPostExecute(Bitmap result) {
+            if(result == null) target.setImageResource(R.drawable.ic_launcher);
+            else {
+                img = result;
+                target.setImageBitmap(result);
+            }
+
+            target.setVisibility(View.VISIBLE);
+        }
+    }
+}

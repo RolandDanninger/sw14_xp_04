@@ -4,6 +4,7 @@ import com.google.android.gms.gcm.GoogleCloudMessaging;
 
 import edu.tugraz.sw14.xp04.ActivityLaunch;
 import edu.tugraz.sw14.xp04.ActivityMain;
+import edu.tugraz.sw14.xp04.ActivitySendTestMessage;
 import edu.tugraz.sw14.xp04.R;
 import android.app.IntentService;
 import android.app.Notification;
@@ -74,10 +75,13 @@ public class GcmIntentService extends IntentService {
 		mNotificationManager = (NotificationManager) this
 				.getSystemService(Context.NOTIFICATION_SERVICE);
 
-		PendingIntent contentIntent = PendingIntent.getActivity(this, 0,
-				new Intent(this, ActivityMain.class), 0);
 		String sender = extras.getString("sender");
 		String msg = extras.getString("message");
+
+		Intent intent = new Intent(this, ActivitySendTestMessage.class);
+
+		PendingIntent contentIntent = PendingIntent.getActivity(this, 0,
+				intent, 0);
 		Notification.Builder mBuilder = new Notification.Builder(this)
 				.setSmallIcon(R.drawable.logo_sam).setContentTitle(sender)
 				// .setStyle(new NotificationCompat.BigTextStyle().bigText(msg))

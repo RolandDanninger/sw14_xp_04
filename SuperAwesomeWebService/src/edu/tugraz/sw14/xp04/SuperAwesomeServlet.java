@@ -1,16 +1,6 @@
 package edu.tugraz.sw14.xp04;
 
-import java.io.BufferedReader;
 import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStream;
-import java.net.HttpURLConnection;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Map;
 
 import javax.servlet.ServletException;
 import javax.servlet.http.HttpServlet;
@@ -22,8 +12,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 import edu.tugraz.sw14.xp04.controllers.LoginController;
 import edu.tugraz.sw14.xp04.controllers.RegistrationController;
-import edu.tugraz.sw14.xp04.entities.User;
-import edu.tugraz.sw14.xp04.stubs.GCMMessage;
+import edu.tugraz.sw14.xp04.controllers.SendMessageController;
 import edu.tugraz.sw14.xp04.stubs.LoginRequest;
 import edu.tugraz.sw14.xp04.stubs.LoginResponse;
 import edu.tugraz.sw14.xp04.stubs.RegistrationRequest;
@@ -117,8 +106,12 @@ public class SuperAwesomeServlet extends HttpServlet {
 
 	private void sendMessage(HttpServletRequest request,
 			HttpServletResponse response) throws ServerException, IOException {
-		RegistrationController controller = new RegistrationController();
 		SendMessageRequest req = null;
+
+		HttpSession session = request.getSession(false);
+		if (session == null) {
+			throw new ServerException("invalid session");
+		}
 
 		try {
 			req = jsonMapper.readValue(request.getInputStream(),
@@ -128,78 +121,9 @@ public class SuperAwesomeServlet extends HttpServlet {
 			throw new ServerException("Failed to parse SendMessageRequest.", e);
 		}
 
-		URL url = null;
-
-		try {
-			url = new URL("https://android.googleapis.com/gcm/send");
-		} catch (MalformedURLException e) {
-			System.err.println("invalid url sendMessage");
-			throw new ServerException("invalid url sendMessage");
-		}
-
-		HttpSession session = request.getSession(false);
-		if (session == null) {
-			throw new ServerException("invalid session");
-		}
-
-		HttpURLConnection connection = null;
-
-		try {
-			connection = (HttpURLConnection) url.openConnection();
-			connection.setRequestMethod("POST");
-			connection.setRequestProperty("Content-Type", "application/json");
-			connection.setRequestProperty("Authorization",
-					"key=AIzaSyDaEIpAaziLsL9SVA5N3_MzPdf8FLVA7wA");
-			connection.setUseCaches(false);
-			connection.setDoOutput(true);
-
-			User receiver = controller.findUserByEmail(req.getReceiverId());
-
-			GCMMessage msg = new GCMMessage();
-			msg.setRegistration_ids(Arrays.asList(receiver.getGcmId()));
-
-			System.err.println(receiver.getGcmId());
-
-			String id = (String) session.getAttribute("id");
-			Map<String, String> data = new HashMap<String, String>();
-			data.put("message", req.getMessage());
-			data.put("sender", id);
-			msg.setData(data);
-
-			OutputStream out = connection.getOutputStream();
-
-			String jsonGCMMsg = jsonMapper.writeValueAsString(msg);
-
-			System.err.println(jsonGCMMsg);
-
-			out.write(jsonGCMMsg.getBytes());
-			out.close();
-
-			int status = connection.getResponseCode();
-			if (status == 200) {
-				InputStream is = connection.getInputStream();
-				InputStreamReader isReader = new InputStreamReader(is);
-				BufferedReader bReader = new BufferedReader(isReader);
-
-				String line = "";
-				while ((line = bReader.readLine()) != null) {
-					System.err.println(line);
-				}
-
-				bReader.close();
-			} else {
-				System.err.println("Post failed with error code ");
-				throw new IOException("Post failed with error code " + status);
-			}
-		} finally {
-			if (connection != null) {
-				connection.disconnect();
-			}
-		}
-
-		SendMessageResponse res = new SendMessageResponse();
-		res.setError(false);
-		res.setErrorMessage(null);
+		SendMessageController controller = new SendMessageController();
+		String sender = (String) session.getAttribute("id");
+		SendMessageResponse res = controller.sendMessage(req, sender);
 
 		try {
 			jsonMapper.writeValue(response.getOutputStream(), res);
