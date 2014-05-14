@@ -3,11 +3,8 @@ package edu.tugraz.sw14.xp04.controllers;
 import edu.tugraz.sw14.xp04.UserException;
 import edu.tugraz.sw14.xp04.entities.dao.UserDAO;
 import edu.tugraz.sw14.xp04.stubs.ErrorMessages;
-import edu.tugraz.sw14.xp04.stubs.LoginRequest;
-import edu.tugraz.sw14.xp04.stubs.LoginResponse;
 import edu.tugraz.sw14.xp04.stubs.RegistrationRequest;
 import edu.tugraz.sw14.xp04.stubs.RegistrationResponse;
-import edu.tugraz.sw14.xp04.stubs.Response;
 
 public class RegistrationController extends ServletController {
 
@@ -28,7 +25,7 @@ public class RegistrationController extends ServletController {
 		RegistrationResponse response = new RegistrationResponse();
 
 		try {
-			checkInput(request, response);
+			checkInput(request);
 		} catch (UserException e) {
 			response.setError(true);
 			response.setErrorMessage(e.getMessage());
@@ -46,8 +43,7 @@ public class RegistrationController extends ServletController {
 		return response;
 	}
 
-	private void checkInput(RegistrationRequest req, RegistrationResponse res)
-			throws UserException {
+	private void checkInput(RegistrationRequest req) throws UserException {
 		if (req.getPassword() == null || req.getPassword().equals("")) {
 			throw new UserException(ErrorMessages.PASSWORD_IS_EMPTY);
 		}

@@ -8,7 +8,11 @@ import org.easymock.EasyMock;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
 
 import com.google.appengine.tools.development.testing.LocalDatastoreServiceTestConfig;
 import com.google.appengine.tools.development.testing.LocalServiceTestHelper;
@@ -16,9 +20,11 @@ import com.google.appengine.tools.development.testing.LocalServiceTestHelper;
 import edu.tugraz.sw14.xp04.controllers.RegistrationController;
 import edu.tugraz.sw14.xp04.entities.dao.UserDAO;
 import edu.tugraz.sw14.xp04.stubs.ErrorMessages;
+import edu.tugraz.sw14.xp04.stubs.LoginResponse;
 import edu.tugraz.sw14.xp04.stubs.RegistrationRequest;
 import edu.tugraz.sw14.xp04.stubs.RegistrationResponse;
 
+@RunWith(JUnit4.class)
 public class RegistrationControllerTest extends TestCase {
 
 	private RegistrationController controller;
@@ -38,6 +44,9 @@ public class RegistrationControllerTest extends TestCase {
 		helper.tearDown();
 		controller = null;
 	}
+
+	@Rule
+	public ExpectedException exception = ExpectedException.none();
 
 	@Test
 	public void testRegistrationSucceed() {
@@ -111,5 +120,14 @@ public class RegistrationControllerTest extends TestCase {
 		Assert.assertTrue(response.isError());
 		Assert.assertEquals(ErrorMessages.USER_ALREADY_EXISTS,
 				response.getErrorMessage());
+	}
+
+	@Test
+	public void testRequestIsNull() {
+
+		RegistrationRequest request = null;
+
+		exception.expect(IllegalStateException.class);
+		RegistrationResponse response = controller.register(request);
 	}
 }
