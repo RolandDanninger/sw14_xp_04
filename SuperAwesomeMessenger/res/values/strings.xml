@@ -4,12 +4,19 @@
     <string name="app_name">SuperAwesomeMessenger</string>
     <string name="action_settings">Settings</string>
     <string name="hello_world">Hello world!</string>
+    <string name="yes">YES</string>
+    <string name="no">NO</string>
+    <string name="navigation_drawer_open">Navigation Open</string>
+    <string name="navigation_drawer_close">Navigation Close</string>
+    <string name="menu">Contacts</string>
+    <string name="a_quit">QUIT</string>
     <string name="title_activity_activity_launch">ActivityLaunch</string>
     <string name="title_activity_activity_main">ActivityMain</string>
     <string name="title_activity_activity_login">ActivityLogin</string>
     <string name="title_activity_activity_registration">ActivityRegistration</string>
     <string name="title_activity_activity_home">ActivityHome</string>
     <string name="error">Error occured!</string>
+    <string name="error_network">No Network</string>
     <string name="a_login_lbl_welcome">Welcome to SAM!</string>
     <string name="a_login_txt_email">Email</string>
     <string name="a_login_txt_password">Password</string>
@@ -35,5 +42,7 @@
     <string name="a_sendtestmessage_txt_id">ID...</string>
     <string name="a_sendtestmessage_txt_message_hint">Message...</string>
     <string name="a_sendtestmessage_btn_send">Send</string>
+    <string name="a_main_quit_app_title">QUIT SAM?</string>
+    <string name="a_main_quit_app_desc">Do you wand to quit the app?</string>
 
 </resources>
