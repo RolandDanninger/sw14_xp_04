@@ -1,4 +1,11 @@
-build
-.DS_Store
-bin
-google-play-services_lib
+*.class
+
+# Package Files #
+*.war
+*.ear
+
+*.bak
+
+/*/bin/
+/*/gen/
+/*/assets/
