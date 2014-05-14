@@ -5,16 +5,17 @@ import android.widget.EditText;
 
 import com.robotium.solo.Solo;
 
+import edu.tugraz.sw14.xp04.derivates.ActivityLoginDerivate;
 import edu.tugraz.sw14.xp04.gcm.GCM;
 import edu.tugraz.sw14.xp04.helpers.UserInfo;
 
 public class ActivityLoginTest extends
-		ActivityInstrumentationTestCase2<ActivityLogin> {
+		ActivityInstrumentationTestCase2<ActivityLoginDerivate> {
 
 	private Solo solo;
 
 	public ActivityLoginTest() {
-		super(ActivityLogin.class);
+		super(ActivityLoginDerivate.class);
 	}
 
 	@Override
