@@ -20,7 +20,8 @@ import javax.servlet.http.HttpSession;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import edu.tugraz.sw14.xp04.controllers.ServletController;
+import edu.tugraz.sw14.xp04.controllers.LoginController;
+import edu.tugraz.sw14.xp04.controllers.RegistrationController;
 import edu.tugraz.sw14.xp04.entities.User;
 import edu.tugraz.sw14.xp04.stubs.GCMMessage;
 import edu.tugraz.sw14.xp04.stubs.LoginRequest;
@@ -73,7 +74,7 @@ public class SuperAwesomeServlet extends HttpServlet {
 			throw new ServerException("Failed to parse LoginRequest.", e);
 		}
 
-		ServletController controller = new ServletController();
+		LoginController controller = new LoginController();
 		LoginResponse res = controller.login(req);
 
 		if (!res.isError()) {
@@ -103,7 +104,7 @@ public class SuperAwesomeServlet extends HttpServlet {
 			throw new ServerException("Failed to parse LoginRequest.", e);
 		}
 
-		ServletController controller = new ServletController();
+		RegistrationController controller = new RegistrationController();
 		RegistrationResponse res = controller.register(req);
 
 		try {
@@ -116,7 +117,7 @@ public class SuperAwesomeServlet extends HttpServlet {
 
 	private void sendMessage(HttpServletRequest request,
 			HttpServletResponse response) throws ServerException, IOException {
-		ServletController controller = new ServletController();
+		RegistrationController controller = new RegistrationController();
 		SendMessageRequest req = null;
 
 		try {
