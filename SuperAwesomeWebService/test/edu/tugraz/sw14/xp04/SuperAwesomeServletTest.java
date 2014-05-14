@@ -26,137 +26,146 @@ import com.google.appengine.tools.development.testing.LocalDatastoreServiceTestC
 import com.google.appengine.tools.development.testing.LocalServiceTestHelper;
 
 import edu.tugraz.sw14.xp04.entities.dao.UserDAO;
+import edu.tugraz.sw14.xp04.stubs.LoginRequest;
 import edu.tugraz.sw14.xp04.stubs.RegistrationRequest;
 
 public class SuperAwesomeServletTest extends TestCase {
 
 	@SuppressWarnings("serial")
 	public class ServletTest extends SuperAwesomeServlet {
-		public void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+		@Override
+		public void doGet(HttpServletRequest request,
+				HttpServletResponse response) throws ServletException,
+				IOException {
 			super.doGet(request, response);
 		}
-		
-		public void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+
+		@Override
+		public void doPost(HttpServletRequest request,
+				HttpServletResponse response) throws ServletException,
+				IOException {
 			super.doPost(request, response);
 		}
 	}
-	
-	private final LocalServiceTestHelper helper =
-            new LocalServiceTestHelper(new LocalDatastoreServiceTestConfig());
-	
-	private ServletTest servlet = new ServletTest();
+
+	private final LocalServiceTestHelper helper = new LocalServiceTestHelper(
+			new LocalDatastoreServiceTestConfig());
+
+	private final ServletTest servlet = new ServletTest();
 	private HttpServletResponse responseMock;
 	private HttpServletRequest requestMock;
-	private PrintWriter printWriterMock;
-	
+
+	@Override
 	@Before
 	public void setUp() {
 		helper.setUp();
-		
+
 		responseMock = createMock(HttpServletResponse.class);
-		requestMock  = createMock(HttpServletRequest.class);
-		
-		printWriterMock = createMock(PrintWriter.class);
+		requestMock = createMock(HttpServletRequest.class);
+
+		createMock(PrintWriter.class);
 	}
-	
+
+	@Override
 	@After
 	public void tearDown() {
 		helper.tearDown();
 	}
-	
+
 	@Test
 	public void testWrongAction() throws IOException, ServletException {
-		
+
 		expect(requestMock.getParameter("action")).andReturn("unkownAction");
-		
+
 		EasyMock.replay(requestMock);
-			
+
 		servlet.doPost(requestMock, responseMock);
-		
+
 		EasyMock.verify(requestMock);
 	}
-	
+
 	@Test
 	public void testRegistrationRequest() throws IOException, ServletException {
 		// Fixture Setup
 		final String email = "email@email.com";
-		final String name  = "asdf";
-		final String password = "pw"; 
-		
+		final String name = "asdf";
+		final String password = "pw";
+
 		RegistrationRequest request = new RegistrationRequest();
 		request.setId(email);
 		request.setName(name);
 		request.setPassword(password);
-		
+
 		// Request
 		expect(requestMock.getParameter("action")).andReturn("register");
-		expect(requestMock.getInputStream()).andReturn(createInputStream(request));
-		
+		expect(requestMock.getInputStream()).andReturn(
+				createInputStream(request));
+
 		// Response
-		expect(responseMock.getOutputStream()).andReturn(createEmptyServletOutputStream());
-		
+		expect(responseMock.getOutputStream()).andReturn(
+				createEmptyServletOutputStream());
+
 		EasyMock.replay(requestMock);
 		EasyMock.replay(responseMock);
-			
+
 		// Exercise
 		servlet.doPost(requestMock, responseMock);
-		
+
 		// Verify
 		UserDAO dao = new UserDAO();
 		Assert.assertTrue(dao.userExistsByEmail(email));
 		EasyMock.verify(requestMock);
 		EasyMock.verify(responseMock);
 	}
-	
-//	@Test
-//	public void testLoginRequest() throws IOException, ServletException {
-//		// Fixture Setup
-//		final String email = "email@email.com";
-//		final String name  = "asdf";
-//		final String password = "pw"; 
-//		
-//		LoginRequest request = new LoginRequest();
-//		request.setId(email);
-//		request.setPassword(password);
-//		
-//		// Request
-//		expect(requestMock.getParameter("action")).andReturn("register");
-//		expect(requestMock.getInputStream()).andReturn(createInputStream(request));
-//		
-//		// Response
-//		expect(responseMock.getOutputStream()).andReturn(createEmptyServletOutputStream());
-//		
-//		EasyMock.replay(requestMock);
-//		EasyMock.replay(responseMock);
-//			
-//		// Exercise
-//		servlet.doPost(requestMock, responseMock);
-//		
-//		// Verify
-//		UserDAO dao = new UserDAO();
-//		Assert.assertTrue(dao.userExistsByEmail(email));
-//		EasyMock.verify(requestMock);
-//		EasyMock.verify(responseMock);
-//	}
-	
+
+	@Test
+	public void testLoginRequest() throws IOException, ServletException {
+		// Fixture Setup
+		final String email = "email@email.com";
+		final String password = "pw";
+
+		LoginRequest request = new LoginRequest();
+		request.setId(email);
+		request.setPassword(password);
+
+		// Request
+		expect(requestMock.getParameter("action")).andReturn("login");
+		expect(requestMock.getInputStream()).andReturn(
+				createInputStream(request));
+
+		// Response
+		expect(responseMock.getOutputStream()).andReturn(
+				createEmptyServletOutputStream());
+
+		EasyMock.replay(requestMock);
+		EasyMock.replay(responseMock);
+
+		// Exercise
+		servlet.doPost(requestMock, responseMock);
+
+		// Verify
+		EasyMock.verify(requestMock);
+		EasyMock.verify(responseMock);
+	}
+
 	private ServletInputStream createInputStream(final String input) {
 		return new ServletInputStream() {
 			int i = 0;
 			String json = input;
-			
+
 			@Override
 			public int read() throws IOException {
-				if(i >= json.length()) {
+				if (i >= json.length()) {
 					return -1;
 				}
-				int charCode = (int)json.charAt(i);
+				int charCode = json.charAt(i);
 				i++;
 				return charCode;
 			}
 		};
 	}
-	
-	private ServletInputStream createInputStream(RegistrationRequest request) {
+
+	private ServletInputStream createInputStream(Object request) {
 		ObjectMapper mapper = new ObjectMapper();
 		String json;
 		try {
@@ -164,11 +173,11 @@ public class SuperAwesomeServletTest extends TestCase {
 			return createInputStream(json);
 		} catch (JsonProcessingException e) {
 		}
-		
+
 		fail("couldn't parse request");
 		return null;
 	}
-	
+
 	private ServletOutputStream createEmptyServletOutputStream() {
 		return new ServletOutputStream() {
 			@Override
