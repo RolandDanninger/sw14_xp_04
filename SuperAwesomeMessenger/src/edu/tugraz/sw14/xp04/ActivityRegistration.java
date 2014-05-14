@@ -176,7 +176,7 @@ public class ActivityRegistration extends Activity implements OnClickListener {
 				if (response.isError())
 					MToast.errorRegister(context, true);
 				else {
-					MApp.goToActivity((Activity) context, ActivityMain.class,
+					MApp.goToActivity((Activity) context, ActivityLogin.class,
 							true);
 				}
 			}
