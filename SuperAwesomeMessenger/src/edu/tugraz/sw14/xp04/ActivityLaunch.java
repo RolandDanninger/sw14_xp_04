@@ -134,7 +134,7 @@ public class ActivityLaunch extends Activity {
 		if (isLoggedIn())
 			MApp.goToActivity(this, ActivityMain.class, true);
 		else
-			MApp.goToActivity(this, ActivityLogin.class, true);
+			MApp.goToActivity(this, ActivityMain.class, true);
 	}
 
 	private void goToError() {
