@@ -83,7 +83,7 @@ public class ActivityLogin extends Activity {
 		MApp.goToActivity(this, ActivityRegistration.class, true);
 	}
 
-	private void doLogin(String email, String password) {
+	protected void doLogin(String email, String password) {
 		new LoginTask(email, password).execute((Void[]) null);
 	}
 
