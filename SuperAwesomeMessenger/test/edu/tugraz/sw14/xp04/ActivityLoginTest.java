@@ -5,6 +5,9 @@ import android.widget.EditText;
 
 import com.robotium.solo.Solo;
 
+import edu.tugraz.sw14.xp04.gcm.GCM;
+import edu.tugraz.sw14.xp04.helpers.UserInfo;
+
 public class ActivityLoginTest extends
 		ActivityInstrumentationTestCase2<ActivityLogin> {
 
@@ -28,6 +31,8 @@ public class ActivityLoginTest extends
 		EditText txtID = (EditText) solo.getView(R.id.a_login_txt_email);
 		EditText txtPassword = (EditText) solo
 				.getView(R.id.a_login_txt_password);
+		
+		GCM.storeIdPair(getInstrumentation().getContext(), new UserInfo("aabbccddeeff"));
 
 		solo.enterText(txtID, "fail@user.sw");
 		solo.enterText(txtPassword, "1234");
@@ -41,13 +46,15 @@ public class ActivityLoginTest extends
 		EditText txtID = (EditText) solo.getView(R.id.a_login_txt_email);
 		EditText txtPassword = (EditText) solo
 				.getView(R.id.a_login_txt_password);
+		
+		GCM.storeIdPair(getInstrumentation().getContext(), new UserInfo("aabbccddeeff"));
 
 		solo.enterText(txtID, "success@user.sw");
 		solo.enterText(txtPassword, "1234");
 
 		solo.clickOnButton(solo.getString(R.string.a_login_btn_login));
 
-		assertTrue(solo.waitForText(solo.getString(R.string.a_login_success_login)));
+		assertTrue(solo.waitForActivity(solo.getString(R.string.title_activity_activity_send_test_message)));
 	}
 
 	public void testLoginFailedIDMissing() {

@@ -41,7 +41,7 @@ public final class GCM {
 			result = (UserInfo) is.readObject();
 			is.close();
 		} catch (Exception e) {
-			Log.d(TAG, "load idPaire failed");
+			Log.d(TAG, "load idPaire failed " + e.toString());
 
 		}
 		return result;
