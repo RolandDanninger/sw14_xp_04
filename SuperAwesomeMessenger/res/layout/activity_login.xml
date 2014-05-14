@@ -21,7 +21,7 @@
         android:id="@+id/a_login_img_logo"
         android:layout_width="wrap_content"
         android:layout_height="@dimen/logo_height"
-        android:src="@drawable/logo_sam" />
+        android:src="@drawable/banner_sam" />
 
     <EditText
         android:id="@+id/a_login_txt_email"
