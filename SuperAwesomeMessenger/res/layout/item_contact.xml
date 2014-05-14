@@ -2,18 +2,53 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:orientation="horizontal"
     android:layout_width="match_parent"
-    android:layout_height="match_parent" >
+    android:layout_height="48dp" >
 
     <ImageView
-        android:id="@+id/imageView1"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:src="@drawable/btn_nav" />
+        android:id="@+id/item_contact_image"
+        android:layout_width="40dp"
+        android:layout_height="40dp"
+        android:layout_margin="4dp"
+        android:src="@drawable/ico_w_person"
+        android:background="@color/highlight_light" />
 
-    <TextView
-        android:id="@+id/textView1"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="TextView" />
+    <LinearLayout 
+        android:layout_width="0dp"
+        android:layout_height="match_parent"
+        android:layout_weight="1"
+        android:paddingLeft="8dp"
+        android:paddingRight="8dp"
+        android:orientation="vertical"
+        android:gravity="center_vertical">
+        <TextView
+	        android:id="@+id/item_contact_title"
+	        android:layout_width="match_parent"
+	        android:layout_height="wrap_content"
+	        android:gravity="left|center_vertical"
+	        android:text="Max Muster"
+	        android:textSize="16sp"
+	        android:lines="1"
+	        android:singleLine="true"
+	        android:marqueeRepeatLimit="marquee_forever"
+	        android:ellipsize="marquee"
+	        android:textStyle="italic"
+	        android:fontFamily="sans-serif-light"
+	        android:textColor="@color/fnt_dark1"/>
+        <TextView
+	        android:id="@+id/item_contact_desc"
+	        android:layout_width="match_parent"
+	        android:layout_height="wrap_content"
+	        android:gravity="left|center_vertical"
+	        android:text="max.muster@gmail.com"
+	        android:textSize="12sp"
+	        android:lines="1"
+	        android:singleLine="true"
+	        android:marqueeRepeatLimit="marquee_forever"
+	        android:ellipsize="marquee"
+	        android:textStyle="italic"
+	        android:fontFamily="sans-serif-light"
+	        android:textColor="@color/fnt_dark2"/>
+    </LinearLayout>
+    
 
 </LinearLayout>

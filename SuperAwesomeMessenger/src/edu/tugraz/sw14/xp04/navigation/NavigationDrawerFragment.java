@@ -1,15 +1,11 @@
 package edu.tugraz.sw14.xp04.navigation;
 
+import java.util.ArrayList;
 
-import android.accounts.Account;
-import android.accounts.AccountManager;
 import android.app.Activity;
 import android.app.ActionBar;
 import android.app.Fragment;
 import android.content.Context;
-import android.database.Cursor;
-import android.net.Uri;
-import android.provider.ContactsContract;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
@@ -17,22 +13,19 @@ import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
-import android.text.Layout;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.ViewGroup;
-import android.widget.AdapterView;
-import android.widget.ArrayAdapter;
-import android.widget.ImageView;
+import android.widget.Button;
 import android.widget.ListView;
-import android.widget.Toast;
 import edu.tugraz.sw14.xp04.R;
+import edu.tugraz.sw14.xp04.adapters.ContactAdapter;
+import edu.tugraz.sw14.xp04.contacts.Contact;
 import edu.tugraz.sw14.xp04.helpers.MApp;
 
-import java.util.ArrayList;
 
 /**
  * Fragment used for managing interactions for and presentation of a navigation drawer.
@@ -69,6 +62,19 @@ public class NavigationDrawerFragment extends Fragment {
     private int mCurrentSelectedPosition = 0;
     private boolean mFromSavedInstanceState;
     private boolean mUserLearnedDrawer;
+    
+    private Activity context;
+    
+    private ArrayList<Contact> list;
+    private ContactAdapter adapter;
+    private ListView listView;
+    private Button addBtn;
+    
+    private boolean contacts_loaded = false;
+
+    public boolean contactsLoaded(){
+        return this.contacts_loaded;
+    }
 
     public NavigationDrawerFragment() {
     }
@@ -104,11 +110,39 @@ public class NavigationDrawerFragment extends Fragment {
 
         mLayout = inflater.inflate(R.layout.fragment_navigation_drawer, container, false);
         if(mLayout == null) return null;
-
+        this.context = getActivity();
+        
+        this.list = new ArrayList<Contact>();
+        
+        this.listView = (ListView) mLayout.findViewById(R.id.nav_list);
+        this.adapter = new ContactAdapter(getActivity(), R.layout.item_contact, list);
+        this.listView.setAdapter(this.adapter);
+        loadContacts();
         
         return mLayout;
     }
 
+    private void loadContacts(){
+    	if(MApp.isNetworkAvailable(context)) {
+            
+            this.list.clear();
+            this.list.add(new Contact("Test",
+                    "test@test.com",
+                    null));
+            this.list.add(new Contact("Max Mustermann",
+                    "max.mustermann@gmail.com",
+                    "http://www.womenshealthmag.com/files/wh6_uploads/imagecache/scale_600_wide/files/images/0709-a-wh-fitness-1847.jpg"));
+            this.list.add(new Contact("Susi Studierschnell",
+                    "susi@gmail.com",
+                    "https://lh4.googleusercontent.com/-OSQFDHoiicI/Ubn6r5qfS7I/AAAAAAABUT4/XyIQ1Rb4jJc/s1600/Competitors-2013-Brazil-Mister-Fitness-contest.jpg"));
+            this.list.add(new Contact("Hans Guck In Die Luft",
+                    "hansi@guck-in-die-luft.at",
+                    "http://www.womenshealthmag.com/files/wh6_uploads/images/fitness-star-images-main.jpg"));
+            this.adapter.notifyDataSetChanged();
+            this.contacts_loaded = true;
+        }
+    }
+    
     public boolean isDrawerOpen() {
         return mDrawerLayout != null && mDrawerLayout.isDrawerOpen(mFragmentContainerView);
     }
