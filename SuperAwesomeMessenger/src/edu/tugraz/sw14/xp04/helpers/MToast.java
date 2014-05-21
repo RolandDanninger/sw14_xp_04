@@ -11,6 +11,11 @@ public class MToast {
 				isShort ? Toast.LENGTH_SHORT : Toast.LENGTH_LONG).show();
 	}
 
+	public static void errorNetwork(Context context, boolean isShort) {
+		Toast.makeText(context, context.getString(R.string.error_network),
+				isShort ? Toast.LENGTH_SHORT : Toast.LENGTH_LONG).show();
+	}
+	
 	public static void errorLogin(Context context, boolean isShort) {
 		Toast.makeText(context,
 				context.getString(R.string.a_login_error_login),
@@ -38,6 +43,16 @@ public class MToast {
 	public static void errorSendMessage(Context context, boolean isShort) {
 		Toast.makeText(context,
 				context.getString(R.string.a_sendmessage_error),
+				isShort ? Toast.LENGTH_SHORT : Toast.LENGTH_LONG).show();
+	}
+	public static void errorAddContactEmail(Context context, boolean isShort) {
+		Toast.makeText(context,
+				context.getString(R.string.a_add_contact_error_login_email),
+				isShort ? Toast.LENGTH_SHORT : Toast.LENGTH_LONG).show();
+	}
+	public static void errorAddContact(Context context, boolean isShort) {
+		Toast.makeText(context,
+				context.getString(R.string.a_login_error_login),
 				isShort ? Toast.LENGTH_SHORT : Toast.LENGTH_LONG).show();
 	}
 }

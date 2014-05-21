@@ -3,6 +3,7 @@ package edu.tugraz.sw14.xp04.contacts;
 import edu.tugraz.sw14.xp04.R;
 import edu.tugraz.sw14.xp04.helpers.MApp;
 import edu.tugraz.sw14.xp04.helpers.MDownloads;
+import edu.tugraz.sw14.xp04.stubs.ContactStub;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.os.AsyncTask;
@@ -52,6 +53,12 @@ public class Contact {
 		this.name = name;
 		this.email = email;
 		this.imgUrl = imgUrl;
+	}
+
+	public Contact(ContactStub contact_stub) {
+		this.name = contact_stub.getName();
+		this.email = contact_stub.getEmail();
+		this.imgUrl = contact_stub.getImgUrl();
 	}
 
 	// Methods
