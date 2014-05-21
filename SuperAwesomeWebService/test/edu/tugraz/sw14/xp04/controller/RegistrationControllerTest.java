@@ -20,7 +20,6 @@ import com.google.appengine.tools.development.testing.LocalServiceTestHelper;
 import edu.tugraz.sw14.xp04.controllers.RegistrationController;
 import edu.tugraz.sw14.xp04.entities.dao.UserDAO;
 import edu.tugraz.sw14.xp04.stubs.ErrorMessages;
-import edu.tugraz.sw14.xp04.stubs.LoginResponse;
 import edu.tugraz.sw14.xp04.stubs.RegistrationRequest;
 import edu.tugraz.sw14.xp04.stubs.RegistrationResponse;
 
@@ -111,7 +110,7 @@ public class RegistrationControllerTest extends TestCase {
 		request.setName("wos onders");
 		request.setPassword("pw");
 
-		expect(daoMock.userExistsByEmail(request.getId())).andReturn(true);
+		expect(daoMock.existsByEmail(request.getId())).andReturn(true);
 		EasyMock.replay(daoMock);
 
 		RegistrationResponse response = controller.register(request);

@@ -14,7 +14,6 @@ import java.util.Map;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-import edu.tugraz.sw14.xp04.entities.User;
 import edu.tugraz.sw14.xp04.stubs.GCMMessage;
 import edu.tugraz.sw14.xp04.stubs.SendMessageRequest;
 

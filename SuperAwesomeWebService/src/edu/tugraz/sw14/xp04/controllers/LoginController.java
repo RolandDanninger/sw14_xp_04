@@ -25,12 +25,12 @@ public class LoginController extends ServletController {
 		String email = request.getId();
 		String password = request.getPassword();
 
-		if (!userDAO.userExistsByEmail(email)) {
+		if (!userDAO.existsByEmail(email)) {
 			response.setError(true);
 			response.setErrorMessage(ErrorMessages.USER_DOES_NOT_EXISTS);
 
 		} else {
-			if (password.compareTo(userDAO.getUserByEmail(email).getPassword()) == 0) {
+			if (password.compareTo(userDAO.getByEmail(email).getPassword()) == 0) {
 				response.setError(false);
 				response.setId(request.getId());
 
