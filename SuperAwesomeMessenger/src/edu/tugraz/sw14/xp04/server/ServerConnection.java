@@ -182,7 +182,7 @@ public class ServerConnection {
 			throw new ServerConnectionException(ENTITY_CREATION_FAILED, e);
 		}
 
-		HttpPost httpPost = createHttpPost("login", httpEntity);
+		HttpPost httpPost = createHttpPost("addcontact", httpEntity);
 
 		HttpResponse httpResponse = null;
 		try {
