@@ -3,8 +3,8 @@ package edu.tugraz.sw14.xp04;
 import android.app.Activity;
 import android.app.ProgressDialog;
 import android.content.Context;
-import android.os.AsyncTask;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.widget.Button;
@@ -14,8 +14,8 @@ import edu.tugraz.sw14.xp04.gcm.GCM;
 import edu.tugraz.sw14.xp04.helpers.MApp;
 import edu.tugraz.sw14.xp04.helpers.MToast;
 import edu.tugraz.sw14.xp04.helpers.UserInfo;
-import edu.tugraz.sw14.xp04.server.ServerConnection;
-import edu.tugraz.sw14.xp04.server.ServerConnectionException;
+import edu.tugraz.sw14.xp04.server.LoginTask;
+import edu.tugraz.sw14.xp04.server.LoginTask.LoginTaskListener;
 import edu.tugraz.sw14.xp04.stubs.LoginRequest;
 import edu.tugraz.sw14.xp04.stubs.LoginResponse;
 
@@ -26,6 +26,34 @@ public class ActivityLogin extends Activity {
 	private EditText etPassword;
 	private Button btnLogin;
 	private Button btnRegister;
+	private ProgressDialog dialog;
+	
+	private LoginTaskListener loginTaskListener = new LoginTaskListener() {
+    
+    @Override
+    public void onPreExecute() {
+      dialog = new ProgressDialog(context);
+      dialog.setCancelable(false);
+      dialog.show();
+      dialog.setContentView(new ProgressBar(context));
+    }
+    
+    @Override
+    public void onPostExecute(LoginResponse response) {
+      if (dialog != null)
+        dialog.dismiss();
+      if (response == null)
+        MToast.error(context, true);
+      else {
+        if (response.isError())
+          MToast.errorLogin(context, true);
+        else {
+          MApp.goToActivity((Activity) context,
+              ActivitySendTestMessage.class, true);
+        }
+      }
+    }
+  };
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -84,74 +112,22 @@ public class ActivityLogin extends Activity {
 	}
 
 	protected void doLogin(String email, String password) {
-		new LoginTask(email, password).execute((Void[]) null);
-	}
+	  LoginRequest request = new LoginRequest();
+    UserInfo info = GCM.loadIdPair(context);
+    if (info == null) {
+      Log.e("ActivityLogin", "UserInfo is null");
+      return;
+    }
+    String gmcId = info.getGcmRegId();
+    if (gmcId == null) {
+      Log.e("ActivityLogin", "gmcId is null");
+      return;
+    }
+    request.setGcmId(gmcId);
+    request.setId(email);
+    request.setPassword(password);
 
-	private class LoginTask extends AsyncTask<Void, Void, LoginResponse> {
-
-		private ProgressDialog dialog;
-		private final String email;
-		private final String password;
-
-		public LoginTask(String email, String password) {
-			this.email = email;
-			this.password = password;
-		}
-
-		@Override
-		protected void onPreExecute() {
-			super.onPreExecute();
-			dialog = new ProgressDialog(context);
-			dialog.setCancelable(false);
-			dialog.show();
-			dialog.setContentView(new ProgressBar(context));
-		}
-
-		@Override
-		protected LoginResponse doInBackground(Void... params) {
-			LoginResponse response = null;
-			LoginRequest request = new LoginRequest();
-			UserInfo info = GCM.loadIdPair(context);
-			if (info == null)
-				return null;
-			String gmcId = info.getGcmRegId();
-			if (gmcId == null)
-				return null;
-			request.setGcmId(gmcId);
-			request.setId(email);
-			request.setPassword(password);
-
-			MApp app = MApp.getApp(context);
-			ServerConnection connection = app.getServerConnection();
-			if (connection != null) {
-				try {
-					response = connection.login(request);
-					return response;
-				} catch (ServerConnectionException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-			}
-			return null;
-
-		}
-
-		@Override
-		protected void onPostExecute(LoginResponse response) {
-			super.onPostExecute(response);
-			if (dialog != null)
-				dialog.dismiss();
-			if (response == null)
-				MToast.error(context, true);
-			else {
-				if (response.isError())
-					MToast.errorLogin(context, true);
-				else {
-					MApp.goToActivity((Activity) context,
-							ActivitySendTestMessage.class, true);
-				}
-			}
-		}
-
+    LoginTask loginTask = new LoginTask(context, loginTaskListener);
+		loginTask.execute(request);
 	}
 }
