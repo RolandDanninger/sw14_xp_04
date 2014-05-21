@@ -41,7 +41,7 @@ public class GCMConnection {
 			return false;
 		}
 
-		String line = "";
+		String gcmResponse = "";
 		try {
 			connection = (HttpURLConnection) url.openConnection();
 			connection.setRequestMethod("POST");
@@ -75,11 +75,13 @@ public class GCMConnection {
 				InputStreamReader isReader = new InputStreamReader(is);
 				BufferedReader bReader = new BufferedReader(isReader);
 
+				String line = "";
 				while ((line = bReader.readLine()) != null) {
 					System.err.println(line);
+					gcmResponse += line;
 				}
-				System.err.println(line);
-				if (line.contains("\"failure\":0")) {
+				System.err.println(gcmResponse);
+				if (gcmResponse.contains("\"failure\":1")) {
 					bReader.close();
 					return false;
 				}
@@ -98,7 +100,7 @@ public class GCMConnection {
 			}
 		}
 
-		if (line.contains("\"success\":1"))
+		if (gcmResponse.contains("\"success\":1"))
 			return true;
 		else
 			return false;
