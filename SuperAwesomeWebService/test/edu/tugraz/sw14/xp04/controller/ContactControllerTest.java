@@ -52,7 +52,7 @@ public class ContactControllerTest extends TestCase {
 
 		request.setId("blub@blub.com");
 
-		expect(daoMock.getUserByEmail(request.getId())).andReturn(null);
+		expect(daoMock.getByEmail(request.getId())).andReturn(null);
 
 		EasyMock.replay(daoMock);
 
@@ -75,7 +75,7 @@ public class ContactControllerTest extends TestCase {
 		user.setEmail("guy@sam.com");
 		user.setName("Guy");
 
-		expect(daoMock.getUserByEmail(request.getId())).andReturn(user);
+		expect(daoMock.getByEmail(request.getId())).andReturn(user);
 
 		EasyMock.replay(daoMock);
 
