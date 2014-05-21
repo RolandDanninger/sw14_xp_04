@@ -193,8 +193,10 @@ public class ServerConnection {
 
 		AddContactResponse res = null;
 		try {
+			Log.d("AddContactResponse", "readValue ...");
 			res = jsonMapper.readValue(httpResponse.getEntity().getContent(),
 					AddContactResponse.class);
+			Log.d("AddContactResponse", "AddContactResponse: " + res);
 		} catch (Exception e) {
 			throw new ServerConnectionException(RES_PARSE_FAILED, e);
 		}

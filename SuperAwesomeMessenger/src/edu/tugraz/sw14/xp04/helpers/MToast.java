@@ -45,14 +45,20 @@ public class MToast {
 				context.getString(R.string.a_sendmessage_error),
 				isShort ? Toast.LENGTH_SHORT : Toast.LENGTH_LONG).show();
 	}
+	public static void errorUserAlreadyExists(Context context, boolean isShort) {
+		Toast.makeText(context,
+				context.getString(R.string.a_add_contact_user_already_exists),
+				isShort ? Toast.LENGTH_SHORT : Toast.LENGTH_LONG).show();
+	}
+	
 	public static void errorAddContactEmail(Context context, boolean isShort) {
 		Toast.makeText(context,
-				context.getString(R.string.a_add_contact_error_login_email),
+				context.getString(R.string.a_add_contact_error_email),
 				isShort ? Toast.LENGTH_SHORT : Toast.LENGTH_LONG).show();
 	}
 	public static void errorAddContact(Context context, boolean isShort) {
 		Toast.makeText(context,
-				context.getString(R.string.a_login_error_login),
+				context.getString(R.string.a_add_contact_error),
 				isShort ? Toast.LENGTH_SHORT : Toast.LENGTH_LONG).show();
 	}
 }

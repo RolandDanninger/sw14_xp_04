@@ -13,6 +13,7 @@ import android.widget.ProgressBar;
 import edu.tugraz.sw14.xp04.gcm.GCM;
 import edu.tugraz.sw14.xp04.helpers.MApp;
 import edu.tugraz.sw14.xp04.helpers.MToast;
+import edu.tugraz.sw14.xp04.helpers.ShPref;
 import edu.tugraz.sw14.xp04.helpers.UserInfo;
 import edu.tugraz.sw14.xp04.server.LoginTask;
 import edu.tugraz.sw14.xp04.server.ServerConnection;
@@ -28,33 +29,34 @@ public class ActivityLogin extends Activity {
 	private Button btnLogin;
 	private Button btnRegister;
 	private ProgressDialog dialog;
-	
+
 	private LoginTaskListener loginTaskListener = new LoginTaskListener() {
-    
-    @Override
-    public void onPreExecute() {
-      dialog = new ProgressDialog(context);
-      dialog.setCancelable(false);
-      dialog.show();
-      dialog.setContentView(new ProgressBar(context));
-    }
-    
-    @Override
-    public void onPostExecute(LoginResponse response) {
-      if (dialog != null)
-        dialog.dismiss();
-      if (response == null)
-        MToast.error(context, true);
-      else {
-        if (response.isError())
-          MToast.errorLogin(context, true);
-        else {
-          MApp.goToActivity((Activity) context,
-              ActivityMain.class, true);
-        }
-      }
-    }
-  };
+
+		@Override
+		public void onPreExecute() {
+			dialog = new ProgressDialog(context);
+			dialog.setCancelable(false);
+			dialog.show();
+			dialog.setContentView(new ProgressBar(context));
+		}
+
+		@Override
+		public void onPostExecute(LoginResponse response) {
+			if (dialog != null)
+				dialog.dismiss();
+			if (response == null)
+				MToast.error(context, true);
+			else {
+				if (response.isError())
+					MToast.errorLogin(context, true);
+				else {
+					saveLoginInfo();
+					MApp.goToActivity((Activity) context, ActivityMain.class,
+							true);
+				}
+			}
+		}
+	};
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -89,6 +91,17 @@ public class ActivityLogin extends Activity {
 			});
 		}
 
+		String email = ShPref.getShPrefString(context, "logininfo_email");
+		String password = ShPref.getShPrefString(context, "logininfo_password");
+		if (email != null && !email.isEmpty()) {
+			if (etEmail != null)
+				etEmail.setText(email);
+		}
+		if (password != null && !password.isEmpty()) {
+			if (etPassword != null)
+				etPassword.setText(password);
+		}
+
 	}
 
 	private void handlerBtnLogin() {
@@ -108,30 +121,46 @@ public class ActivityLogin extends Activity {
 
 	}
 
+	private void saveLoginInfo() {
+		String email = etEmail.getText().toString();
+		String password = etPassword.getText().toString();
+
+		if (email == null || email.isEmpty()) {
+			MToast.errorLoginEmail(context, true);
+			return;
+		}
+		if (password == null || password.isEmpty()) {
+			MToast.errorLoginPassword(context, true);
+			return;
+		}
+		ShPref.setShPrefString(context, "logininfo_email", email);
+		ShPref.setShPrefString(context, "logininfo_password", password);
+	}
+
 	private void handlerBtnRegister() {
 		MApp.goToActivity(this, ActivityRegistration.class, true);
 	}
 
 	protected void doLogin(String email, String password) {
-	  LoginRequest request = new LoginRequest();
-    UserInfo info = GCM.loadIdPair(context);
-    if (info == null) {
-      Log.e("ActivityLogin", "UserInfo is null");
-      return;
-    }
-    String gmcId = info.getGcmRegId();
-    if (gmcId == null) {
-      Log.e("ActivityLogin", "gmcId is null");
-      return;
-    }
-    request.setGcmId(gmcId);
-    request.setId(email);
-    request.setPassword(password);
-    
-    MApp app = MApp.getApp(context);
-    ServerConnection connection = app.getServerConnection();
+		LoginRequest request = new LoginRequest();
+		UserInfo info = GCM.loadIdPair(context);
+		if (info == null) {
+			Log.e("ActivityLogin", "UserInfo is null");
+			return;
+		}
+		String gmcId = info.getGcmRegId();
+		if (gmcId == null) {
+			Log.e("ActivityLogin", "gmcId is null");
+			return;
+		}
+		request.setGcmId(gmcId);
+		request.setId(email);
+		request.setPassword(password);
 
-    LoginTask loginTask = new LoginTask(connection, loginTaskListener);
+		MApp app = MApp.getApp(context);
+		ServerConnection connection = app.getServerConnection();
+
+		LoginTask loginTask = new LoginTask(connection, loginTaskListener);
 		loginTask.execute(request);
 	}
 }

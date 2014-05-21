@@ -451,10 +451,11 @@ public class NavigationDrawerFragment extends Fragment {
 			if (dialog != null)
 				dialog.dismiss();
 			if (response == null){
-				Log.d("AddContactResponse", "AddContactResponse is null");
 				MToast.error(context, true);
 			}
 			else {
+
+				Log.d("AddContactResponse", "AddContactResponse is: \n" + response.toString());
 				if (response.isError())
 					MToast.errorAddContact(context, true);
 				else {
@@ -481,6 +482,13 @@ public class NavigationDrawerFragment extends Fragment {
 	};
 
 	protected void doAddContact(String id) {
+		
+		Database db = new Database(getActivity());
+		if(db.contactAlreadyExists(id)){
+			MToast.errorUserAlreadyExists(getActivity(), true);
+			return;
+		}
+		
 		AddContactRequest request = new AddContactRequest();
 		request.setId(id);
 

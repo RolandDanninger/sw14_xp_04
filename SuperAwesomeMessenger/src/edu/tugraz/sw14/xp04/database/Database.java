@@ -97,9 +97,9 @@ public class Database extends SQLiteOpenHelper {
 	public ArrayList<Contact> getAllContacts() {
 		ArrayList<Contact> list = new ArrayList<Contact>();
 		try {
-			String sql = "SELECT * FROM " + CONTACT_TABLE + ";";
-			// + "ORDER BY "
-			// + CONTACT_NAME + " DESC " + "LIMIT 0 OFFSET 0;";
+			String sql = "SELECT * FROM " + CONTACT_TABLE + " ORDER BY "
+					+ CONTACT_USR_ID + " ASC;";
+			// + " DESC " + "LIMIT 0 OFFSET 0;";
 			SQLiteDatabase db = this.getReadableDatabase();
 			Cursor cursor = db.rawQuery(sql, null);
 			if (cursor != null && cursor.getCount() > 0) {
@@ -115,6 +115,21 @@ public class Database extends SQLiteOpenHelper {
 			return list;
 		} catch (SQLException ignore) {
 			return list;
+		}
+	}
+
+	public boolean contactAlreadyExists(String id) {
+		try {
+			String sql = "SELECT * FROM " + CONTACT_TABLE + " " + "WHERE \""
+					+ CONTACT_USR_ID + "\" = \"" + id + "\";";
+			SQLiteDatabase db = this.getReadableDatabase();
+			Cursor cursor = db.rawQuery(sql, null);
+			if (cursor != null && cursor.getCount() > 0)
+				return true;
+			else
+				return false;
+		} catch (SQLException ignore) {
+			return false;
 		}
 	}
 }
