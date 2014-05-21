@@ -10,10 +10,13 @@ import javax.servlet.http.HttpSession;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import edu.tugraz.sw14.xp04.controllers.ContactController;
 import edu.tugraz.sw14.xp04.controllers.LoginController;
 import edu.tugraz.sw14.xp04.controllers.RegistrationController;
 import edu.tugraz.sw14.xp04.controllers.SendMessageController;
 import edu.tugraz.sw14.xp04.gcm.GCMConnection;
+import edu.tugraz.sw14.xp04.stubs.AddContactRequest;
+import edu.tugraz.sw14.xp04.stubs.AddContactResponse;
 import edu.tugraz.sw14.xp04.stubs.LoginRequest;
 import edu.tugraz.sw14.xp04.stubs.LoginResponse;
 import edu.tugraz.sw14.xp04.stubs.RegistrationRequest;
@@ -45,7 +48,10 @@ public class SuperAwesomeServlet extends HttpServlet {
 				register(request, response);
 			} else if (action.compareTo("send") == 0) {
 				sendMessage(request, response);
+			} else if (action.compareTo("addcontact") == 0) {
+				addContact(request, response);
 			}
+
 		} catch (ServerException e) {
 
 		} catch (UserException e) {
@@ -133,6 +139,34 @@ public class SuperAwesomeServlet extends HttpServlet {
 		} catch (Exception e) {
 			throw new ServerException(
 					"Failed to parse RegistrationResponse to JSON.", e);
+		}
+	}
+
+	private void addContact(HttpServletRequest request,
+			HttpServletResponse response) throws ServerException {
+		AddContactRequest req = null;
+
+		HttpSession session = request.getSession(false);
+		if (session == null) {
+			throw new ServerException("invalid session");
+		}
+
+		try {
+			req = jsonMapper.readValue(request.getInputStream(),
+					AddContactRequest.class);
+		} catch (Exception e) {
+			System.err.println("Failed to parse AddContactRequest.");
+			throw new ServerException("Failed to parse AddContactRequest.", e);
+		}
+
+		ContactController controller = new ContactController();
+		AddContactResponse res = controller.getContactInfo(req);
+
+		try {
+			jsonMapper.writeValue(response.getOutputStream(), res);
+		} catch (Exception e) {
+			throw new ServerException(
+					"Failed to parse AddContactResponse to JSON.", e);
 		}
 	}
 }

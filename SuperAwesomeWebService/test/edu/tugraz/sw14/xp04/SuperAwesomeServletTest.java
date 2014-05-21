@@ -27,6 +27,7 @@ import com.google.appengine.tools.development.testing.LocalDatastoreServiceTestC
 import com.google.appengine.tools.development.testing.LocalServiceTestHelper;
 
 import edu.tugraz.sw14.xp04.entities.dao.UserDAO;
+import edu.tugraz.sw14.xp04.stubs.AddContactRequest;
 import edu.tugraz.sw14.xp04.stubs.LoginRequest;
 import edu.tugraz.sw14.xp04.stubs.RegistrationRequest;
 import edu.tugraz.sw14.xp04.stubs.SendMessageRequest;
@@ -174,6 +175,35 @@ public class SuperAwesomeServletTest extends TestCase {
 				createEmptyServletOutputStream());
 
 		expect(session.getAttribute("id")).andReturn(email);
+
+		EasyMock.replay(requestMock);
+		EasyMock.replay(responseMock);
+		EasyMock.replay(session);
+
+		// Exercise
+		servlet.doPost(requestMock, responseMock);
+
+		// Verify
+		EasyMock.verify(requestMock);
+		EasyMock.verify(responseMock);
+		EasyMock.verify(session);
+	}
+
+	@Test
+	public void testaddContactRequest() throws IOException, ServletException {
+		AddContactRequest request = new AddContactRequest();
+
+		request.setId("email@email.com");
+
+		// Request
+		expect(requestMock.getParameter("action")).andReturn("addcontact");
+		expect(requestMock.getSession(false)).andReturn(session);
+		expect(requestMock.getInputStream()).andReturn(
+				createInputStream(request));
+
+		// Response
+		expect(responseMock.getOutputStream()).andReturn(
+				createEmptyServletOutputStream());
 
 		EasyMock.replay(requestMock);
 		EasyMock.replay(responseMock);
