@@ -18,11 +18,17 @@
         android:text="@string/a_registration_lbl_registration"
         android:textAppearance="?android:attr/textAppearanceMedium" />
 
-    <ImageView
-        android:id="@+id/a_registration_img_logo"
+    <FrameLayout
         android:layout_width="wrap_content"
-        android:layout_height="@dimen/logo_height"
-        android:src="@drawable/banner_sam" />
+        android:layout_height="@dimen/logo_height" >
+
+        <ImageView
+            android:id="@+id/a_registration_img_logo"
+            android:layout_width="match_parent"
+            android:layout_height="match_parent"
+            android:src="@drawable/banner_sam" />
+    </FrameLayout>
+
 
     <TextView
         android:id="@+id/a_registration_lbl_error"

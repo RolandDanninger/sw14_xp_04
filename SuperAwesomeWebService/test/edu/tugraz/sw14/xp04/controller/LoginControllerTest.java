@@ -8,24 +8,29 @@ import org.easymock.EasyMock;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
+import org.junit.Rule;
 import org.junit.Test;
+import org.junit.rules.ExpectedException;
+import org.junit.runner.RunWith;
+import org.junit.runners.JUnit4;
 
 import com.google.appengine.tools.development.testing.LocalDatastoreServiceTestConfig;
 import com.google.appengine.tools.development.testing.LocalServiceTestHelper;
 
 import edu.tugraz.sw14.xp04.controllers.LoginController;
-import edu.tugraz.sw14.xp04.controllers.RegistrationController;
-import edu.tugraz.sw14.xp04.controllers.ServletController;
+import edu.tugraz.sw14.xp04.entities.User;
 import edu.tugraz.sw14.xp04.entities.dao.UserDAO;
 import edu.tugraz.sw14.xp04.stubs.ErrorMessages;
 import edu.tugraz.sw14.xp04.stubs.LoginRequest;
 import edu.tugraz.sw14.xp04.stubs.LoginResponse;
-import edu.tugraz.sw14.xp04.stubs.RegistrationRequest;
-import edu.tugraz.sw14.xp04.stubs.RegistrationResponse;
 
+@RunWith(JUnit4.class)
 public class LoginControllerTest extends TestCase {
 
 	private LoginController controller;
+	private LoginRequest loginRequest;
+	private User user;
+	private UserDAO daoMock;
 	private final LocalServiceTestHelper helper = new LocalServiceTestHelper(
 			new LocalDatastoreServiceTestConfig());
 
@@ -34,6 +39,20 @@ public class LoginControllerTest extends TestCase {
 	public void setUp() {
 		helper.setUp();
 		controller = new LoginController();
+
+		loginRequest = new LoginRequest();
+
+		loginRequest.setId("a@gmail.com");
+		loginRequest.setPassword("pw");
+		loginRequest.setGcmId("1234");
+
+		user = new User();
+		user.setPassword(loginRequest.getPassword());
+		user.setEmail(loginRequest.getId());
+		user.setGcmId(loginRequest.getGcmId());
+
+		daoMock = createMock(UserDAO.class);
+		controller = new LoginController(daoMock);
 	}
 
 	@Override
@@ -41,28 +60,26 @@ public class LoginControllerTest extends TestCase {
 	public void tearDown() {
 		helper.tearDown();
 		controller = null;
+		loginRequest = null;
+		user = null;
+		daoMock = null;
 	}
+
+	@Rule
+	public ExpectedException exception = ExpectedException.none();
 
 	@Test
 	public void testLoginSucceed() {
 
-		RegistrationRequest request = new RegistrationRequest();
+		expect(daoMock.userExistsByEmail(loginRequest.getId())).andReturn(true);
+		expect(daoMock.getUserByEmail(loginRequest.getId())).andReturn(user);
+		daoMock.updateGcmId(loginRequest.getId(), loginRequest.getGcmId());
 
-		request.setId("a@gmail.com");
-		request.setName("wos onders");
-		request.setPassword("pw");
+		EasyMock.replay(daoMock);
 
-		// TODO mock that shit
-		RegistrationController regCon = new RegistrationController();
-		RegistrationResponse response = regCon.register(request);
+		LoginResponse login_response = controller.login(loginRequest);
 
-		LoginRequest login_request = new LoginRequest();
-
-		login_request.setId("a@gmail.com");
-		login_request.setPassword("pw");
-		login_request.setGcmId("1234");
-
-		LoginResponse login_response = controller.login(login_request);
+		EasyMock.verify(daoMock);
 
 		Assert.assertFalse(login_response.isError());
 		Assert.assertNull(login_response.getErrorMessage());
@@ -70,23 +87,17 @@ public class LoginControllerTest extends TestCase {
 
 	@Test
 	public void testWrongPassword() {
-		RegistrationRequest request = new RegistrationRequest();
 
-		request.setId("a@gmail.com");
-		request.setName("wos onders");
-		request.setPassword("pw");
+		loginRequest.setPassword("wrongPassword");
 
-		// TODO mock that shit
-		RegistrationController regCon = new RegistrationController();
-		RegistrationResponse response = regCon.register(request);
+		expect(daoMock.userExistsByEmail(loginRequest.getId())).andReturn(true);
+		expect(daoMock.getUserByEmail(loginRequest.getId())).andReturn(user);
 
-		LoginRequest login_request = new LoginRequest();
+		EasyMock.replay(daoMock);
 
-		login_request.setId("a@gmail.com");
-		login_request.setPassword("haha");
-		login_request.setGcmId("1234");
+		LoginResponse login_response = controller.login(loginRequest);
 
-		LoginResponse login_response = controller.login(login_request);
+		EasyMock.verify(daoMock);
 
 		Assert.assertTrue(login_response.isError());
 		Assert.assertEquals(ErrorMessages.PASSWORD_IS_WRONG,
@@ -94,26 +105,27 @@ public class LoginControllerTest extends TestCase {
 	}
 
 	@Test
-	public void testNonExistingName() {
-		RegistrationRequest request = new RegistrationRequest();
+	public void testNonExistingUser() {
+		expect(daoMock.userExistsByEmail(loginRequest.getId()))
+				.andReturn(false);
 
-		request.setId("a@gmail.com");
-		request.setName("wos onders");
-		request.setPassword("pw");
+		EasyMock.replay(daoMock);
 
-		RegistrationController regCon = new RegistrationController();
-		RegistrationResponse response = regCon.register(request);
+		LoginResponse login_response = controller.login(loginRequest);
 
-		LoginRequest login_request = new LoginRequest();
-
-		login_request.setId("b@gmail.com");
-		login_request.setPassword("pw");
-		login_request.setGcmId("1234");
-
-		LoginResponse login_response = controller.login(login_request);
+		EasyMock.verify(daoMock);
 
 		Assert.assertTrue(login_response.isError());
 		Assert.assertEquals(ErrorMessages.USER_DOES_NOT_EXISTS,
 				login_response.getErrorMessage());
+	}
+
+	@Test
+	public void testRequestIsNull() {
+
+		loginRequest = null;
+
+		exception.expect(IllegalStateException.class);
+		LoginResponse login_response = controller.login(loginRequest);
 	}
 }

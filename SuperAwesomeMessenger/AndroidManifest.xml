@@ -86,6 +86,12 @@
             android:name="edu.tugraz.sw14.xp04.AddContactActivity"
             android:label="@string/title_activity_add_contact" >
         </activity>
+
+        <!-- test derivates -->
+        <activity
+            android:name="edu.tugraz.sw14.xp04.derivates.ActivityLoginDerivate"
+            android:label="@string/title_activity_activity_login" >
+        </activity>
     </application>
 
 </manifest>
