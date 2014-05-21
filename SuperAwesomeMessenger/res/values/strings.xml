@@ -7,6 +7,7 @@
     <string name="hello_world">Hello world!</string>
     <string name="yes">YES</string>
     <string name="no">NO</string>
+    <string name="today">today</string>
     <string name="navigation_drawer_open">Navigation Open</string>
     <string name="navigation_drawer_close">Navigation Close</string>
     <string name="menu">Contacts</string>
@@ -45,5 +46,12 @@
     <string name="a_sendtestmessage_btn_send">Send</string>
     <string name="a_main_quit_app_title">QUIT SAM?</string>
     <string name="a_main_quit_app_desc">Do you want to quit the app?</string>
+    <string name="title_activity_add_contact">AddContactActivity</string>
+    <string name="a_add_contact_txt_name">Contact Name</string>
+    <string name="a_add_contact_txt_mail">Email</string>
+    <string name="a_add_contact_btn_add">Add</string>
+    <string name="a_add_contact_btn_cancel">Cancel</string>
+    <string name="a_add_contact_btn_add_image">Add Image</string>
+    <string name="f_navigation_drawer_btn_add_contact">Add Contact</string>
 
 </resources>

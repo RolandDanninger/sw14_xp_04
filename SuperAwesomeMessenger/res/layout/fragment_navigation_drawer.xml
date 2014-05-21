@@ -8,16 +8,16 @@
     tools:context="edu.tugraz.sw14.xp04.navigation.NavigationDrawerFragment">
     
    <Button
-        android:id="@+id/nav_btn_add"
-        android:layout_width="match_parent"
-        android:layout_height="48dp"
-        android:text="Add Contact"
-        android:paddingLeft="16dp"
-        android:paddingRight="16dp"
-        android:drawableLeft="@drawable/ico_transparent"
-        android:drawableRight="@drawable/ico_w_add_person" 
-        android:background="@drawable/btn_nav"
-        android:textColor="@color/white"/>
+       android:id="@+id/nav_btn_add"
+       android:layout_width="match_parent"
+       android:layout_height="48dp"
+       android:background="@drawable/btn_nav"
+       android:drawableLeft="@drawable/ico_transparent"
+       android:drawableRight="@drawable/ico_w_add_person"
+       android:paddingLeft="16dp"
+       android:paddingRight="16dp"
+       android:text="@string/f_navigation_drawer_btn_add_contact"
+       android:textColor="@color/white" />
     
     <ListView
            android:id="@+id/nav_list" 
