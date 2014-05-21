@@ -17,9 +17,11 @@ public class RegisterTaskTest extends InstrumentationTestCase {
   ServerConnection connectionMock;
 
   RegistrationTaskListener registrationTaskListener = new RegistrationTaskListener() {
+    @Override
     public void onPreExecute() {
     }
 
+    @Override
     public void onPostExecute(RegistrationResponse response) {
     }
   };
@@ -53,7 +55,7 @@ public class RegisterTaskTest extends InstrumentationTestCase {
     EasyMock.replay(connectionMock);
 
     RegistrationTask registrationTask = new RegistrationTask(connectionMock,
-        registrationTaskListener);
+        this.registrationTaskListener);
     registrationTask.execute(request).get();
 
     EasyMock.verify(connectionMock);

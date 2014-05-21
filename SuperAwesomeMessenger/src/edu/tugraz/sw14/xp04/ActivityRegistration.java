@@ -39,7 +39,7 @@ public class ActivityRegistration extends Activity implements OnClickListener {
   private Button btnRegister = null;
   private ProgressDialog dialog;
 
-  private RegistrationTaskListener listener = new RegistrationTaskListener() {
+  private RegistrationTaskListener registrationTaskListener = new RegistrationTaskListener() {
 
     @Override
     public void onPreExecute() {
@@ -150,11 +150,12 @@ public class ActivityRegistration extends Activity implements OnClickListener {
     request.setId(email);
     request.setPassword(password);
     request.setName(email);
-    
+
     MApp app = MApp.getApp(context);
     ServerConnection connection = app.getServerConnection();
 
-    RegistrationTask task = new RegistrationTask(connection, listener);
+    RegistrationTask task = new RegistrationTask(connection,
+        registrationTaskListener);
     task.execute(request);
   }
 }
