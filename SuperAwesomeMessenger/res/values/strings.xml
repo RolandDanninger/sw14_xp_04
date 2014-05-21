@@ -46,12 +46,7 @@
     <string name="a_sendtestmessage_btn_send">Send</string>
     <string name="a_main_quit_app_title">QUIT SAM?</string>
     <string name="a_main_quit_app_desc">Do you want to quit the app?</string>
-    <string name="title_activity_add_contact">AddContactActivity</string>
-    <string name="a_add_contact_txt_name">Contact Name</string>
-    <string name="a_add_contact_txt_mail">Email</string>
-    <string name="a_add_contact_btn_add">Add</string>
-    <string name="a_add_contact_btn_cancel">Cancel</string>
-    <string name="a_add_contact_btn_add_image">Add Image</string>
+    <string name="a_add_contact_txt_mail">enter e-mail</string>
     <string name="f_navigation_drawer_btn_add_contact">Add Contact</string>
 
 </resources>
