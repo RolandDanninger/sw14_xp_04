@@ -1,6 +1,7 @@
 package edu.tugraz.sw14.xp04.controllers;
 
 import edu.tugraz.sw14.xp04.UserException;
+import edu.tugraz.sw14.xp04.entities.User;
 import edu.tugraz.sw14.xp04.entities.dao.UserDAO;
 import edu.tugraz.sw14.xp04.stubs.ErrorMessages;
 import edu.tugraz.sw14.xp04.stubs.RegistrationRequest;
@@ -36,7 +37,9 @@ public class RegistrationController extends ServletController {
 		String name = request.getName();
 		String password = request.getPassword();
 
-		userDAO.insertUser(name, email, password);
+		User u = new User(email, name, password);
+
+		userDAO.insert(u);
 
 		response.setError(false);
 
@@ -53,7 +56,7 @@ public class RegistrationController extends ServletController {
 		if (req.getName() == null || req.getName().equals("")) {
 			throw new UserException(ErrorMessages.NAME_IS_EMPTY);
 		}
-		if (userDAO.userExistsByEmail(req.getId())) {
+		if (userDAO.existsByEmail(req.getId())) {
 			throw new UserException(ErrorMessages.USER_ALREADY_EXISTS);
 		}
 	}

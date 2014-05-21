@@ -66,7 +66,7 @@ public class SendMessageController extends ServletController {
 		if (req.getMessage() == null || req.getMessage().equals("")) {
 			throw new UserException(ErrorMessages.MESSAGE_IS_EMPTY);
 		}
-		if (!userDAO.userExistsByEmail(req.getReceiverId())) {
+		if (!userDAO.existsByEmail(req.getReceiverId())) {
 			throw new UserException(ErrorMessages.RECEIVER_DOES_NOT_EXIST);
 		}
 

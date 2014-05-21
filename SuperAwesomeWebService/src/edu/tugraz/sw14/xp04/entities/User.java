@@ -1,15 +1,11 @@
 package edu.tugraz.sw14.xp04.entities;
 
-import java.util.List;
-
 import javax.persistence.Entity;
-import javax.persistence.EntityManager;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.NamedQueries;
 import javax.persistence.NamedQuery;
-import javax.persistence.Query;
 
 import com.google.appengine.api.datastore.Key;
 
@@ -50,6 +46,13 @@ public class User {
 		this.password = password;
 		this.email = email;
 		this.gcmId = gcmId;
+	}
+
+	public User(String email, String name, String password) {
+		super();
+		this.name = name;
+		this.password = password;
+		this.email = email;
 	}
 
 	public Key getKey() {

@@ -30,11 +30,4 @@ public class ContactStub {
 		this.imgUrl = imgUrl;
 	}
 
-	public ContactStub(String name, String email, String imgUrl) {
-		super();
-		this.name = name;
-		this.email = email;
-		this.imgUrl = imgUrl;
-	}
-
 }
