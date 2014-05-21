@@ -16,85 +16,101 @@ import edu.tugraz.sw14.xp04.entities.User;
 
 public class UserDAO {
 
-	public UserDAO() {}
-	
+	public UserDAO() {
+	}
+
 	public void insertUser(String name, String email, String password) {
-		DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
-		
+		DatastoreService datastore = DatastoreServiceFactory
+				.getDatastoreService();
+
 		Entity newUser = new Entity("User", name);
-		
+
 		datastore.put(newUser);
-		
+
 		Transaction txn = datastore.beginTransaction();
 		Key key = newUser.getKey();
-		
+
 		Entity user;
 		try {
 			user = datastore.get(key);
 			user.setProperty("name", name);
 			user.setProperty("email", email);
 			user.setProperty("password", password);
-			
+
 			datastore.put(user);
-			
+
 		} catch (EntityNotFoundException e) {
 			e.printStackTrace();
 		}
-		
+
 		txn.commit();
 	}
-	
+
 	public boolean userExistsByEmail(String email) {
-		
-		DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
-		
-		Filter emailFilter = new FilterPredicate("email", FilterOperator.EQUAL, email);
-		
+
+		DatastoreService datastore = DatastoreServiceFactory
+				.getDatastoreService();
+
+		Filter emailFilter = new FilterPredicate("email", FilterOperator.EQUAL,
+				email);
+
 		Query query = new Query("User").setFilter(emailFilter);
 		PreparedQuery preparedQuery = datastore.prepare(query);
-		
+
 		Entity userEntity = preparedQuery.asSingleEntity();
-		
+
 		return (userEntity != null);
 	}
-	
+
 	public User getUserByEmail(String email) {
-		
-		DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
-		
-		Filter emailFilter = new FilterPredicate("email", FilterOperator.EQUAL, email);
-		
+
+		DatastoreService datastore = DatastoreServiceFactory
+				.getDatastoreService();
+
+		Filter emailFilter = new FilterPredicate("email", FilterOperator.EQUAL,
+				email);
+
 		Query query = new Query("User").setFilter(emailFilter);
 		PreparedQuery preparedQuery = datastore.prepare(query);
-		
+
 		Entity userEntity = preparedQuery.asSingleEntity();
-		
-		return createUserFromEntity(userEntity);
+
+		if (userEntity == null) {
+			return null;
+		} else {
+			return createUserFromEntity(userEntity);
+		}
 	}
-	
-	public void updateGcmId(String email, String gcmId) {
-		
-		DatastoreService datastore = DatastoreServiceFactory.getDatastoreService();
-		
-		Filter emailFilter = new FilterPredicate("email", FilterOperator.EQUAL, email);
-		
+
+	public boolean updateGcmId(String email, String gcmId) {
+
+		DatastoreService datastore = DatastoreServiceFactory
+				.getDatastoreService();
+
+		Filter emailFilter = new FilterPredicate("email", FilterOperator.EQUAL,
+				email);
+
 		Query query = new Query("User").setFilter(emailFilter);
 		PreparedQuery preparedQuery = datastore.prepare(query);
-		
+
 		Entity userEntity = preparedQuery.asSingleEntity();
 		
+		if (userEntity == null)
+			return false;
+
 		userEntity.setProperty("gcmId", gcmId);
 		datastore.put(userEntity);
+		return true;
 	}
-	
-	public User createUserFromEntity(Entity userEntity) {
-		
+
+	private User createUserFromEntity(Entity userEntity) {
+
 		Key key = userEntity.getKey();
-		String name = (String)userEntity.getProperty("name");
-		String email = (String)userEntity.getProperty("email");
-		String password = (String)userEntity.getProperty("password");
-		String gcmId = (String)userEntity.getProperty("gcmId");
-		
+		String name = (String) userEntity.getProperty("name");
+		String email = (String) userEntity.getProperty("email");
+		String password = (String) userEntity.getProperty("password");
+		String gcmId = (String) userEntity.getProperty("gcmId");
+
 		return new User(key, name, password, email, gcmId);
 	}
 }

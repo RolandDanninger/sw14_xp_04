@@ -73,7 +73,9 @@ public class LoginControllerTest extends TestCase {
 
 		expect(daoMock.userExistsByEmail(loginRequest.getId())).andReturn(true);
 		expect(daoMock.getUserByEmail(loginRequest.getId())).andReturn(user);
-		daoMock.updateGcmId(loginRequest.getId(), loginRequest.getGcmId());
+		expect(
+				daoMock.updateGcmId(loginRequest.getId(),
+						loginRequest.getGcmId())).andReturn(true);
 
 		EasyMock.replay(daoMock);
 
