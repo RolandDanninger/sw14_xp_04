@@ -1,9 +1,11 @@
 package edu.tugraz.sw14.xp04.contacts;
 
 import edu.tugraz.sw14.xp04.R;
+import edu.tugraz.sw14.xp04.database.Database;
 import edu.tugraz.sw14.xp04.helpers.MApp;
 import edu.tugraz.sw14.xp04.helpers.MDownloads;
 import edu.tugraz.sw14.xp04.stubs.ContactStub;
+import android.content.ContentValues;
 import android.content.Context;
 import android.graphics.Bitmap;
 import android.os.AsyncTask;
@@ -99,4 +101,14 @@ public class Contact {
             target.setVisibility(View.VISIBLE);
         }
     }
+
+    public ContentValues toContentValues(){
+        ContentValues v = new ContentValues();
+        v.put(Database.CONTACT_USR_ID, this.email);
+        v.put(Database.CONTACT_NAME, this.name);
+        v.put(Database.CONTACT_IMG_URL, this.imgUrl);
+        
+        return v;
+    }
+
 }
