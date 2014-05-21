@@ -39,7 +39,7 @@ public class ActivityRegistration extends Activity implements OnClickListener {
 	private Button btnRegister = null;
 	private ProgressDialog dialog;
 
-	private RegistrationTaskListener registrationTaskListener = new RegistrationTaskListener() {
+	private final RegistrationTaskListener registrationTaskListener = new RegistrationTaskListener() {
 
 		@Override
 		public void onPreExecute() {
@@ -59,6 +59,9 @@ public class ActivityRegistration extends Activity implements OnClickListener {
 				if (response.isError())
 					MToast.errorRegister(context, true);
 				else {
+					Toast.makeText(ActivityRegistration.this,
+							R.string.a_registration_success, Toast.LENGTH_SHORT)
+							.show();
 					MApp.goToActivity((Activity) context, ActivityLogin.class,
 							true);
 				}
@@ -146,8 +149,6 @@ public class ActivityRegistration extends Activity implements OnClickListener {
 		}
 
 		doRegister(id, password);
-		Toast.makeText(this, R.string.a_registration_success,
-				Toast.LENGTH_SHORT).show();
 	}
 
 	private void doRegister(String email, String password) {
