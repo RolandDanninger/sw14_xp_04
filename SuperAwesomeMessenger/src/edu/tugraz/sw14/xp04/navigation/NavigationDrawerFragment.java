@@ -450,13 +450,14 @@ public class NavigationDrawerFragment extends Fragment {
 		public void onPostExecute(AddContactResponse response) {
 			if (dialog != null)
 				dialog.dismiss();
-			if (response == null)
+			if (response == null){
+				Log.d("AddContactResponse", "AddContactResponse is null");
 				MToast.error(context, true);
+			}
 			else {
 				if (response.isError())
 					MToast.errorAddContact(context, true);
 				else {
-
 					ContactStub contact_stub = response.getContact();
 					if (contact_stub != null) {
 						Contact contact = new Contact(contact_stub);

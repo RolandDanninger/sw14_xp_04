@@ -67,31 +67,31 @@ public class Database extends SQLiteOpenHelper {
 	}
 
 	public boolean insertMsg(ContentValues values) {
+		long result = -1;
 		try {
 			SQLiteDatabase db = this.getWritableDatabase();
-			long result = -1;
 			if (db != null) {
 				result = db.insertWithOnConflict(MSG_TABLE, null, values,
 						SQLiteDatabase.CONFLICT_REPLACE);
 			}
-			return result >= 0;
 		} catch (SQLException ignore) {
 			return false;
 		}
+		return result >= 0;
 	}
 
 	public boolean insertContact(ContentValues values) {
+		long result = -1;
 		try {
 			SQLiteDatabase db = this.getWritableDatabase();
-			long result = -1;
 			if (db != null) {
 				result = db.insertWithOnConflict(CONTACT_TABLE, null, values,
 						SQLiteDatabase.CONFLICT_REPLACE);
 			}
-			return result >= 0;
 		} catch (SQLException ignore) {
 			return false;
 		}
+		return result >= 0;
 	}
 
 	public ArrayList<Contact> getAllContacts() {
