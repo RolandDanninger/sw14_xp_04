@@ -27,6 +27,7 @@ import edu.tugraz.sw14.xp04.stubs.RegistrationResponse;
 public class RegistrationControllerTest extends TestCase {
 
 	private RegistrationController controller;
+	private RegistrationRequest request;
 	private final LocalServiceTestHelper helper = new LocalServiceTestHelper(
 			new LocalDatastoreServiceTestConfig());
 
@@ -35,6 +36,12 @@ public class RegistrationControllerTest extends TestCase {
 	public void setUp() {
 		helper.setUp();
 		controller = new RegistrationController();
+
+		request = new RegistrationRequest();
+
+		request.setId("a@gmail.com");
+		request.setName("horst");
+		request.setPassword("pw");
 	}
 
 	@Override
@@ -49,12 +56,6 @@ public class RegistrationControllerTest extends TestCase {
 
 	@Test
 	public void testRegistrationSucceed() {
-		RegistrationRequest request = new RegistrationRequest();
-
-		request.setId("a@gmail.com");
-		request.setName("wos onders");
-		request.setPassword("pw");
-
 		RegistrationResponse response = controller.register(request);
 
 		Assert.assertFalse(response.isError());
@@ -63,10 +64,7 @@ public class RegistrationControllerTest extends TestCase {
 
 	@Test
 	public void testEmptyPassword() {
-		RegistrationRequest request = new RegistrationRequest();
-
-		request.setId("a@gmail.com");
-		request.setName("wos onders");
+		request.setPassword("");
 
 		RegistrationResponse response = controller.register(request);
 		Assert.assertTrue(response.isError());
@@ -76,10 +74,7 @@ public class RegistrationControllerTest extends TestCase {
 
 	@Test
 	public void testEmptyName() {
-		RegistrationRequest request = new RegistrationRequest();
-
-		request.setId("a@gmail.com");
-		request.setPassword("pw");
+		request.setName("");
 
 		RegistrationResponse response = controller.register(request);
 		Assert.assertTrue(response.isError());
@@ -89,10 +84,7 @@ public class RegistrationControllerTest extends TestCase {
 
 	@Test
 	public void testEmptyEmail() {
-		RegistrationRequest request = new RegistrationRequest();
-
-		request.setName("wos onders");
-		request.setPassword("pw");
+		request.setId(null);
 
 		RegistrationResponse response = controller.register(request);
 		Assert.assertTrue(response.isError());
@@ -104,11 +96,6 @@ public class RegistrationControllerTest extends TestCase {
 	public void testUserExists() {
 		UserDAO daoMock = createMock(UserDAO.class);
 		controller = new RegistrationController(daoMock);
-		RegistrationRequest request = new RegistrationRequest();
-
-		request.setId("a@gmail.com");
-		request.setName("wos onders");
-		request.setPassword("pw");
 
 		expect(daoMock.existsByEmail(request.getId())).andReturn(true);
 		EasyMock.replay(daoMock);
@@ -123,10 +110,9 @@ public class RegistrationControllerTest extends TestCase {
 
 	@Test
 	public void testRequestIsNull() {
-
 		RegistrationRequest request = null;
 
 		exception.expect(IllegalStateException.class);
-		RegistrationResponse response = controller.register(request);
+		controller.register(request);
 	}
 }
