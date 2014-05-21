@@ -18,168 +18,143 @@ import edu.tugraz.sw14.xp04.gcm.GCM;
 import edu.tugraz.sw14.xp04.helpers.MApp;
 import edu.tugraz.sw14.xp04.helpers.MToast;
 import edu.tugraz.sw14.xp04.helpers.UserInfo;
+import edu.tugraz.sw14.xp04.server.LoginTask;
+import edu.tugraz.sw14.xp04.server.RegistrationTask;
+import edu.tugraz.sw14.xp04.server.LoginTask.LoginTaskListener;
+import edu.tugraz.sw14.xp04.server.RegistrationTask.RegistrationTaskListener;
 import edu.tugraz.sw14.xp04.server.ServerConnection;
 import edu.tugraz.sw14.xp04.server.ServerConnectionException;
+import edu.tugraz.sw14.xp04.stubs.LoginResponse;
 import edu.tugraz.sw14.xp04.stubs.RegistrationRequest;
 import edu.tugraz.sw14.xp04.stubs.RegistrationResponse;
 
 public class ActivityRegistration extends Activity implements OnClickListener {
 
-	private Context context;
+  private Context context;
 
-	private EditText txtId = null;
-	private EditText txtPassword = null;
-	private EditText txtPasswordRepeat = null;
-	private TextView lblError = null;
-	private Button btnRegister = null;
+  private EditText txtId = null;
+  private EditText txtPassword = null;
+  private EditText txtPasswordRepeat = null;
+  private TextView lblError = null;
+  private Button btnRegister = null;
+  private ProgressDialog dialog;
 
-	@Override
-	protected void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_registration);
-		context = this;
+  private RegistrationTaskListener listener = new RegistrationTaskListener() {
 
-		txtId = (EditText) findViewById(R.id.a_registration_txt_id);
-		txtPassword = (EditText) findViewById(R.id.a_registration_txt_password);
-		txtPasswordRepeat = (EditText) findViewById(R.id.a_registration_txt_reenter_password);
-		lblError = (TextView) findViewById(R.id.a_registration_lbl_error);
-		btnRegister = (Button) findViewById(R.id.a_registration_btn_register);
-		btnRegister.setOnClickListener(this);
-	}
+    @Override
+    public void onPreExecute() {
+      dialog = new ProgressDialog(context);
+      dialog.setCancelable(false);
+      dialog.show();
+      dialog.setContentView(new ProgressBar(context));
+    }
 
-	@Override
-	public boolean onCreateOptionsMenu(Menu menu) {
+    @Override
+    public void onPostExecute(RegistrationResponse response) {
+      if (dialog != null)
+        dialog.dismiss();
+      if (response == null)
+        MToast.error(context, true);
+      else {
+        if (response.isError())
+          MToast.errorRegister(context, true);
+        else {
+          MApp.goToActivity((Activity) context, ActivityLogin.class, true);
+        }
+      }
+    }
+  };
 
-		// Inflate the menu; this adds items to the action bar if it is present.
-		getMenuInflater().inflate(R.menu.activity_registration, menu);
-		return true;
-	}
+  @Override
+  protected void onCreate(Bundle savedInstanceState) {
+    super.onCreate(savedInstanceState);
+    setContentView(R.layout.activity_registration);
+    context = this;
 
-	@Override
-	public boolean onOptionsItemSelected(MenuItem item) {
-		// Handle action bar item clicks here. The action bar will
-		// automatically handle clicks on the Home/Up button, so long
-		// as you specify a parent activity in AndroidManifest.xml.
-		int id = item.getItemId();
-		if (id == R.id.action_settings) {
-			return true;
-		}
-		return super.onOptionsItemSelected(item);
-	}
+    txtId = (EditText) findViewById(R.id.a_registration_txt_id);
+    txtPassword = (EditText) findViewById(R.id.a_registration_txt_password);
+    txtPasswordRepeat = (EditText) findViewById(R.id.a_registration_txt_reenter_password);
+    lblError = (TextView) findViewById(R.id.a_registration_lbl_error);
+    btnRegister = (Button) findViewById(R.id.a_registration_btn_register);
+    btnRegister.setOnClickListener(this);
+  }
 
-	@Override
-	public void onClick(View arg0) {
-		switch (arg0.getId()) {
-		case R.id.a_registration_btn_register:
-			handlerBtnRegister();
-			break;
-		default:
-			break;
-		}
-	}
+  @Override
+  public boolean onCreateOptionsMenu(Menu menu) {
 
-	private void handlerBtnRegister() {
-		String id = txtId.getText().toString();
-		String password = txtPassword.getText().toString();
-		String passwordRepeat = txtPasswordRepeat.getText().toString();
+    // Inflate the menu; this adds items to the action bar if it is present.
+    getMenuInflater().inflate(R.menu.activity_registration, menu);
+    return true;
+  }
 
-		if (id.isEmpty()) {
-			lblError.setText(R.string.a_registration_error_missing_id);
-			lblError.setVisibility(View.VISIBLE);
-			return;
-		}
-		if (password.isEmpty()) {
-			lblError.setText(R.string.a_registration_error_missing_password);
-			lblError.setVisibility(View.VISIBLE);
-			return;
-		}
-		if (password.compareTo(passwordRepeat) != 0) {
-			lblError.setText(R.string.a_registration_error_passwords_mismatch);
-			lblError.setVisibility(View.VISIBLE);
-			return;
-		}
+  @Override
+  public boolean onOptionsItemSelected(MenuItem item) {
+    // Handle action bar item clicks here. The action bar will
+    // automatically handle clicks on the Home/Up button, so long
+    // as you specify a parent activity in AndroidManifest.xml.
+    int id = item.getItemId();
+    if (id == R.id.action_settings) {
+      return true;
+    }
+    return super.onOptionsItemSelected(item);
+  }
 
-		boolean idValid = android.util.Patterns.EMAIL_ADDRESS.matcher(id)
-				.matches();
-		if (!idValid) {
-			lblError.setText(R.string.a_registration_error_invalid_id);
-			lblError.setVisibility(View.VISIBLE);
-			return;
-		}
+  @Override
+  public void onClick(View arg0) {
+    switch (arg0.getId()) {
+    case R.id.a_registration_btn_register:
+      handlerBtnRegister();
+      break;
+    default:
+      break;
+    }
+  }
 
-		doRegister(id, password);
-		Toast.makeText(this, R.string.a_registration_success,
-				Toast.LENGTH_SHORT).show();
-	}
+  private void handlerBtnRegister() {
+    String id = txtId.getText().toString();
+    String password = txtPassword.getText().toString();
+    String passwordRepeat = txtPasswordRepeat.getText().toString();
 
-	private void doRegister(String email, String password) {
-		new RegisterTask(email, password).execute((Void[]) null);
-	}
+    if (id.isEmpty()) {
+      lblError.setText(R.string.a_registration_error_missing_id);
+      lblError.setVisibility(View.VISIBLE);
+      return;
+    }
+    if (password.isEmpty()) {
+      lblError.setText(R.string.a_registration_error_missing_password);
+      lblError.setVisibility(View.VISIBLE);
+      return;
+    }
+    if (password.compareTo(passwordRepeat) != 0) {
+      lblError.setText(R.string.a_registration_error_passwords_mismatch);
+      lblError.setVisibility(View.VISIBLE);
+      return;
+    }
 
-	private class RegisterTask extends
-			AsyncTask<Void, Void, RegistrationResponse> {
+    boolean idValid = android.util.Patterns.EMAIL_ADDRESS.matcher(id).matches();
+    if (!idValid) {
+      lblError.setText(R.string.a_registration_error_invalid_id);
+      lblError.setVisibility(View.VISIBLE);
+      return;
+    }
 
-		private ProgressDialog dialog;
-		private final String email;
-		private final String password;
+    doRegister(id, password);
+    Toast.makeText(this, R.string.a_registration_success, Toast.LENGTH_SHORT)
+        .show();
+  }
 
-		public RegisterTask(String email, String password) {
-			this.email = email;
-			this.password = password;
-		}
+  private void doRegister(String email, String password) {
 
-		@Override
-		protected void onPreExecute() {
-			super.onPreExecute();
-			dialog = new ProgressDialog(context);
-			dialog.setCancelable(false);
-			dialog.show();
-			dialog.setContentView(new ProgressBar(context));
-		}
+    RegistrationRequest request = new RegistrationRequest();
 
-		@Override
-		protected RegistrationResponse doInBackground(Void... params) {
-			RegistrationResponse response = null;
-			RegistrationRequest request = new RegistrationRequest();
-			UserInfo info = GCM.loadIdPair(context);
-			if (info == null)
-				return null;
-			String gmcId = info.getGcmRegId();
-			if (gmcId == null)
-				return null;
-			request.setId(email);
-			request.setPassword(password);
-			request.setName(email);
+    request.setId(email);
+    request.setPassword(password);
+    request.setName(email);
+    
+    MApp app = MApp.getApp(context);
+    ServerConnection connection = app.getServerConnection();
 
-			MApp app = MApp.getApp(context);
-			ServerConnection connection = app.getServerConnection();
-			if (connection != null) {
-				try {
-					response = connection.register(request);
-					return response;
-				} catch (ServerConnectionException e) {
-					e.printStackTrace();
-				}
-			}
-			return null;
-
-		}
-
-		@Override
-		protected void onPostExecute(RegistrationResponse response) {
-			super.onPostExecute(response);
-			if (dialog != null)
-				dialog.dismiss();
-			if (response == null)
-				MToast.error(context, true);
-			else {
-				if (response.isError())
-					MToast.errorRegister(context, true);
-				else {
-					MApp.goToActivity((Activity) context, ActivityLogin.class,
-							true);
-				}
-			}
-		}
-	}
+    RegistrationTask task = new RegistrationTask(connection, listener);
+    task.execute(request);
+  }
 }
