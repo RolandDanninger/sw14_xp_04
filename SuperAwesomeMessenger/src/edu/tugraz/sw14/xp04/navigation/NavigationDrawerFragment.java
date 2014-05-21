@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import android.app.Activity;
 import android.app.ActionBar;
 import android.app.Fragment;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.view.GravityCompat;
@@ -25,10 +26,15 @@ import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.ListView;
+import android.widget.ProgressBar;
+import edu.tugraz.sw14.xp04.ActivitySendTestMessage;
 import edu.tugraz.sw14.xp04.R;
 import edu.tugraz.sw14.xp04.adapters.ContactAdapter;
 import edu.tugraz.sw14.xp04.contacts.Contact;
 import edu.tugraz.sw14.xp04.helpers.MApp;
+import edu.tugraz.sw14.xp04.helpers.MToast;
+import edu.tugraz.sw14.xp04.server.AddContactTask.AddContactTaskListener;
+import edu.tugraz.sw14.xp04.stubs.AddContactResponse;
 
 /**
  * Fragment used for managing interactions for and presentation of a navigation
@@ -77,6 +83,8 @@ public class NavigationDrawerFragment extends Fragment {
 	private LinearLayout form;
 	private ImageButton addBtnGo;
 	private EditText etEmail;
+
+	private ProgressDialog dialog;
 
 	private boolean contacts_loaded = false;
 
@@ -133,18 +141,20 @@ public class NavigationDrawerFragment extends Fragment {
 
 				@Override
 				public void onClick(View v) {
-					if(form != null) form.setVisibility(View.VISIBLE);
-					if(v != null) v.setVisibility(View.INVISIBLE);
+					if (form != null)
+						form.setVisibility(View.VISIBLE);
+					if (v != null)
+						v.setVisibility(View.INVISIBLE);
 
 				}
 			});
 		}
 
 		this.form = (LinearLayout) mLayout.findViewById(R.id.nav_lin_add_form);
-		if (this.form != null){
+		if (this.form != null) {
 			this.form.setVisibility(View.INVISIBLE);
 		}
-		this.etEmail = (EditText)mLayout.findViewById(R.id.nav_et_add_mail);
+		this.etEmail = (EditText) mLayout.findViewById(R.id.nav_et_add_mail);
 		this.addBtnGo = (ImageButton) mLayout.findViewById(R.id.nav_btn_add_go);
 		if (this.addBtnGo != null) {
 			this.addBtnGo.setOnClickListener(new OnClickListener() {
@@ -401,5 +411,32 @@ public class NavigationDrawerFragment extends Fragment {
 		 */
 		void onNavigationDrawerItemSelected(int position);
 	}
+
+	private AddContactTaskListener addContactTaskListener = new AddContactTaskListener() {
+
+		@Override
+		public void onPreExecute() {
+			dialog = new ProgressDialog(context);
+			dialog.setCancelable(false);
+			dialog.show();
+			dialog.setContentView(new ProgressBar(context));
+		}
+
+		@Override
+		public void onPostExecute(AddContactResponse response) {
+			if (dialog != null)
+				dialog.dismiss();
+			if (response == null)
+				MToast.error(context, true);
+			else {
+				if (response.isError())
+					MToast.errorLogin(context, true);
+				else {
+					MApp.goToActivity((Activity) context,
+							ActivitySendTestMessage.class, true);
+				}
+			}
+		}
+	};
 
 }
