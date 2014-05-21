@@ -152,42 +152,41 @@ public class SuperAwesomeServletTest extends TestCase {
 		EasyMock.verify(responseMock);
 	}
 
-	// @Test
-	// public void testSendMessageRequest() throws IOException, ServletException
-	// {
-	// // Fixture Setup
-	// final String email = "email@email.com";
-	// final String message = "hallo, test message";
-	//
-	// SendMessageRequest request = new SendMessageRequest();
-	//
-	// request.setMessage(message);
-	// request.setReceiverId(email);
-	//
-	// // Request
-	// expect(requestMock.getParameter("action")).andReturn("send");
-	// expect(requestMock.getSession(false)).andReturn(session);
-	// expect(requestMock.getInputStream()).andReturn(
-	// createInputStream(request));
-	//
-	// // Response
-	// expect(responseMock.getOutputStream()).andReturn(
-	// createEmptyServletOutputStream());
-	//
-	// expect(session.getAttribute("id")).andReturn(email);
-	//
-	// EasyMock.replay(requestMock);
-	// EasyMock.replay(responseMock);
-	// EasyMock.replay(session);
-	//
-	// // Exercise
-	// servlet.doPost(requestMock, responseMock);
-	//
-	// // Verify
-	// EasyMock.verify(requestMock);
-	// EasyMock.verify(responseMock);
-	// EasyMock.verify(session);
-	// }
+	@Test
+	public void testSendMessageRequest() throws IOException, ServletException {
+		// Fixture Setup
+		final String email = "email@email.com";
+		final String message = "hallo, test message";
+
+		SendMessageRequest request = new SendMessageRequest();
+
+		request.setMessage(message);
+		request.setReceiverId(email);
+
+		// Request
+		expect(requestMock.getParameter("action")).andReturn("send");
+		expect(requestMock.getSession(false)).andReturn(session);
+		expect(requestMock.getInputStream()).andReturn(
+				createInputStream(request));
+
+		// Response
+		expect(responseMock.getOutputStream()).andReturn(
+				createEmptyServletOutputStream());
+
+		expect(session.getAttribute("id")).andReturn(email);
+
+		EasyMock.replay(requestMock);
+		EasyMock.replay(responseMock);
+		EasyMock.replay(session);
+
+		// Exercise
+		servlet.doPost(requestMock, responseMock);
+
+		// Verify
+		EasyMock.verify(requestMock);
+		EasyMock.verify(responseMock);
+		EasyMock.verify(session);
+	}
 
 	private ServletInputStream createInputStream(final String input) {
 		return new ServletInputStream() {

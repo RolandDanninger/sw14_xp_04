@@ -2,6 +2,8 @@ package edu.tugraz.sw14.xp04.navigation;
 
 import java.util.ArrayList;
 
+import com.google.android.gms.internal.et;
+
 import android.app.Activity;
 import android.app.ActionBar;
 import android.app.Fragment;
@@ -10,10 +12,12 @@ import android.content.Context;
 import android.support.v4.app.ActionBarDrawerToggle;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
+import android.text.Editable;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -31,10 +35,18 @@ import edu.tugraz.sw14.xp04.ActivitySendTestMessage;
 import edu.tugraz.sw14.xp04.R;
 import edu.tugraz.sw14.xp04.adapters.ContactAdapter;
 import edu.tugraz.sw14.xp04.contacts.Contact;
+import edu.tugraz.sw14.xp04.gcm.GCM;
 import edu.tugraz.sw14.xp04.helpers.MApp;
 import edu.tugraz.sw14.xp04.helpers.MToast;
+import edu.tugraz.sw14.xp04.helpers.UserInfo;
+import edu.tugraz.sw14.xp04.server.AddContactTask;
+import edu.tugraz.sw14.xp04.server.LoginTask;
+import edu.tugraz.sw14.xp04.server.ServerConnection;
 import edu.tugraz.sw14.xp04.server.AddContactTask.AddContactTaskListener;
+import edu.tugraz.sw14.xp04.stubs.AddContactRequest;
 import edu.tugraz.sw14.xp04.stubs.AddContactResponse;
+import edu.tugraz.sw14.xp04.stubs.ContactStub;
+import edu.tugraz.sw14.xp04.stubs.LoginRequest;
 
 /**
  * Fragment used for managing interactions for and presentation of a navigation
@@ -161,7 +173,19 @@ public class NavigationDrawerFragment extends Fragment {
 
 				@Override
 				public void onClick(View v) {
-					// TODO Auto-generated method stub
+					if (!MApp.isNetworkAvailable(getActivity())) {
+						MToast.errorNetwork(getActivity(), true);
+					}
+					if (etEmail != null) {
+						Editable eaEmail = etEmail.getText();
+						if (eaEmail != null) {
+							String id = eaEmail.toString();
+							if (id != null && !id.isEmpty())
+								doAddContact(id);
+							else
+								MToast.errorAddContactEmail(getActivity(), true);
+						}
+					}
 
 				}
 			});
@@ -178,28 +202,27 @@ public class NavigationDrawerFragment extends Fragment {
 	}
 
 	private void loadContacts() {
-		if (MApp.isNetworkAvailable(context)) {
+		// TODO read from database (sort by date??)
+		this.list.clear();
+		this.list.add(new Contact("Test", "test@test.com", null));
+		this.list
+				.add(new Contact(
+						"Max Mustermann",
+						"max.mustermann@gmail.com",
+						"http://www.womenshealthmag.com/files/wh6_uploads/imagecache/scale_600_wide/files/images/0709-a-wh-fitness-1847.jpg"));
+		this.list
+				.add(new Contact(
+						"Susi Studierschnell",
+						"susi@gmail.com",
+						"https://lh4.googleusercontent.com/-OSQFDHoiicI/Ubn6r5qfS7I/AAAAAAABUT4/XyIQ1Rb4jJc/s1600/Competitors-2013-Brazil-Mister-Fitness-contest.jpg"));
+		this.list
+				.add(new Contact(
+						"Hans Guck In Die Luft",
+						"hansi@guck-in-die-luft.at",
+						"http://www.womenshealthmag.com/files/wh6_uploads/images/fitness-star-images-main.jpg"));
+		this.adapter.notifyDataSetChanged();
+		this.contacts_loaded = true;
 
-			this.list.clear();
-			this.list.add(new Contact("Test", "test@test.com", null));
-			this.list
-					.add(new Contact(
-							"Max Mustermann",
-							"max.mustermann@gmail.com",
-							"http://www.womenshealthmag.com/files/wh6_uploads/imagecache/scale_600_wide/files/images/0709-a-wh-fitness-1847.jpg"));
-			this.list
-					.add(new Contact(
-							"Susi Studierschnell",
-							"susi@gmail.com",
-							"https://lh4.googleusercontent.com/-OSQFDHoiicI/Ubn6r5qfS7I/AAAAAAABUT4/XyIQ1Rb4jJc/s1600/Competitors-2013-Brazil-Mister-Fitness-contest.jpg"));
-			this.list
-					.add(new Contact(
-							"Hans Guck In Die Luft",
-							"hansi@guck-in-die-luft.at",
-							"http://www.womenshealthmag.com/files/wh6_uploads/images/fitness-star-images-main.jpg"));
-			this.adapter.notifyDataSetChanged();
-			this.contacts_loaded = true;
-		}
 	}
 
 	public boolean isDrawerOpen() {
@@ -430,13 +453,34 @@ public class NavigationDrawerFragment extends Fragment {
 				MToast.error(context, true);
 			else {
 				if (response.isError())
-					MToast.errorLogin(context, true);
+					MToast.errorAddContact(context, true);
 				else {
-					MApp.goToActivity((Activity) context,
-							ActivitySendTestMessage.class, true);
+
+					ContactStub contact_stub = response.getContact();
+					if (contact_stub != null) {
+						// TODO add contact to db
+						Contact contact = new Contact(contact_stub);
+						// DB.addContact(contact)
+						
+						if(form != null) form.setVisibility(View.INVISIBLE);
+						if(etEmail != null) etEmail.setText("");
+						if(addBtn != null) addBtn.setVisibility(View.VISIBLE);
+					} else
+						MToast.errorAddContact(context, true);
 				}
 			}
 		}
 	};
 
+	protected void doAddContact(String id) {
+		AddContactRequest request = new AddContactRequest();
+		request.setId(id);
+
+		MApp app = MApp.getApp(context);
+		ServerConnection connection = app.getServerConnection();
+
+		AddContactTask addContactTask = new AddContactTask(connection,
+				addContactTaskListener);
+		addContactTask.execute(request);
+	}
 }

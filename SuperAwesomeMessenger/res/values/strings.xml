@@ -39,6 +39,8 @@
     <string name="a_login_error_login_email">Please enter an email address in the ID field!</string>
     <string name="a_login_error_login_password">Please enter a password!</string>
     <string name="a_login_success_login">Logged in</string>
+    <string name="a_add_contact_error_login">User not found!</string>
+    <string name="a_add_contact_error_login_email">Please enter an email address!</string>
     <string name="a_sendmessage_error">Message sent failed!</string>
     <string name="title_activity_activity_send_test_message">ActivitySendTestMessage</string>
     <string name="a_sendtestmessage_txt_id">ID...</string>
