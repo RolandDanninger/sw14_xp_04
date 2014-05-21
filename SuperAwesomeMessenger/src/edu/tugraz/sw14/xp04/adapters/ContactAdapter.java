@@ -9,8 +9,10 @@ import android.widget.ArrayAdapter;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
+import edu.tugraz.sw14.xp04.ActivityMsg;
 import edu.tugraz.sw14.xp04.R;
 import edu.tugraz.sw14.xp04.contacts.Contact;
+import edu.tugraz.sw14.xp04.helpers.MApp;
 
 import java.util.List;
 
@@ -60,7 +62,7 @@ public class ContactAdapter extends ArrayAdapter<Contact>{
             private String email = item.getEmail();
             @Override
             public void onClick(View v) {
-                //TODO goto chat by email
+                MApp.goToActivity(activity, ActivityMsg.class, false);
             }
         });
         itemView.setBackgroundResource(R.drawable.btn_nav_item);

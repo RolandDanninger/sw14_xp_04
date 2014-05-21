@@ -18,10 +18,7 @@ public class ActivityMsg extends Activity {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_msg);
 
-		if (savedInstanceState == null) {
-			getFragmentManager().beginTransaction()
-					.add(R.id.container, new PlaceholderFragment()).commit();
-		}
+		
 	}
 
 	@Override
@@ -42,23 +39,6 @@ public class ActivityMsg extends Activity {
 			return true;
 		}
 		return super.onOptionsItemSelected(item);
-	}
-
-	/**
-	 * A placeholder fragment containing a simple view.
-	 */
-	public static class PlaceholderFragment extends Fragment {
-
-		public PlaceholderFragment() {
-		}
-
-		@Override
-		public View onCreateView(LayoutInflater inflater, ViewGroup container,
-				Bundle savedInstanceState) {
-			View rootView = inflater.inflate(R.layout.fragment_activity_msg,
-					container, false);
-			return rootView;
-		}
 	}
 
 }
