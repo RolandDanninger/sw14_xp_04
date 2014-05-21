@@ -53,12 +53,15 @@ public class ChatOverviewAdapter extends ArrayAdapter<ChatOverview> {
 				.findViewById(R.id.item_chat_overview_time);
 		TextView date = (TextView) itemView
 				.findViewById(R.id.item_chat_overview_date);
+		View notification = itemView
+				.findViewById(R.id.item_chat_overview_notification);
 		String str_name = item.getTitle().toUpperCase();
 		String str_desc = item.getDesc();
 		String str_time = DateTime.timeFromStamp(item.getTimestamp());
 		String str_date;
 		if (DateTime.isToday(item.getTimestamp()))
-			str_date = activity.getResources().getString(R.string.today).toUpperCase();
+			str_date = activity.getResources().getString(R.string.today)
+					.toUpperCase();
 		else
 			str_date = DateTime.dateFromStamp(item.getTimestamp());
 
@@ -76,6 +79,14 @@ public class ChatOverviewAdapter extends ArrayAdapter<ChatOverview> {
 			time.setText(str_time);
 		if (date != null)
 			date.setText(str_date);
+
+		if (item.getNewMsg() > 0) {
+			if (notification != null)
+				notification.setVisibility(View.VISIBLE);
+		} else {
+			if (notification != null)
+				notification.setVisibility(View.INVISIBLE);
+		}
 
 		itemView.setOnClickListener(new View.OnClickListener() {
 			private String id = item.getId();

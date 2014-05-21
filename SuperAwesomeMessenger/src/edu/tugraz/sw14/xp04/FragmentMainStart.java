@@ -92,22 +92,26 @@ public class FragmentMainStart extends Fragment {
                     "letzte nachricht inhalt",
                     "nachricht@von.user",
                     System.currentTimeMillis() - (1000 * 60 * 60 *24 * 2),
-                    null));
+                    null,
+                    0));
             this.list.add(new ChatOverview("Nachricht von",
                     "letzte nachricht inhalt",
                     "nachricht@von.user",
                     System.currentTimeMillis(),
-                    "http://www.womenshealthmag.com/files/wh6_uploads/imagecache/scale_600_wide/files/images/0709-a-wh-fitness-1847.jpg"));
+                    "http://www.womenshealthmag.com/files/wh6_uploads/imagecache/scale_600_wide/files/images/0709-a-wh-fitness-1847.jpg",
+                    0));
             this.list.add(new ChatOverview("Nachricht von",
                     "letzte nachricht inhalt",
                     "nachricht@von.user",
                     System.currentTimeMillis(),
-                    "https://lh4.googleusercontent.com/-OSQFDHoiicI/Ubn6r5qfS7I/AAAAAAABUT4/XyIQ1Rb4jJc/s1600/Competitors-2013-Brazil-Mister-Fitness-contest.jpg"));
+                    "https://lh4.googleusercontent.com/-OSQFDHoiicI/Ubn6r5qfS7I/AAAAAAABUT4/XyIQ1Rb4jJc/s1600/Competitors-2013-Brazil-Mister-Fitness-contest.jpg",
+                    0));
             this.list.add(new ChatOverview("Nachricht von",
                     "letzte nachricht inhalt",
                     "nachricht@von.user",
                     System.currentTimeMillis(),
-                    "http://www.womenshealthmag.com/files/wh6_uploads/images/fitness-star-images-main.jpg"));
+                    "http://www.womenshealthmag.com/files/wh6_uploads/images/fitness-star-images-main.jpg",
+                    0));
             this.adapter.notifyDataSetChanged();
             this.chat_overviews_loaded = true;
         }

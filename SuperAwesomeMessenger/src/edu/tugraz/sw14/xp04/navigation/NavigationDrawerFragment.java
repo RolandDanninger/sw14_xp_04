@@ -35,6 +35,7 @@ import edu.tugraz.sw14.xp04.ActivitySendTestMessage;
 import edu.tugraz.sw14.xp04.R;
 import edu.tugraz.sw14.xp04.adapters.ContactAdapter;
 import edu.tugraz.sw14.xp04.contacts.Contact;
+import edu.tugraz.sw14.xp04.database.Database;
 import edu.tugraz.sw14.xp04.gcm.GCM;
 import edu.tugraz.sw14.xp04.helpers.MApp;
 import edu.tugraz.sw14.xp04.helpers.MToast;
@@ -194,7 +195,7 @@ public class NavigationDrawerFragment extends Fragment {
 		this.list = new ArrayList<Contact>();
 		this.listView = (ListView) mLayout.findViewById(R.id.nav_list);
 		this.adapter = new ContactAdapter(getActivity(), R.layout.item_contact,
-				list);
+				this.list);
 		this.listView.setAdapter(this.adapter);
 		loadContacts();
 
@@ -204,25 +205,25 @@ public class NavigationDrawerFragment extends Fragment {
 	private void loadContacts() {
 		// TODO read from database (sort by date??)
 		this.list.clear();
-		this.list.add(new Contact("Test", "test@test.com", null));
-		this.list
-				.add(new Contact(
-						"Max Mustermann",
-						"max.mustermann@gmail.com",
-						"http://www.womenshealthmag.com/files/wh6_uploads/imagecache/scale_600_wide/files/images/0709-a-wh-fitness-1847.jpg"));
-		this.list
-				.add(new Contact(
-						"Susi Studierschnell",
-						"susi@gmail.com",
-						"https://lh4.googleusercontent.com/-OSQFDHoiicI/Ubn6r5qfS7I/AAAAAAABUT4/XyIQ1Rb4jJc/s1600/Competitors-2013-Brazil-Mister-Fitness-contest.jpg"));
-		this.list
-				.add(new Contact(
-						"Hans Guck In Die Luft",
-						"hansi@guck-in-die-luft.at",
-						"http://www.womenshealthmag.com/files/wh6_uploads/images/fitness-star-images-main.jpg"));
+		Database db = new Database(getActivity());
+
+//		boolean b = db.insertContact(new Contact(
+//						"Max Mustermann",
+//						"max.mustermann@gmail.com",
+//						"http://www.womenshealthmag.com/files/wh6_uploads/imagecache/scale_600_wide/files/images/0709-a-wh-fitness-1847.jpg").toContentValues());
+//		db.insertContact(new Contact(
+//						"Susi Studierschnell",
+//						"susi@gmail.com",
+//						"https://lh4.googleusercontent.com/-OSQFDHoiicI/Ubn6r5qfS7I/AAAAAAABUT4/XyIQ1Rb4jJc/s1600/Competitors-2013-Brazil-Mister-Fitness-contest.jpg").toContentValues());
+//		db.insertContact(new Contact(
+//						"Hans Guck In Die Luft",
+//						"hansi@guck-in-die-luft.at",
+//						"http://www.womenshealthmag.com/files/wh6_uploads/images/fitness-star-images-main.jpg").toContentValues());
+//		Log.d("database", "insert ? = " + b);
+		
+		this.list.addAll(db.getAllContacts());
 		this.adapter.notifyDataSetChanged();
 		this.contacts_loaded = true;
-
 	}
 
 	public boolean isDrawerOpen() {
@@ -449,22 +450,29 @@ public class NavigationDrawerFragment extends Fragment {
 		public void onPostExecute(AddContactResponse response) {
 			if (dialog != null)
 				dialog.dismiss();
-			if (response == null)
+			if (response == null){
+				Log.d("AddContactResponse", "AddContactResponse is null");
 				MToast.error(context, true);
+			}
 			else {
 				if (response.isError())
 					MToast.errorAddContact(context, true);
 				else {
-
 					ContactStub contact_stub = response.getContact();
 					if (contact_stub != null) {
-						// TODO add contact to db
 						Contact contact = new Contact(contact_stub);
-						// DB.addContact(contact)
-						
-						if(form != null) form.setVisibility(View.INVISIBLE);
-						if(etEmail != null) etEmail.setText("");
-						if(addBtn != null) addBtn.setVisibility(View.VISIBLE);
+						Database db = new Database(getActivity());
+						if (db.insertContact(contact.toContentValues())) {
+							if (form != null)
+								form.setVisibility(View.INVISIBLE);
+							if (etEmail != null)
+								etEmail.setText("");
+							if (addBtn != null)
+								addBtn.setVisibility(View.VISIBLE);
+							
+							loadContacts();
+						} else
+							MToast.error(getActivity(), true);
 					} else
 						MToast.errorAddContact(context, true);
 				}

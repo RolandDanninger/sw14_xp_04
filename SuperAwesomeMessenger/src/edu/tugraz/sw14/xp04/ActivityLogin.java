@@ -50,7 +50,7 @@ public class ActivityLogin extends Activity {
           MToast.errorLogin(context, true);
         else {
           MApp.goToActivity((Activity) context,
-              ActivitySendTestMessage.class, true);
+              ActivityMain.class, true);
         }
       }
     }
