@@ -15,6 +15,7 @@ import edu.tugraz.sw14.xp04.helpers.MApp;
 import edu.tugraz.sw14.xp04.helpers.MToast;
 import edu.tugraz.sw14.xp04.helpers.UserInfo;
 import edu.tugraz.sw14.xp04.server.LoginTask;
+import edu.tugraz.sw14.xp04.server.ServerConnection;
 import edu.tugraz.sw14.xp04.server.LoginTask.LoginTaskListener;
 import edu.tugraz.sw14.xp04.stubs.LoginRequest;
 import edu.tugraz.sw14.xp04.stubs.LoginResponse;
@@ -126,8 +127,11 @@ public class ActivityLogin extends Activity {
     request.setGcmId(gmcId);
     request.setId(email);
     request.setPassword(password);
+    
+    MApp app = MApp.getApp(context);
+    ServerConnection connection = app.getServerConnection();
 
-    LoginTask loginTask = new LoginTask(context, loginTaskListener);
+    LoginTask loginTask = new LoginTask(connection, loginTaskListener);
 		loginTask.execute(request);
 	}
 }

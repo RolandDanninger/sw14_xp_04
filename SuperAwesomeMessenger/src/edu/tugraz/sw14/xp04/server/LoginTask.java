@@ -1,15 +1,13 @@
 package edu.tugraz.sw14.xp04.server;
 
-import android.content.Context;
 import android.os.AsyncTask;
 import android.util.Log;
-import edu.tugraz.sw14.xp04.helpers.MApp;
 import edu.tugraz.sw14.xp04.stubs.LoginRequest;
 import edu.tugraz.sw14.xp04.stubs.LoginResponse;
 
 public class LoginTask extends AsyncTask<LoginRequest, Void, LoginResponse> {
 
-  private final Context context;
+  private final ServerConnection connection;
   private LoginTaskListener listener;
 
   public interface LoginTaskListener {
@@ -18,8 +16,8 @@ public class LoginTask extends AsyncTask<LoginRequest, Void, LoginResponse> {
     void onPostExecute(LoginResponse response);
   }
 
-  public LoginTask(Context context, LoginTaskListener listener) {
-    this.context = context;
+  public LoginTask(ServerConnection connection, LoginTaskListener listener) {
+    this.connection = connection;
     this.listener = listener;
   }
 
@@ -33,8 +31,6 @@ public class LoginTask extends AsyncTask<LoginRequest, Void, LoginResponse> {
   protected LoginResponse doInBackground(LoginRequest... params) {
     LoginResponse response = null;
 
-    MApp app = MApp.getApp(context);
-    ServerConnection connection = app.getServerConnection();
     if (connection != null) {
       try {
         response = connection.login(params[0]);
@@ -43,6 +39,8 @@ public class LoginTask extends AsyncTask<LoginRequest, Void, LoginResponse> {
         Log.e("LoginTask", e.getMessage(), e);
       }
     }
+    else
+      Log.e("LoginTask", "connection is null");
     return null;
   }
 
