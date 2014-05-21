@@ -1,27 +1,67 @@
 <LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
     xmlns:tools="http://schemas.android.com/tools"
     xmlns:app="http://schemas.android.com/apk/res-auto"
-    android:orientation="vertical"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     android:background="@color/bg_navi"
-    tools:context="edu.tugraz.sw14.xp04.navigation.NavigationDrawerFragment">
-    
-   <Button
-        android:id="@+id/nav_btn_add"
+    android:orientation="vertical"
+    tools:context="edu.tugraz.sw14.xp04.navigation.NavigationDrawerFragment" >
+
+    <FrameLayout
         android:layout_width="match_parent"
-        android:layout_height="48dp"
-        android:text="Add Contact"
-        android:paddingLeft="16dp"
-        android:paddingRight="16dp"
-        android:drawableLeft="@drawable/ico_transparent"
-        android:drawableRight="@drawable/ico_w_add_person" 
-        android:background="@drawable/btn_nav"
-        android:textColor="@color/white"/>
-    
+        android:layout_height="48dp" >
+
+        <LinearLayout
+            android:id="@+id/nav_lin_add_form"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:gravity="center_vertical"
+            android:orientation="horizontal"
+            android:background="@color/bg_light" >
+
+            <EditText
+                android:id="@+id/nav_et_add_mail"
+                android:layout_width="0dp"
+                android:layout_height="wrap_content"
+                android:layout_weight="1"
+                android:layout_marginLeft="4dp"
+                android:layout_marginRight="4dp"
+                android:textColorHint="@color/fnt_dark3"
+                android:textColor="@color/white"
+                android:fontFamily="sans-serif-light"
+                android:ems="10"
+                android:hint="@string/a_add_contact_txt_mail"
+                android:inputType="textEmailAddress" />
+
+            <ImageButton
+                android:id="@+id/nav_btn_add_go"
+                android:layout_width="48dp"
+                android:layout_height="48dp"
+                android:layout_gravity="right"
+                android:background="@drawable/btn_nav"
+                android:paddingLeft="16dp"
+                android:paddingRight="16dp"
+                android:src="@drawable/ico_w_add_person"
+                android:text="@string/f_navigation_drawer_btn_add_contact"
+                android:textColor="@color/white" />
+        </LinearLayout>
+
+        <Button
+            android:id="@+id/nav_btn_add"
+            android:layout_width="match_parent"
+            android:layout_height="48dp"
+            android:background="@drawable/btn_nav"
+            android:drawableLeft="@drawable/ico_transparent"
+            android:drawableRight="@drawable/ico_w_add_person"
+            android:paddingLeft="16dp"
+            android:paddingRight="16dp"
+            android:text="@string/f_navigation_drawer_btn_add_contact"
+            android:textColor="@color/white" />
+    </FrameLayout>
+
     <ListView
-           android:id="@+id/nav_list" 
-           android:layout_width="match_parent"
-           android:layout_height="match_parent"/>
-    
+        android:id="@+id/nav_list"
+        android:layout_width="match_parent"
+        android:layout_height="match_parent" />
+
 </LinearLayout>

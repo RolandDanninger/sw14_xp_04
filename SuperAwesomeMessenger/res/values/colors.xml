@@ -5,9 +5,11 @@
     <color name="white">#FFFFFFFF</color>
     <color name="bg_app">#FFDDDDDD</color>
     <color name="bg_navi">#FFDDDDDD</color>
+    <color name="bg_light">#FFBBBBBB</color>
     
     <color name="fnt_dark1">#FF111111</color>
     <color name="fnt_dark2">#FF333333</color>
+    <color name="fnt_dark3">#FF555555</color>
     
     <color name="highlight_light">#33B5E5</color>
     <color name="highlight_dark">#0099CC</color>

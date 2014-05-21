@@ -8,7 +8,6 @@
         android:minSdkVersion="16"
         android:targetSdkVersion="16" />
 
-    
     <permission
         android:name="com.appsrox.instachat.permission.C2D_MESSAGE"
         android:protectionLevel="signature" />
@@ -83,8 +82,8 @@
             android:name="edu.tugraz.sw14.xp04.ActivitySendTestMessage"
             android:label="@string/title_activity_activity_send_test_message" >
         </activity>
-        
-        <!--test derivates -->
+
+        <!-- test derivates -->
         <activity
             android:name="edu.tugraz.sw14.xp04.derivates.ActivityLoginDerivate"
             android:label="@string/title_activity_activity_login" >
