@@ -1,7 +1,13 @@
 package edu.tugraz.sw14.xp04.controller;
 
+import static org.easymock.EasyMock.createMock;
+import static org.easymock.EasyMock.expect;
+
+import java.io.IOException;
+
 import junit.framework.TestCase;
 
+import org.easymock.EasyMock;
 import org.junit.After;
 import org.junit.Assert;
 import org.junit.Before;
@@ -9,26 +15,30 @@ import org.junit.Test;
 
 import com.google.appengine.tools.development.testing.LocalDatastoreServiceTestConfig;
 import com.google.appengine.tools.development.testing.LocalServiceTestHelper;
+import com.google.apphosting.utils.config.ClientDeployYamlMaker.Request;
 
-import edu.tugraz.sw14.xp04.controllers.LoginController;
-import edu.tugraz.sw14.xp04.controllers.RegistrationController;
+import edu.tugraz.sw14.xp04.ServerException;
+import edu.tugraz.sw14.xp04.controllers.SendMessageController;
+import edu.tugraz.sw14.xp04.entities.User;
+import edu.tugraz.sw14.xp04.entities.dao.UserDAO;
+import edu.tugraz.sw14.xp04.gcm.GCMConnection;
 import edu.tugraz.sw14.xp04.stubs.ErrorMessages;
-import edu.tugraz.sw14.xp04.stubs.LoginRequest;
-import edu.tugraz.sw14.xp04.stubs.LoginResponse;
-import edu.tugraz.sw14.xp04.stubs.RegistrationRequest;
-import edu.tugraz.sw14.xp04.stubs.RegistrationResponse;
+import edu.tugraz.sw14.xp04.stubs.SendMessageRequest;
+import edu.tugraz.sw14.xp04.stubs.SendMessageResponse;
 
 public class SendMessageControllerTest extends TestCase {
 
-	private LoginController controller;
+	private SendMessageController controller;
 	private final LocalServiceTestHelper helper = new LocalServiceTestHelper(
 			new LocalDatastoreServiceTestConfig());
+	private GCMConnection gcmConMock;
 
 	@Override
 	@Before
 	public void setUp() {
 		helper.setUp();
-		controller = new LoginController();
+		gcmConMock = createMock(GCMConnection.class);
+		controller = new SendMessageController(gcmConMock);
 	}
 
 	@Override
@@ -39,76 +49,68 @@ public class SendMessageControllerTest extends TestCase {
 	}
 
 	@Test
-	public void testLoginSucceed() {
+	public void testSendMessageSucceed() {
+		UserDAO daoMock = createMock(UserDAO.class);
 
-		RegistrationRequest request = new RegistrationRequest();
+		controller = new SendMessageController(gcmConMock, daoMock);
 
-		request.setId("a@gmail.com");
-		request.setName("wos onders");
-		request.setPassword("pw");
+		User user = new User();
+		user.setGcmId("1234");
 
-		// TODO mock that shit
-		RegistrationController regCon = new RegistrationController();
-		RegistrationResponse response = regCon.register(request);
+		SendMessageRequest smRequest = new SendMessageRequest();
 
-		LoginRequest login_request = new LoginRequest();
+		String sender = "Silvio";
+		smRequest.setReceiverId("cool_guy@sam.com");
+		smRequest.setMessage("wayne");
 
-		login_request.setId("a@gmail.com");
-		login_request.setPassword("pw");
-		login_request.setGcmId("1234");
+		expect(daoMock.getUserByEmail(smRequest.getReceiverId())).andReturn(
+				user);
+		expect(daoMock.userExistsByEmail(smRequest.getReceiverId())).andReturn(
+				true);
+		expect(gcmConMock.sendMessage(smRequest, sender, user.getGcmId()))
+				.andReturn(true);
 
-		LoginResponse login_response = controller.login(login_request);
+		EasyMock.replay(gcmConMock);
+		EasyMock.replay(daoMock);
 
-		Assert.assertFalse(login_response.isError());
-		Assert.assertNull(login_response.getErrorMessage());
+		SendMessageResponse smResponse = controller.sendMessage(smRequest,
+				sender);
+
+		EasyMock.verify(daoMock);
+		EasyMock.verify(gcmConMock);
+
+		Assert.assertFalse(smResponse.isError());
+		Assert.assertEquals(null, smResponse.getErrorMessage());
+
 	}
 
 	@Test
-	public void testWrongPassword() {
-		RegistrationRequest request = new RegistrationRequest();
+	public void testEmptyReceiver() throws ServerException, IOException {
+		SendMessageRequest smRequest = new SendMessageRequest();
 
-		request.setId("a@gmail.com");
-		request.setName("wos onders");
-		request.setPassword("pw");
+		smRequest.setReceiverId("");
+		smRequest.setMessage("wayne");
 
-		// TODO mock that shit
-		RegistrationController regCon = new RegistrationController();
-		RegistrationResponse response = regCon.register(request);
+		SendMessageResponse smResponse = controller.sendMessage(smRequest,
+				"silvio");
 
-		LoginRequest login_request = new LoginRequest();
-
-		login_request.setId("a@gmail.com");
-		login_request.setPassword("haha");
-		login_request.setGcmId("1234");
-
-		LoginResponse login_response = controller.login(login_request);
-
-		Assert.assertTrue(login_response.isError());
-		Assert.assertEquals(ErrorMessages.PASSWORD_IS_WRONG,
-				login_response.getErrorMessage());
+		Assert.assertTrue(smResponse.isError());
+		Assert.assertEquals(ErrorMessages.RECEIVER_IS_EMPTY,
+				smResponse.getErrorMessage());
 	}
 
 	@Test
-	public void testNonExistingName() {
-		RegistrationRequest request = new RegistrationRequest();
+	public void testEmptyMessage() throws ServerException, IOException {
+		SendMessageRequest smRequest = new SendMessageRequest();
 
-		request.setId("a@gmail.com");
-		request.setName("wos onders");
-		request.setPassword("pw");
+		smRequest.setReceiverId("cool_guy@sam.com");
+		smRequest.setMessage("");
 
-		RegistrationController regCon = new RegistrationController();
-		RegistrationResponse response = regCon.register(request);
+		SendMessageResponse smResponse = controller.sendMessage(smRequest,
+				"silvio");
 
-		LoginRequest login_request = new LoginRequest();
-
-		login_request.setId("b@gmail.com");
-		login_request.setPassword("pw");
-		login_request.setGcmId("1234");
-
-		LoginResponse login_response = controller.login(login_request);
-
-		Assert.assertTrue(login_response.isError());
-		Assert.assertEquals(ErrorMessages.USER_DOES_NOT_EXISTS,
-				login_response.getErrorMessage());
+		Assert.assertTrue(smResponse.isError());
+		Assert.assertEquals(ErrorMessages.MESSAGE_IS_EMPTY,
+				smResponse.getErrorMessage());
 	}
 }
