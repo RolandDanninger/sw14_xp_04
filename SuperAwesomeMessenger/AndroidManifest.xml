@@ -88,6 +88,10 @@
             android:name="edu.tugraz.sw14.xp04.derivates.ActivityLoginDerivate"
             android:label="@string/title_activity_activity_login" >
         </activity>
+        <activity
+            android:name="edu.tugraz.sw14.xp04.ActivityMsg"
+            android:label="@string/title_activity_activity_msg" >
+        </activity>
     </application>
 
 </manifest>

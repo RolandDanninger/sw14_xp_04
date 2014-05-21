@@ -51,5 +51,6 @@
     <string name="a_main_quit_app_desc">Do you want to quit the app?</string>
     <string name="a_add_contact_txt_mail">enter e-mail</string>
     <string name="f_navigation_drawer_btn_add_contact">Add Contact</string>
+    <string name="title_activity_activity_msg">Msg</string>
 
 </resources>

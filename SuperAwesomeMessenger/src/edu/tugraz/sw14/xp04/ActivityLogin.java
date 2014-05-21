@@ -94,12 +94,14 @@ public class ActivityLogin extends Activity {
 		String email = ShPref.getShPrefString(context, "logininfo_email");
 		String password = ShPref.getShPrefString(context, "logininfo_password");
 		if (email != null && !email.isEmpty()) {
-			if (etEmail != null)
-				etEmail.setText(email);
+			if (etEmail != null){
+//				etEmail.setText(email);
+			}
 		}
 		if (password != null && !password.isEmpty()) {
-			if (etPassword != null)
-				etPassword.setText(password);
+			if (etPassword != null){
+//				etPassword.setText(password);
+			}
 		}
 
 	}
