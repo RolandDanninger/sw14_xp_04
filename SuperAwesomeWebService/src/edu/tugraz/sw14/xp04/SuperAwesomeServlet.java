@@ -53,14 +53,14 @@ public class SuperAwesomeServlet extends HttpServlet {
 			}
 
 		} catch (ServerException e) {
-
-		} catch (UserException e) {
-
+			System.err.println("Server Exception: " + e.getMessage());
+			throw new ServletException(e.getMessage());
 		}
+
 	}
 
 	private void login(HttpServletRequest request, HttpServletResponse response)
-			throws ServerException, IOException, UserException {
+			throws ServerException, IOException {
 		LoginRequest req = null;
 
 		try {
@@ -89,8 +89,7 @@ public class SuperAwesomeServlet extends HttpServlet {
 	}
 
 	private void register(HttpServletRequest request,
-			HttpServletResponse response) throws ServerException, IOException,
-			UserException {
+			HttpServletResponse response) throws ServerException, IOException {
 		RegistrationRequest req = null;
 
 		try {
