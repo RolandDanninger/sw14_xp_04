@@ -35,8 +35,10 @@ public class ContactController extends ServletController {
 			response.setErrorMessage(null);
 
 			// TODO change image url parameter
-			ContactStub contactInfo = new ContactStub(user.getName(),
-					user.getEmail(), null);
+			ContactStub contactInfo = new ContactStub();
+			contactInfo.setEmail(user.getEmail());
+			contactInfo.setName(user.getName());
+			contactInfo.setImgUrl(null);
 
 			response.setContact(contactInfo);
 		}

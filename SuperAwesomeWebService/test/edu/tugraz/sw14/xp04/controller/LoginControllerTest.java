@@ -108,8 +108,7 @@ public class LoginControllerTest extends TestCase {
 
 	@Test
 	public void testNonExistingUser() {
-		expect(daoMock.existsByEmail(loginRequest.getId()))
-				.andReturn(false);
+		expect(daoMock.existsByEmail(loginRequest.getId())).andReturn(false);
 
 		EasyMock.replay(daoMock);
 
@@ -123,11 +122,47 @@ public class LoginControllerTest extends TestCase {
 	}
 
 	@Test
+	public void testPasswordIsNull() {
+
+		loginRequest.setPassword(null);
+
+		LoginResponse login_response = controller.login(loginRequest);
+
+		Assert.assertTrue(login_response.isError());
+		Assert.assertEquals(ErrorMessages.PASSWORD_IS_EMPTY,
+				login_response.getErrorMessage());
+	}
+
+	@Test
+	public void testIdIsNull() {
+
+		loginRequest.setId(null);
+
+		LoginResponse login_response = controller.login(loginRequest);
+
+		Assert.assertTrue(login_response.isError());
+		Assert.assertEquals(ErrorMessages.EMAIL_IS_EMPTY,
+				login_response.getErrorMessage());
+	}
+
+	@Test
+	public void testGCMIdIsEmpty() {
+
+		loginRequest.setGcmId("");
+
+		LoginResponse login_response = controller.login(loginRequest);
+
+		Assert.assertTrue(login_response.isError());
+		Assert.assertEquals(ErrorMessages.GCM_ID_IS_EMPTY,
+				login_response.getErrorMessage());
+	}
+
+	@Test
 	public void testRequestIsNull() {
 
 		loginRequest = null;
 
 		exception.expect(IllegalStateException.class);
-		LoginResponse login_response = controller.login(loginRequest);
+		controller.login(loginRequest);
 	}
 }
