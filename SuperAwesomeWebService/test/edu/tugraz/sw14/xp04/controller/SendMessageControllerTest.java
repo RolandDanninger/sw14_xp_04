@@ -15,7 +15,6 @@ import org.junit.Test;
 
 import com.google.appengine.tools.development.testing.LocalDatastoreServiceTestConfig;
 import com.google.appengine.tools.development.testing.LocalServiceTestHelper;
-import com.google.apphosting.utils.config.ClientDeployYamlMaker.Request;
 
 import edu.tugraz.sw14.xp04.ServerException;
 import edu.tugraz.sw14.xp04.controllers.SendMessageController;
@@ -63,9 +62,9 @@ public class SendMessageControllerTest extends TestCase {
 		smRequest.setReceiverId("cool_guy@sam.com");
 		smRequest.setMessage("wayne");
 
-		expect(daoMock.getUserByEmail(smRequest.getReceiverId())).andReturn(
+		expect(daoMock.getByEmail(smRequest.getReceiverId())).andReturn(
 				user);
-		expect(daoMock.userExistsByEmail(smRequest.getReceiverId())).andReturn(
+		expect(daoMock.existsByEmail(smRequest.getReceiverId())).andReturn(
 				true);
 		expect(gcmConMock.sendMessage(smRequest, sender, user.getGcmId()))
 				.andReturn(true);

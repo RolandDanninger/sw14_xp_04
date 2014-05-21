@@ -71,8 +71,8 @@ public class LoginControllerTest extends TestCase {
 	@Test
 	public void testLoginSucceed() {
 
-		expect(daoMock.userExistsByEmail(loginRequest.getId())).andReturn(true);
-		expect(daoMock.getUserByEmail(loginRequest.getId())).andReturn(user);
+		expect(daoMock.existsByEmail(loginRequest.getId())).andReturn(true);
+		expect(daoMock.getByEmail(loginRequest.getId())).andReturn(user);
 		expect(
 				daoMock.updateGcmId(loginRequest.getId(),
 						loginRequest.getGcmId())).andReturn(true);
@@ -92,8 +92,8 @@ public class LoginControllerTest extends TestCase {
 
 		loginRequest.setPassword("wrongPassword");
 
-		expect(daoMock.userExistsByEmail(loginRequest.getId())).andReturn(true);
-		expect(daoMock.getUserByEmail(loginRequest.getId())).andReturn(user);
+		expect(daoMock.existsByEmail(loginRequest.getId())).andReturn(true);
+		expect(daoMock.getByEmail(loginRequest.getId())).andReturn(user);
 
 		EasyMock.replay(daoMock);
 
@@ -108,7 +108,7 @@ public class LoginControllerTest extends TestCase {
 
 	@Test
 	public void testNonExistingUser() {
-		expect(daoMock.userExistsByEmail(loginRequest.getId()))
+		expect(daoMock.existsByEmail(loginRequest.getId()))
 				.andReturn(false);
 
 		EasyMock.replay(daoMock);
