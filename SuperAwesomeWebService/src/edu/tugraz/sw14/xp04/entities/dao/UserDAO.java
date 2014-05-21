@@ -16,14 +16,20 @@ import edu.tugraz.sw14.xp04.entities.User;
 
 public class UserDAO {
 
+	private static final String PROP_NAME = "name";
+	private static final String PROP_EMAIL = "email";
+	private static final String PROP_PW = "password";
+	private static final String PROP_GCMID = "gcmId";
+	private static final String ENTITY = "User";
+
 	public UserDAO() {
 	}
 
-	public void insertUser(String name, String email, String password) {
+	public boolean insert(User u) {
 		DatastoreService datastore = DatastoreServiceFactory
 				.getDatastoreService();
 
-		Entity newUser = new Entity("User", name);
+		Entity newUser = new Entity(ENTITY, u.getName());
 
 		datastore.put(newUser);
 
@@ -33,28 +39,28 @@ public class UserDAO {
 		Entity user;
 		try {
 			user = datastore.get(key);
-			user.setProperty("name", name);
-			user.setProperty("email", email);
-			user.setProperty("password", password);
+			setEntityPropertiesFromUser(user, u);
 
 			datastore.put(user);
 
 		} catch (EntityNotFoundException e) {
 			e.printStackTrace();
+			return false;
 		}
 
 		txn.commit();
+		return true;
 	}
 
-	public boolean userExistsByEmail(String email) {
+	public boolean existsByEmail(String email) {
 
 		DatastoreService datastore = DatastoreServiceFactory
 				.getDatastoreService();
 
-		Filter emailFilter = new FilterPredicate("email", FilterOperator.EQUAL,
-				email);
+		Filter emailFilter = new FilterPredicate(PROP_EMAIL,
+				FilterOperator.EQUAL, email);
 
-		Query query = new Query("User").setFilter(emailFilter);
+		Query query = new Query(ENTITY).setFilter(emailFilter);
 		PreparedQuery preparedQuery = datastore.prepare(query);
 
 		Entity userEntity = preparedQuery.asSingleEntity();
@@ -62,15 +68,15 @@ public class UserDAO {
 		return (userEntity != null);
 	}
 
-	public User getUserByEmail(String email) {
+	public User getByEmail(String email) {
 
 		DatastoreService datastore = DatastoreServiceFactory
 				.getDatastoreService();
 
-		Filter emailFilter = new FilterPredicate("email", FilterOperator.EQUAL,
-				email);
+		Filter emailFilter = new FilterPredicate(PROP_EMAIL,
+				FilterOperator.EQUAL, email);
 
-		Query query = new Query("User").setFilter(emailFilter);
+		Query query = new Query(ENTITY).setFilter(emailFilter);
 		PreparedQuery preparedQuery = datastore.prepare(query);
 
 		Entity userEntity = preparedQuery.asSingleEntity();
@@ -82,25 +88,34 @@ public class UserDAO {
 		}
 	}
 
-	public boolean updateGcmId(String email, String gcmId) {
-
+	private boolean update(String email, User u) {
 		DatastoreService datastore = DatastoreServiceFactory
 				.getDatastoreService();
 
-		Filter emailFilter = new FilterPredicate("email", FilterOperator.EQUAL,
-				email);
+		Filter emailFilter = new FilterPredicate(PROP_EMAIL,
+				FilterOperator.EQUAL, email);
 
-		Query query = new Query("User").setFilter(emailFilter);
+		Query query = new Query(ENTITY).setFilter(emailFilter);
 		PreparedQuery preparedQuery = datastore.prepare(query);
 
 		Entity userEntity = preparedQuery.asSingleEntity();
-		
+
 		if (userEntity == null)
 			return false;
 
-		userEntity.setProperty("gcmId", gcmId);
+		setEntityPropertiesFromUser(userEntity, u);
+
 		datastore.put(userEntity);
 		return true;
+	}
+
+	public boolean updateGcmId(String email, String gcmId) {
+		User u = getByEmail(email);
+		if (u == null) 
+			return false;
+		
+		u.setGcmId(gcmId);
+		return update(email, u);
 	}
 
 	private User createUserFromEntity(Entity userEntity) {
@@ -112,5 +127,12 @@ public class UserDAO {
 		String gcmId = (String) userEntity.getProperty("gcmId");
 
 		return new User(key, name, password, email, gcmId);
+	}
+
+	private void setEntityPropertiesFromUser(Entity entity, User user) {
+		entity.setProperty(PROP_NAME, user.getName());
+		entity.setProperty(PROP_EMAIL, user.getEmail());
+		entity.setProperty(PROP_PW, user.getPassword());
+		entity.setProperty(PROP_GCMID, user.getGcmId());
 	}
 }

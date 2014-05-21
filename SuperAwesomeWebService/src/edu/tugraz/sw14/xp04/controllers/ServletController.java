@@ -16,7 +16,7 @@ public abstract class ServletController {
 	}
 
 	public User findUserByEmail(String email) {
-		return userDAO.getUserByEmail(email);
+		return userDAO.getByEmail(email);
 	}
 
 }

@@ -117,7 +117,7 @@ public class SuperAwesomeServletTest extends TestCase {
 
 		// Verify
 		UserDAO dao = new UserDAO();
-		Assert.assertTrue(dao.userExistsByEmail(email));
+		Assert.assertTrue(dao.existsByEmail(email));
 		EasyMock.verify(requestMock);
 		EasyMock.verify(responseMock);
 	}
