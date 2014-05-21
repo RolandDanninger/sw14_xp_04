@@ -13,6 +13,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import edu.tugraz.sw14.xp04.controllers.LoginController;
 import edu.tugraz.sw14.xp04.controllers.RegistrationController;
 import edu.tugraz.sw14.xp04.controllers.SendMessageController;
+import edu.tugraz.sw14.xp04.gcm.GCMConnection;
 import edu.tugraz.sw14.xp04.stubs.LoginRequest;
 import edu.tugraz.sw14.xp04.stubs.LoginResponse;
 import edu.tugraz.sw14.xp04.stubs.RegistrationRequest;
@@ -121,7 +122,9 @@ public class SuperAwesomeServlet extends HttpServlet {
 			throw new ServerException("Failed to parse SendMessageRequest.", e);
 		}
 
-		SendMessageController controller = new SendMessageController();
+		GCMConnection gcmConnection = new GCMConnection();
+		SendMessageController controller = new SendMessageController(
+				gcmConnection);
 		String sender = (String) session.getAttribute("id");
 		SendMessageResponse res = controller.sendMessage(req, sender);
 
