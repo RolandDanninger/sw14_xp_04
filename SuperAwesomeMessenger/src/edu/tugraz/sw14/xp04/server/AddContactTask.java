@@ -33,7 +33,7 @@ public class AddContactTask extends AsyncTask<AddContactRequest, Void, AddContac
 
     if (connection != null) {
       try {
-        response = connection.AddContact(params[0]);
+        response = connection.addContact(params[0]);
         return response;
       } catch (ServerConnectionException e) {
         Log.e("AddContactTask", e.getMessage(), e);

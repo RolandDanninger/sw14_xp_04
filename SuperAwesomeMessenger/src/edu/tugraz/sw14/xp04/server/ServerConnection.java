@@ -15,6 +15,8 @@ import com.fasterxml.jackson.core.JsonEncoding;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+import edu.tugraz.sw14.xp04.stubs.AddContactRequest;
+import edu.tugraz.sw14.xp04.stubs.AddContactResponse;
 import edu.tugraz.sw14.xp04.stubs.LoginRequest;
 import edu.tugraz.sw14.xp04.stubs.LoginResponse;
 import edu.tugraz.sw14.xp04.stubs.RegistrationRequest;
@@ -157,6 +159,42 @@ public class ServerConnection {
 		try {
 			res = jsonMapper.readValue(httpResponse.getEntity().getContent(),
 					SendMessageResponse.class);
+		} catch (Exception e) {
+			throw new ServerConnectionException(RES_PARSE_FAILED, e);
+		}
+
+		return res;
+	}
+
+	public AddContactResponse addContact(AddContactRequest request)
+			throws ServerConnectionException {
+		String entityJson = "";
+		try {
+			entityJson = jsonMapper.writeValueAsString(request);
+		} catch (JsonProcessingException e) {
+			throw new ServerConnectionException(REQ_PARSE_FAILED, e);
+		}
+
+		StringEntity httpEntity = null;
+		try {
+			httpEntity = new StringEntity(entityJson);
+		} catch (UnsupportedEncodingException e) {
+			throw new ServerConnectionException(ENTITY_CREATION_FAILED, e);
+		}
+
+		HttpPost httpPost = createHttpPost("login", httpEntity);
+
+		HttpResponse httpResponse = null;
+		try {
+			httpResponse = httpClient.execute(httpPost);
+		} catch (Exception e) {
+			throw new ServerConnectionException(REQ_SEND_FAILED, e);
+		}
+
+		AddContactResponse res = null;
+		try {
+			res = jsonMapper.readValue(httpResponse.getEntity().getContent(),
+					AddContactResponse.class);
 		} catch (Exception e) {
 			throw new ServerConnectionException(RES_PARSE_FAILED, e);
 		}
