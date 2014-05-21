@@ -11,17 +11,37 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.webkit.WebSettings;
 import android.webkit.WebView;
+import android.widget.Button;
+import android.widget.ListView;
 import android.widget.TextView;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.Serializable;
+import java.util.ArrayList;
+
+import edu.tugraz.sw14.xp04.adapters.ChatOverviewAdapter;
+import edu.tugraz.sw14.xp04.adapters.ContactAdapter;
+import edu.tugraz.sw14.xp04.contacts.Contact;
+import edu.tugraz.sw14.xp04.helpers.ChatOverview;
+import edu.tugraz.sw14.xp04.helpers.MApp;
 
 public class FragmentMainStart extends Fragment {
 
     private static final String ARG_OBJECT = "argument_object";
 
     private Context context;
+    
+    private ArrayList<ChatOverview> list;
+    private ChatOverviewAdapter adapter;
+    private ListView listView;
+    private Button btn;
+    
+    private boolean chat_overviews_loaded = false;
+
+    public boolean chatOverviewsLoaded(){
+        return this.chat_overviews_loaded;
+    }
 
     public static FragmentMainStart newInstance(Serializable arg) {
         FragmentMainStart fragment = new FragmentMainStart();
@@ -48,7 +68,12 @@ public class FragmentMainStart extends Fragment {
             }
             Context context = inflater.getContext();
             
-            // ToDo Layout here
+            this.list = new ArrayList<ChatOverview>();
+            
+            this.listView = (ListView) rootView.findViewById(R.id.main_list);
+            this.adapter = new ChatOverviewAdapter(getActivity(), R.layout.item_chat_overview, list);
+            this.listView.setAdapter(this.adapter);
+            loadChatOverviews();
         }
         return rootView;
     }
@@ -57,5 +82,34 @@ public class FragmentMainStart extends Fragment {
     public void onAttach(Activity activity) {
         super.onAttach(activity);
         //((ActivityMain) activity).onSectionAttached(getArguments().getString(getString(R.string.fr_main_start_title)));
+    }
+    
+    private void loadChatOverviews(){
+    	if(MApp.isNetworkAvailable(context)) {
+            
+            this.list.clear();
+            this.list.add(new ChatOverview("Nachricht von",
+                    "letzte nachricht inhalt",
+                    "nachricht@von.user",
+                    System.currentTimeMillis() - (1000 * 60 * 60 *24 * 2),
+                    null));
+            this.list.add(new ChatOverview("Nachricht von",
+                    "letzte nachricht inhalt",
+                    "nachricht@von.user",
+                    System.currentTimeMillis(),
+                    "http://www.womenshealthmag.com/files/wh6_uploads/imagecache/scale_600_wide/files/images/0709-a-wh-fitness-1847.jpg"));
+            this.list.add(new ChatOverview("Nachricht von",
+                    "letzte nachricht inhalt",
+                    "nachricht@von.user",
+                    System.currentTimeMillis(),
+                    "https://lh4.googleusercontent.com/-OSQFDHoiicI/Ubn6r5qfS7I/AAAAAAABUT4/XyIQ1Rb4jJc/s1600/Competitors-2013-Brazil-Mister-Fitness-contest.jpg"));
+            this.list.add(new ChatOverview("Nachricht von",
+                    "letzte nachricht inhalt",
+                    "nachricht@von.user",
+                    System.currentTimeMillis(),
+                    "http://www.womenshealthmag.com/files/wh6_uploads/images/fitness-star-images-main.jpg"));
+            this.adapter.notifyDataSetChanged();
+            this.chat_overviews_loaded = true;
+        }
     }
 }
