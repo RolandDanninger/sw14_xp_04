@@ -104,6 +104,11 @@ public class ActivityLogin extends Activity {
 
 	}
 
+	@Override
+	public void onBackPressed() {
+		MApp.quitApp(this);
+	}
+
 	private void handlerBtnLogin() {
 		String email = etEmail.getText().toString();
 		String password = etPassword.getText().toString();
