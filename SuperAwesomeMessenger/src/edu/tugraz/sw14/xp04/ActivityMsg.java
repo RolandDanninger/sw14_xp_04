@@ -4,6 +4,7 @@ import java.util.ArrayList;
 
 import edu.tugraz.sw14.xp04.adapters.ChatOverviewAdapter;
 import edu.tugraz.sw14.xp04.adapters.MsgAdapter;
+import edu.tugraz.sw14.xp04.database.Database;
 import edu.tugraz.sw14.xp04.helpers.MApp;
 import edu.tugraz.sw14.xp04.helpers.MToast;
 import edu.tugraz.sw14.xp04.helpers.UIHelper;
@@ -60,7 +61,12 @@ public class ActivityMsg extends Activity {
 			return;
 		}
 
-		UIHelper.setActionBarTitle(this, email);
+		Database db = new Database(this);
+		String name = db.getContactName(email);
+		name = name != null ? name : email;
+		
+		UIHelper.setActionBarIco(this, R.drawable.ico_w_person);
+		UIHelper.setActionBarTitle(this, name);
 		
 		this.btnSend = (ImageButton) findViewById(R.id.msg_btn_send);
 		if(this.btnSend != null){

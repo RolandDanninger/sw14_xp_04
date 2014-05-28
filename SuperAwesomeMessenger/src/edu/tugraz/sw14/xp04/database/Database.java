@@ -3,6 +3,7 @@ package edu.tugraz.sw14.xp04.database;
 import java.util.ArrayList;
 
 import edu.tugraz.sw14.xp04.contacts.Contact;
+import edu.tugraz.sw14.xp04.msg.Msg;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.Cursor;
@@ -95,7 +96,7 @@ public class Database extends SQLiteOpenHelper {
 	}
 
 	public int getContactId(String email) {
-		String sql = "SELECT * FROM " + CONTACT_TABLE + " WHERE "
+		String sql = "SELECT " + CONTACT_ID + " FROM " + CONTACT_TABLE + " WHERE "
 				+ CONTACT_USR_ID + "='" + email + "'";
 		int id = -1;
 		try {
@@ -113,6 +114,25 @@ public class Database extends SQLiteOpenHelper {
 		return id;
 	}
 
+	public String getContactName(String email) {
+		String sql = "SELECT " + CONTACT_NAME + " FROM " + CONTACT_TABLE + " WHERE "
+				+ CONTACT_USR_ID + "='" + email + "'";
+		String name = null;
+		try {
+
+			SQLiteDatabase db = this.getReadableDatabase();
+			Cursor cursor = db.rawQuery(sql, null);
+			if (cursor != null && cursor.getCount() == 1) {
+				cursor.moveToNext();
+				name = cursor.getString(cursor.getColumnIndex(CONTACT_NAME));
+			}
+		} catch (SQLException ignore) {
+			Log.d(TAG, "error retrieving contactId");
+		}
+
+		return name;
+	}
+	
 	public ArrayList<Contact> getAllContacts() {
 		ArrayList<Contact> list = new ArrayList<Contact>();
 		try {
@@ -137,6 +157,32 @@ public class Database extends SQLiteOpenHelper {
 		}
 	}
 
+	public ArrayList<Msg> getMsgsBySender(String sender, int limit){
+		ArrayList<Msg> list = new ArrayList<Msg>();
+		try {
+			String sql = "SELECT * FROM " + MSG_TABLE + " "
+					+ "WHERE " + MSG_SENDER_ID + "='" + sender + "' "
+					+ "ORDER BY " + MSG_TIMESTAMP + " ASC;";
+			// + " LIMIT " + limit + ";";
+			SQLiteDatabase db = this.getReadableDatabase();
+			Cursor cursor = db.rawQuery(sql, null);
+			if (cursor != null && cursor.getCount() > 0) {
+				cursor.moveToFirst();
+				do {
+					String content = cursor.getString(cursor.getColumnIndex(MSG_CONTENT));
+					long timestamp = cursor.getLong(cursor.getColumnIndex(MSG_TIMESTAMP));
+					boolean flag_own = cursor.getInt(cursor.getColumnIndex(MSG_FLAG_OWN)) > 0;
+					boolean flag_read = cursor.getInt(cursor.getColumnIndex(MSG_FLAG_READ)) > 0;
+					Msg m = new Msg(sender, content, timestamp, flag_own, flag_read);
+					list.add(m);
+				} while (cursor.moveToNext());
+			}
+			return list;
+		} catch (SQLException ignore) {
+			return list;
+		}
+	}
+	
 	public boolean contactAlreadyExists(String id) {
 		try {
 			String sql = "SELECT * FROM " + CONTACT_TABLE + " " + "WHERE \""
