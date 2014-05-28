@@ -30,7 +30,7 @@
             android:orientation="horizontal" >
 
             <EditText
-                android:id="@+id/nav_et_add_mail"
+                android:id="@+id/msg_et_msg"
                 android:layout_width="0dp"
                 android:layout_height="wrap_content"
                 android:layout_gravity="left|top"

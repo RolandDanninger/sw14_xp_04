@@ -206,20 +206,6 @@ public class NavigationDrawerFragment extends Fragment {
 		// TODO read from database (sort by date??)
 		this.list.clear();
 		Database db = new Database(getActivity());
-
-//		boolean b = db.insertContact(new Contact(
-//						"Max Mustermann",
-//						"max.mustermann@gmail.com",
-//						"http://www.womenshealthmag.com/files/wh6_uploads/imagecache/scale_600_wide/files/images/0709-a-wh-fitness-1847.jpg").toContentValues());
-//		db.insertContact(new Contact(
-//						"Susi Studierschnell",
-//						"susi@gmail.com",
-//						"https://lh4.googleusercontent.com/-OSQFDHoiicI/Ubn6r5qfS7I/AAAAAAABUT4/XyIQ1Rb4jJc/s1600/Competitors-2013-Brazil-Mister-Fitness-contest.jpg").toContentValues());
-//		db.insertContact(new Contact(
-//						"Hans Guck In Die Luft",
-//						"hansi@guck-in-die-luft.at",
-//						"http://www.womenshealthmag.com/files/wh6_uploads/images/fitness-star-images-main.jpg").toContentValues());
-//		Log.d("database", "insert ? = " + b);
 		
 		this.list.addAll(db.getAllContacts());
 		this.adapter.notifyDataSetChanged();

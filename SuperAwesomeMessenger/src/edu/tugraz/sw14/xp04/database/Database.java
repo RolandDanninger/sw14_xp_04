@@ -144,9 +144,9 @@ public class Database extends SQLiteOpenHelper {
 			if (cursor != null && cursor.getCount() > 0) {
 				cursor.moveToFirst();
 				do {
-					String email = cursor.getString(1);
-					String name = cursor.getString(2);
-					String img_url = cursor.getString(3);
+					String email = cursor.getString(cursor.getColumnIndex(CONTACT_USR_ID));
+					String name = cursor.getString(cursor.getColumnIndex(CONTACT_NAME));
+					String img_url = cursor.getString(cursor.getColumnIndex(CONTACT_IMG_URL));
 					Contact c = new Contact(name, email, img_url);
 					list.add(c);
 				} while (cursor.moveToNext());

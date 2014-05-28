@@ -9,41 +9,62 @@ import edu.tugraz.sw14.xp04.helpers.MApp;
 import edu.tugraz.sw14.xp04.helpers.MToast;
 import edu.tugraz.sw14.xp04.helpers.UIHelper;
 import edu.tugraz.sw14.xp04.msg.Msg;
+import edu.tugraz.sw14.xp04.server.SendMessageTask;
+import edu.tugraz.sw14.xp04.server.ServerConnection;
+import edu.tugraz.sw14.xp04.server.SendMessageTask.SendMessageTaskListener;
+import edu.tugraz.sw14.xp04.stubs.SendMessageRequest;
+import edu.tugraz.sw14.xp04.stubs.SendMessageResponse;
 import android.app.Activity;
 import android.app.ActionBar;
 import android.app.Fragment;
+import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.os.Bundle;
+import android.text.Editable;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ListView;
+import android.widget.ProgressBar;
 import android.os.Build;
 
 public class ActivityMsg extends Activity {
 
 	public static final String EXTRA_EMAIL = "extra_email";
+	public static final int DEFAULT_LIMIT = 50;
 
+	private Context context;
+	
+	private String sender;
+	
+	private EditText etMsg;
+	
 	private ListView listView;
 	private ArrayList<Msg> list;
 	private MsgAdapter adapter;
-	
+
 	private ImageButton btnSend;
-	
+
+	private ProgressDialog dialog;
+
 	private boolean msgs_loaded = false;
 
-    public boolean msgsLoaded(){
-        return this.msgs_loaded;
-    }
+	public boolean msgsLoaded() {
+		return this.msgs_loaded;
+	}
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_msg);
+		
+		this.context = this;
 
 		Intent intent = getIntent();
 		if (intent == null) {
@@ -55,85 +76,127 @@ public class ActivityMsg extends Activity {
 			exitOnError();
 			return;
 		}
-		String email = bundle.getString(EXTRA_EMAIL);
-		if (email == null) {
+		sender = bundle.getString(EXTRA_EMAIL);
+		if (sender == null) {
 			exitOnError();
 			return;
 		}
 
 		Database db = new Database(this);
-		String name = db.getContactName(email);
-		name = name != null ? name : email;
-		
+		String name = db.getContactName(sender);
+		name = name != null ? name : sender;
+
 		UIHelper.setActionBarIco(this, R.drawable.ico_w_person);
 		UIHelper.setActionBarTitle(this, name);
-		
+
+		this.etMsg = (EditText) findViewById(R.id.msg_et_msg);
 		this.btnSend = (ImageButton) findViewById(R.id.msg_btn_send);
-		if(this.btnSend != null){
+		if (this.btnSend != null) {
 			this.btnSend.setOnClickListener(new OnClickListener() {
-				
+
 				@Override
 				public void onClick(View v) {
-					// TODO Auto-generated method stub
-					
+					if(etMsg == null){
+						MToast.error(context, true);
+						return;
+					}
+					Editable eaMsg = etMsg.getText();
+					if(eaMsg == null){
+						MToast.error(context, true);
+						return;
+					}
+					String msg = eaMsg.toString();
+					if(msg == null){
+						MToast.error(context, true);
+						return;
+					}
+					if(msg.isEmpty()){
+						MToast.error(context, true);
+						return;
+					}
+					sendMsg(sender, msg);
 				}
 			});
 		}
+
+		
 		
 		this.list = new ArrayList<Msg>();
 		this.listView = (ListView) findViewById(R.id.msg_list);
-        this.adapter = new MsgAdapter(this, R.layout.item_msg, list);
-        this.listView.setAdapter(this.adapter);
-        loadMsgs(0);
+		this.adapter = new MsgAdapter(this, R.layout.item_msg, list);
+		this.listView.setAdapter(this.adapter);
+		loadMsgs(0);
 
 	}
-	
-	private void loadMsgs(int limit){
-		
-		Msg test1 = new Msg("a@b.com",
-				"das ist eine testnachricht",
-				System.currentTimeMillis(),
-				false, false);
-		Msg test2 = new Msg("a@b.com",
-				"Hallo",
-				System.currentTimeMillis(),
-				false, false);
-		Msg test3 = new Msg("a@b.com",
-				"das ist eine testnachricht und diese ist sehr sehr sehr sehr sehr sehr sehr sehr sehr sehr sherhseh sehr sehr sehr sehr sehr laaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaang",
-				System.currentTimeMillis(),
-				false, false);
-		Msg test4 = new Msg("a@b.com",
-				"das ist meine antwort",
-				System.currentTimeMillis(),
-				true, false);
-		Msg test5 = new Msg("a@b.com",
-				"jippiiii",
-				System.currentTimeMillis(),
-				false, false);
 
-		list.add(test1);
-		list.add(test2);
-		list.add(test3);
-		list.add(test4);
-		list.add(test5);
-		
-		msgs_loaded = true;
+	private SendMessageTaskListener sendMessageTaskListener = new SendMessageTaskListener() {
+
+		@Override
+		public void onPreExecute() {
+
+			dialog = new ProgressDialog(context);
+			dialog.setCancelable(false);
+			dialog.show();
+			dialog.setContentView(new ProgressBar(context));
+		}
+
+		@Override
+		public void onPostExecute(SendMessageResponse response) {
+
+			if (dialog != null)
+				dialog.dismiss();
+			if (response == null)
+				MToast.error(context, true);
+			else {
+				if (response.isError())
+					MToast.errorSendMessage(context, true);
+				else {
+					if(etMsg != null){
+						etMsg.setText("");
+					}
+					loadMsgs(0);
+				}
+			}
+		}
+	};
+
+	private void sendMsg(String id, String msg) {
+	    
+	    MApp app = MApp.getApp(context);
+	    ServerConnection connection = app.getServerConnection();
+	    
+	    SendMessageRequest request = new SendMessageRequest();
+	    request.setReceiverId(id);
+	    request.setMessage(msg);
+	    
+	    SendMessageTask sendMessageTask = new SendMessageTask(connection, sendMessageTaskListener);
+	    sendMessageTask.execute(request);
+	  }
+	
+	private void loadMsgs(int limit) {
+
+		this.list.clear();
+		Database db = new Database(this);
+		limit = limit > 0 ? limit : DEFAULT_LIMIT;
+		this.list.addAll(db.getMsgsBySender(sender, limit));
+
 		adapter.notifyDataSetChanged();
-		if(limit <= 0){
+		msgs_loaded = true;
+		if (limit <= 0) {
 			scrollMyListViewToBottom();
 		}
 	}
 
 	private void scrollMyListViewToBottom() {
-	    listView.post(new Runnable() {
-	        @Override
-	        public void run() {
-	            // Select the last row so it will scroll into view...
-	        	listView.setSelection(adapter.getCount() - 1);
-	        }
-	    });
+		listView.post(new Runnable() {
+			@Override
+			public void run() {
+				// Select the last row so it will scroll into view...
+				listView.setSelection(adapter.getCount() - 1);
+			}
+		});
 	}
-	
+
 	@Override
 	public boolean onCreateOptionsMenu(Menu menu) {
 
