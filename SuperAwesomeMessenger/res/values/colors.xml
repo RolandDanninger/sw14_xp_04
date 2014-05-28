@@ -14,4 +14,8 @@
     
     <color name="highlight_light">#33B5E5</color>
     <color name="highlight_dark">#0099CC</color>
+    
+    <color name="bg_msg_sender">#FF99CC00</color>
+    <color name="bg_msg_own">#FF33B5E5</color>
+    <color name="border_msg">#FFAAAAAA</color>
 </resources>
