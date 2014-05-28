@@ -62,12 +62,14 @@ public class SendMessageControllerTest extends TestCase {
 		smRequest.setReceiverId("cool_guy@sam.com");
 		smRequest.setMessage("wayne");
 
-		expect(daoMock.getByEmail(smRequest.getReceiverId())).andReturn(
-				user);
-		expect(daoMock.existsByEmail(smRequest.getReceiverId())).andReturn(
-				true);
-		expect(gcmConMock.sendMessage(smRequest, sender, user.getGcmId(), System.currentTimeMillis()))
+		long timestamp = System.currentTimeMillis();
+
+		expect(daoMock.getByEmail(smRequest.getReceiverId())).andReturn(user);
+		expect(daoMock.existsByEmail(smRequest.getReceiverId()))
 				.andReturn(true);
+		expect(
+				gcmConMock.sendMessage(smRequest, sender, user.getGcmId(),
+						timestamp)).andReturn(true);
 
 		EasyMock.replay(gcmConMock);
 		EasyMock.replay(daoMock);
@@ -80,6 +82,9 @@ public class SendMessageControllerTest extends TestCase {
 
 		Assert.assertFalse(smResponse.isError());
 		Assert.assertEquals(null, smResponse.getErrorMessage());
+		Assert.assertEquals(timestamp, smResponse.getTimestamp());
+		Assert.assertEquals(smRequest.getMessage(), smResponse.getContent());
+		Assert.assertEquals(smRequest.getReceiverId(), smResponse.getId());
 
 	}
 

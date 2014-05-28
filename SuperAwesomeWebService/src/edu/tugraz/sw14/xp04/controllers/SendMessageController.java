@@ -46,13 +46,14 @@ public class SendMessageController extends ServletController {
 		User receiver = findUserByEmail(request.getReceiverId());
 
 		long timestamp = System.currentTimeMillis();
-		
-		boolean bool = gcmCon.sendMessage(request, sender, receiver.getGcmId(), timestamp);
+
+		boolean bool = gcmCon.sendMessage(request, sender, receiver.getGcmId(),
+				timestamp);
 
 		if (bool) {
 			response.setError(false);
 			response.setErrorMessage(null);
-			response.setId(receiver.getEmail());
+			response.setId(request.getReceiverId());
 			response.setContent(request.getMessage());
 			response.setTimestamp(timestamp);
 		} else {
