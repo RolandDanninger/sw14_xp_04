@@ -2,6 +2,7 @@ package edu.tugraz.sw14.xp04.adapters;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -9,9 +10,11 @@ import android.widget.ArrayAdapter;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
 import android.widget.TextView;
+import edu.tugraz.sw14.xp04.ActivityMsg;
 import edu.tugraz.sw14.xp04.R;
 import edu.tugraz.sw14.xp04.helpers.ChatOverview;
 import edu.tugraz.sw14.xp04.helpers.DateTime;
+import edu.tugraz.sw14.xp04.helpers.MApp;
 
 import java.util.List;
 
@@ -93,7 +96,9 @@ public class ChatOverviewAdapter extends ArrayAdapter<ChatOverview> {
 
 			@Override
 			public void onClick(View v) {
-				// TODO goto chat by email
+				Intent intent = new Intent(activity, ActivityMsg.class);
+            	intent.putExtra(ActivityMsg.EXTRA_EMAIL, id);
+                MApp.goToActivity(activity, intent, false);
 			}
 		});
 		itemView.setBackgroundResource(R.drawable.btn_nav_item);
