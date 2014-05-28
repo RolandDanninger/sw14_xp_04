@@ -2,6 +2,7 @@ package edu.tugraz.sw14.xp04.adapters;
 
 import android.app.Activity;
 import android.content.Context;
+import android.content.Intent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -62,7 +63,9 @@ public class ContactAdapter extends ArrayAdapter<Contact>{
             private String email = item.getEmail();
             @Override
             public void onClick(View v) {
-                MApp.goToActivity(activity, ActivityMsg.class, false);
+            	Intent intent = new Intent(activity, ActivityMsg.class);
+            	intent.putExtra(ActivityMsg.EXTRA_EMAIL, email);
+                MApp.goToActivity(activity, intent, false);
             }
         });
         itemView.setBackgroundResource(R.drawable.btn_nav_item);

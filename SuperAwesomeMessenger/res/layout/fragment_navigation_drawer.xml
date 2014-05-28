@@ -27,7 +27,7 @@
                 android:layout_marginLeft="4dp"
                 android:layout_marginRight="4dp"
                 android:textColorHint="@color/fnt_dark3"
-                android:textColor="@color/white"
+                android:textColor="@color/black"
                 android:fontFamily="sans-serif-light"
                 android:ems="10"
                 android:hint="@string/a_add_contact_txt_mail"

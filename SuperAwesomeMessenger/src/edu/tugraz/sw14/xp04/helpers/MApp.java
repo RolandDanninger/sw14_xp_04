@@ -52,6 +52,12 @@ public class MApp extends Application {
 		}
 	}
 	
+	public static void finishActivity(final Activity activity){
+		activity.overridePendingTransition(android.R.anim.fade_in,
+				android.R.anim.fade_out);
+		activity.finish();
+	}
+	
     public static void quitApp(final Activity activity){
         activity.startActivity(new Intent(activity, ActivityQuit.class));
         activity.overridePendingTransition(R.anim.fade_in, R.anim.fade_out);

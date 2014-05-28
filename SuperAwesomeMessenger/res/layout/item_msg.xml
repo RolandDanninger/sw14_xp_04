@@ -1,0 +1,37 @@
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="wrap_content"
+    android:orientation="vertical"
+    android:padding="4dp"
+    android:id="@+id/item_msg_lin_item" >
+
+    <TextView
+        android:id="@+id/item_msg_tv_msg"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:fontFamily="sans-serif-light"
+        android:marqueeRepeatLimit="marquee_forever"
+        android:minHeight="48dp"
+        android:minWidth="94dp"
+        android:singleLine="false"
+        android:text="elgfgjfd  ghsdlg dhg dlg dslig hldhglisdhg sd hgidfhgd hld lsd tlflsdgg ldg "
+        android:textColor="@color/fnt_dark1"
+        android:textSize="16sp"
+        android:textStyle="italic" />
+
+    <TextView
+        android:id="@+id/item_msg_tv_date"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_gravity="right"
+        android:ellipsize="marquee"
+        android:fontFamily="sans-serif-light"
+        android:lines="1"
+        android:singleLine="true"
+        android:text="24.5.2014 08:00"
+        android:textColor="@color/fnt_dark3"
+        android:textSize="14sp"
+        android:textStyle="italic" />
+
+</LinearLayout>
