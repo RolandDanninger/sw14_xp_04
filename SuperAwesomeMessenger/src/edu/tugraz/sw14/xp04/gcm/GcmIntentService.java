@@ -1,11 +1,5 @@
 package edu.tugraz.sw14.xp04.gcm;
 
-import com.google.android.gms.gcm.GoogleCloudMessaging;
-
-import edu.tugraz.sw14.xp04.ActivityLaunch;
-import edu.tugraz.sw14.xp04.ActivityMain;
-import edu.tugraz.sw14.xp04.ActivitySendTestMessage;
-import edu.tugraz.sw14.xp04.R;
 import android.app.IntentService;
 import android.app.Notification;
 import android.app.NotificationManager;
@@ -17,6 +11,15 @@ import android.os.Bundle;
 import android.os.SystemClock;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
+
+import com.google.android.gms.gcm.GoogleCloudMessaging;
+
+import edu.tugraz.sw14.xp04.ActivityMsg;
+import edu.tugraz.sw14.xp04.ActivitySendTestMessage;
+import edu.tugraz.sw14.xp04.R;
+import edu.tugraz.sw14.xp04.database.Database;
+import edu.tugraz.sw14.xp04.helpers.DateTime;
+import edu.tugraz.sw14.xp04.msg.Msg;
 
 public class GcmIntentService extends IntentService {
 
@@ -59,6 +62,7 @@ public class GcmIntentService extends IntentService {
 				// This loop represents the service doing some work.
 
 				Log.i(TAG, "Completed work @ " + SystemClock.elapsedRealtime());
+				storeMessageInDatabase(extras);
 				// Post notification of received message.
 				sendNotification(extras);
 				Log.i(TAG, "Received: " + extras.toString());
@@ -66,6 +70,23 @@ public class GcmIntentService extends IntentService {
 		}
 		// Release the wake lock provided by the WakefulBroadcastReceiver.
 		GcmBroadcastReceiver.completeWakefulIntent(intent);
+	}
+
+	private void storeMessageInDatabase(Bundle extras) {
+		String sender = extras.getString("sender");
+		String msg = extras.getString("message");
+
+		if (sender == null || sender == "")
+			Log.d(TAG, "sender email was empty or null");
+
+		Msg toStore = new Msg(sender, msg, System.currentTimeMillis(), false,
+				false);
+
+		Database db = new Database(this);
+		boolean result = db.insertMsg(toStore.toContentValues());
+		if (result == false)
+			Log.d(TAG, "failed to store message");
+
 	}
 
 	// Put the message into a notification and post it.
@@ -78,21 +99,28 @@ public class GcmIntentService extends IntentService {
 		String sender = extras.getString("sender");
 		String msg = extras.getString("message");
 
-		Intent intent = new Intent(this, ActivitySendTestMessage.class);
+		if (sender == null || sender == "")
+			Log.d(TAG, "sender email was empty or null");
 
-		PendingIntent contentIntent = PendingIntent.getActivity(this, 0,
+		Database db = new Database(this);
+		int id = db.getContactId(sender);
+		Log.d(TAG, "sender id is: " + id);
+
+		Intent intent = new Intent(this, ActivityMsg.class);
+		intent.putExtra(ActivityMsg.EXTRA_EMAIL, sender);
+
+		PendingIntent contentIntent = PendingIntent.getActivity(this, id,
 				intent, 0);
 		Notification.Builder mBuilder = new Notification.Builder(this)
-				.setSmallIcon(R.drawable.logo_sam).setContentTitle(sender)
+				.setAutoCancel(true).setSmallIcon(R.drawable.logo_sam)
+				.setContentTitle(sender)
 				// .setStyle(new NotificationCompat.BigTextStyle().bigText(msg))
 				.setLargeIcon(
 						BitmapFactory.decodeResource(getResources(),
 								R.drawable.logo_sam)).setContentText(msg);
 
 		mBuilder.setContentIntent(contentIntent);
-		// mNotificationManager.notify(NOTIFICATION_ID, mBuilder.build());
-		mNotificationManager.notify(
-				(int) (System.currentTimeMillis() % Integer.MAX_VALUE),
-				mBuilder.build());
+		mNotificationManager.notify(id, mBuilder.build());
+
 	}
 }
