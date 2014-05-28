@@ -75,12 +75,15 @@ public class GcmIntentService extends IntentService {
 	private void storeMessageInDatabase(Bundle extras) {
 		String sender = extras.getString("sender");
 		String msg = extras.getString("message");
+		long timeStamp = Long.valueOf(extras.getString("timestamp"));
 
 		if (sender == null || sender == "")
 			Log.d(TAG, "sender email was empty or null");
 
-		Msg toStore = new Msg(sender, msg, System.currentTimeMillis(), false,
-				false);
+		Msg toStore = new Msg(sender, msg, timeStamp, false, false);
+		Log.d(TAG, "time in ms: " + timeStamp);
+		Log.d(TAG, "time sent: " + DateTime.dateFromStamp(timeStamp) + " "
+				+ DateTime.timeFromStamp(timeStamp));
 
 		Database db = new Database(this);
 		boolean result = db.insertMsg(toStore.toContentValues());
@@ -98,6 +101,7 @@ public class GcmIntentService extends IntentService {
 
 		String sender = extras.getString("sender");
 		String msg = extras.getString("message");
+		long timeStamp = Long.valueOf(extras.getString("timestamp"));
 
 		if (sender == null || sender == "")
 			Log.d(TAG, "sender email was empty or null");
@@ -112,7 +116,9 @@ public class GcmIntentService extends IntentService {
 		PendingIntent contentIntent = PendingIntent.getActivity(this, id,
 				intent, 0);
 		Notification.Builder mBuilder = new Notification.Builder(this)
-				.setAutoCancel(true).setSmallIcon(R.drawable.logo_sam)
+				.setAutoCancel(true)
+				.setSmallIcon(R.drawable.logo_sam)
+				.setWhen(timeStamp)
 				.setContentTitle(sender)
 				// .setStyle(new NotificationCompat.BigTextStyle().bigText(msg))
 				.setLargeIcon(

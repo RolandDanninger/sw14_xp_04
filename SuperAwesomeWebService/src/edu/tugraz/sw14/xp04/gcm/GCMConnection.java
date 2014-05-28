@@ -57,6 +57,7 @@ public class GCMConnection {
 			Map<String, String> data = new HashMap<String, String>();
 			data.put("message", request.getMessage());
 			data.put("sender", sender);
+			data.put("timestamp", String.valueOf(System.currentTimeMillis()));
 			msg.setData(data);
 
 			OutputStream out = connection.getOutputStream();
