@@ -17,7 +17,7 @@
             android:layout_height="48dp"
             android:gravity="center_vertical"
             android:orientation="horizontal"
-            android:background="@color/bg_light" >
+            android:background="@drawable/bg_msg_own" >
 
             <EditText
                 android:id="@+id/nav_et_add_mail"

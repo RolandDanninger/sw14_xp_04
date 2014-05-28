@@ -4,10 +4,12 @@ import java.io.IOException;
 import java.util.concurrent.atomic.AtomicInteger;
 
 import android.app.Activity;
+import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
 import android.util.Log;
+import android.widget.ProgressBar;
 
 import com.google.android.gms.common.ConnectionResult;
 import com.google.android.gms.common.GooglePlayServicesUtil;
@@ -15,7 +17,14 @@ import com.google.android.gms.gcm.GoogleCloudMessaging;
 
 import edu.tugraz.sw14.xp04.gcm.GCM;
 import edu.tugraz.sw14.xp04.helpers.MApp;
+import edu.tugraz.sw14.xp04.helpers.MToast;
+import edu.tugraz.sw14.xp04.helpers.ShPref;
 import edu.tugraz.sw14.xp04.helpers.UserInfo;
+import edu.tugraz.sw14.xp04.server.LoginTask;
+import edu.tugraz.sw14.xp04.server.ServerConnection;
+import edu.tugraz.sw14.xp04.server.LoginTask.LoginTaskListener;
+import edu.tugraz.sw14.xp04.stubs.LoginRequest;
+import edu.tugraz.sw14.xp04.stubs.LoginResponse;
 
 public class ActivityLaunch extends Activity {
 
@@ -23,6 +32,8 @@ public class ActivityLaunch extends Activity {
 	GoogleCloudMessaging gcm;
 	AtomicInteger msgId = new AtomicInteger();
 	String regid;
+
+	private ProgressDialog dialog;
 
 	private final static int PLAY_SERVICES_RESOLUTION_REQUEST = 9000;
 
@@ -126,19 +137,69 @@ public class ActivityLaunch extends Activity {
 		GCM.storeIdPair(context, pair);
 	}
 
-	private boolean isLoggedIn() {
-		return false;
+	private void goToTarget() {
+		String email = ShPref.getShPrefString(context, "logininfo_email");
+		String password = ShPref.getShPrefString(context, "logininfo_password");
+		if ((email == null || email.isEmpty())
+				|| (password == null || password.isEmpty()))
+			MApp.goToActivity(this, ActivityLogin.class, true);
+		else
+			doAutoLogin(email, password);
 	}
 
-	private void goToTarget() {
-		if (isLoggedIn())
-			MApp.goToActivity(this, ActivityMain.class, true);
-		else
-			MApp.goToActivity(this, ActivityLogin.class, true);
+	private void doAutoLogin(String email, String password) {
+		LoginRequest request = new LoginRequest();
+		UserInfo info = GCM.loadIdPair(context);
+		if (info == null) {
+			Log.e("ActivityLogin", "UserInfo is null");
+			return;
+		}
+		String gmcId = info.getGcmRegId();
+		if (gmcId == null) {
+			Log.e("ActivityLogin", "gmcId is null");
+			return;
+		}
+		request.setGcmId(gmcId);
+		request.setId(email);
+		request.setPassword(password);
+
+		MApp app = MApp.getApp(context);
+		ServerConnection connection = app.getServerConnection();
+
+		LoginTask loginTask = new LoginTask(connection, loginTaskListener);
+		loginTask.execute(request);
 	}
+
+	private LoginTaskListener loginTaskListener = new LoginTaskListener() {
+
+		@Override
+		public void onPreExecute() {
+			dialog = new ProgressDialog(context);
+			dialog.setCancelable(false);
+			dialog.show();
+			dialog.setContentView(new ProgressBar(context));
+		}
+
+		@Override
+		public void onPostExecute(LoginResponse response) {
+			if (dialog != null)
+				dialog.dismiss();
+			if (response == null) {
+				MToast.error(context, true);
+				goToError();
+			} else {
+				if (response.isError()) {
+					MToast.errorLogin(context, true);
+					goToError();
+				} else {
+					MApp.goToActivity((Activity) context, ActivityMain.class,
+							true);
+				}
+			}
+		}
+	};
 
 	private void goToError() {
-		// TODO
-		// MApp.goToActivity(this, ActivityNoPlayService, true);
+		MApp.goToActivity(this, ActivityLogin.class, true);
 	}
 }

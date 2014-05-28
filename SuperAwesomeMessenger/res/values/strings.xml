@@ -53,5 +53,6 @@
     <string name="f_navigation_drawer_btn_add_contact">Add Contact</string>
     <string name="title_activity_activity_msg">MSG</string>
     <string name="a_msg_hint">Message</string>
+    <string name="a_msg_me">Me</string>
 
 </resources>

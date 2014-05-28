@@ -45,11 +45,17 @@ public class SendMessageController extends ServletController {
 
 		User receiver = findUserByEmail(request.getReceiverId());
 
-		boolean bool = gcmCon.sendMessage(request, sender, receiver.getGcmId());
+		long timestamp = System.currentTimeMillis();
+
+		boolean bool = gcmCon.sendMessage(request, sender, receiver.getGcmId(),
+				timestamp);
 
 		if (bool) {
 			response.setError(false);
 			response.setErrorMessage(null);
+			response.setId(request.getReceiverId());
+			response.setContent(request.getMessage());
+			response.setTimestamp(timestamp);
 		} else {
 			response.setError(true);
 			response.setErrorMessage("gcm connection failed");

@@ -1,11 +1,5 @@
 package edu.tugraz.sw14.xp04.gcm;
 
-import com.google.android.gms.gcm.GoogleCloudMessaging;
-
-import edu.tugraz.sw14.xp04.ActivityLaunch;
-import edu.tugraz.sw14.xp04.ActivityMain;
-import edu.tugraz.sw14.xp04.ActivitySendTestMessage;
-import edu.tugraz.sw14.xp04.R;
 import android.app.IntentService;
 import android.app.Notification;
 import android.app.NotificationManager;
@@ -16,7 +10,18 @@ import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.os.SystemClock;
 import android.support.v4.app.NotificationCompat;
+import android.text.TextUtils;
 import android.util.Log;
+
+import com.google.android.gms.gcm.GoogleCloudMessaging;
+
+import edu.tugraz.sw14.xp04.ActivityMain;
+import edu.tugraz.sw14.xp04.ActivityMsg;
+import edu.tugraz.sw14.xp04.ActivitySendTestMessage;
+import edu.tugraz.sw14.xp04.R;
+import edu.tugraz.sw14.xp04.database.Database;
+import edu.tugraz.sw14.xp04.helpers.DateTime;
+import edu.tugraz.sw14.xp04.msg.Msg;
 
 public class GcmIntentService extends IntentService {
 
@@ -59,6 +64,7 @@ public class GcmIntentService extends IntentService {
 				// This loop represents the service doing some work.
 
 				Log.i(TAG, "Completed work @ " + SystemClock.elapsedRealtime());
+				storeMessageInDatabase(extras);
 				// Post notification of received message.
 				sendNotification(extras);
 				Log.i(TAG, "Received: " + extras.toString());
@@ -66,6 +72,26 @@ public class GcmIntentService extends IntentService {
 		}
 		// Release the wake lock provided by the WakefulBroadcastReceiver.
 		GcmBroadcastReceiver.completeWakefulIntent(intent);
+	}
+
+	private void storeMessageInDatabase(Bundle extras) {
+		String sender = extras.getString("sender");
+		String msg = extras.getString("message");
+		long timeStamp = Long.valueOf(extras.getString("timestamp"));
+
+		if (sender == null || sender == "")
+			Log.d(TAG, "sender email was empty or null");
+
+		Msg toStore = new Msg(sender, msg, timeStamp, false, false);
+		Log.d(TAG, "time in ms: " + timeStamp);
+		Log.d(TAG, "time sent: " + DateTime.dateFromStamp(timeStamp) + " "
+				+ DateTime.timeFromStamp(timeStamp));
+
+		Database db = new Database(this);
+		boolean result = db.insertMsg(toStore.toContentValues());
+		if (result == false)
+			Log.d(TAG, "failed to store message");
+
 	}
 
 	// Put the message into a notification and post it.
@@ -77,22 +103,41 @@ public class GcmIntentService extends IntentService {
 
 		String sender = extras.getString("sender");
 		String msg = extras.getString("message");
+		long timeStamp = Long.valueOf(extras.getString("timestamp"));
 
-		Intent intent = new Intent(this, ActivitySendTestMessage.class);
+		if (sender == null || sender == "")
+			Log.d(TAG, "sender email was empty or null");
 
-		PendingIntent contentIntent = PendingIntent.getActivity(this, 0,
+		Database db = new Database(this);
+		int id = db.getContactId(sender);
+		Log.d(TAG, "sender id is: " + id);
+
+		Intent intent = new Intent(this, ActivityMain.class);
+		intent.putExtra(ActivityMsg.EXTRA_EMAIL, sender);
+		intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+		// intent.FLAG_ACTIVITY_NEW_TASK
+		PendingIntent contentIntent = PendingIntent.getActivity(this, id,
 				intent, 0);
+
+		// PendingIntent contentIntent = PendingIntent.getActivity(this, id,
+		// intent, PendingIntent.FLAG_UPDATE_CURRENT);
+
 		Notification.Builder mBuilder = new Notification.Builder(this)
-				.setSmallIcon(R.drawable.logo_sam).setContentTitle(sender)
+				.setAutoCancel(true)
+				.setSmallIcon(R.drawable.logo_sam)
+				.setWhen(timeStamp)
+				.setContentTitle(sender)
+				.setVibrate(new long[] { 700, 700, 1000, 700, 700 })
 				// .setStyle(new NotificationCompat.BigTextStyle().bigText(msg))
 				.setLargeIcon(
 						BitmapFactory.decodeResource(getResources(),
 								R.drawable.logo_sam)).setContentText(msg);
 
 		mBuilder.setContentIntent(contentIntent);
-		// mNotificationManager.notify(NOTIFICATION_ID, mBuilder.build());
-		mNotificationManager.notify(
-				(int) (System.currentTimeMillis() % Integer.MAX_VALUE),
-				mBuilder.build());
+		Notification note = mBuilder.build();
+		note.defaults |= Notification.DEFAULT_SOUND;
+
+		mNotificationManager.notify(id, note);
+
 	}
 }
