@@ -186,8 +186,8 @@ public class ActivityMsg extends Activity {
 
 		this.list.clear();
 		Database db = new Database(this);
-		limit = limit > 0 ? limit : DEFAULT_LIMIT;
-		this.list.addAll(db.getMsgsBySender(sender, limit));
+		int limit_tmp = limit > 0 ? limit : DEFAULT_LIMIT;
+		this.list.addAll(db.getMsgsBySender(sender, limit_tmp));
 
 		adapter.notifyDataSetChanged();
 		msgs_loaded = true;
