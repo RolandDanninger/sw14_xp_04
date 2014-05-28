@@ -4,14 +4,20 @@ import java.util.ArrayList;
 
 import edu.tugraz.sw14.xp04.adapters.ChatOverviewAdapter;
 import edu.tugraz.sw14.xp04.adapters.MsgAdapter;
+import edu.tugraz.sw14.xp04.contacts.Contact;
 import edu.tugraz.sw14.xp04.database.Database;
 import edu.tugraz.sw14.xp04.helpers.MApp;
 import edu.tugraz.sw14.xp04.helpers.MToast;
 import edu.tugraz.sw14.xp04.helpers.UIHelper;
 import edu.tugraz.sw14.xp04.msg.Msg;
+import edu.tugraz.sw14.xp04.server.AddContactTask;
 import edu.tugraz.sw14.xp04.server.SendMessageTask;
 import edu.tugraz.sw14.xp04.server.ServerConnection;
+import edu.tugraz.sw14.xp04.server.AddContactTask.AddContactTaskListener;
 import edu.tugraz.sw14.xp04.server.SendMessageTask.SendMessageTaskListener;
+import edu.tugraz.sw14.xp04.stubs.AddContactRequest;
+import edu.tugraz.sw14.xp04.stubs.AddContactResponse;
+import edu.tugraz.sw14.xp04.stubs.ContactStub;
 import edu.tugraz.sw14.xp04.stubs.SendMessageRequest;
 import edu.tugraz.sw14.xp04.stubs.SendMessageResponse;
 import android.app.Activity;
@@ -21,14 +27,22 @@ import android.app.NotificationManager;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.res.Configuration;
 import android.os.Bundle;
+import android.os.Handler;
 import android.text.Editable;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.View.MeasureSpec;
 import android.view.View.OnClickListener;
 import android.view.ViewGroup;
+import android.view.ViewTreeObserver;
+import android.view.inputmethod.InputMethodManager;
+import android.widget.AbsListView;
+import android.widget.AbsListView.OnScrollListener;
 import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.ListView;
@@ -53,6 +67,9 @@ public class ActivityMsg extends Activity {
 	private ImageButton btnSend;
 
 	private ProgressDialog dialog;
+	private ProgressDialog dialogAdd;
+	
+	private Menu menu;
 
 	private boolean msgs_loaded = false;
 
@@ -124,6 +141,7 @@ public class ActivityMsg extends Activity {
 		this.listView = (ListView) findViewById(R.id.msg_list);
 		this.adapter = new MsgAdapter(this, R.layout.item_msg, list);
 		this.listView.setAdapter(this.adapter);
+
 		loadMsgs(0);
 
 	}
@@ -156,7 +174,8 @@ public class ActivityMsg extends Activity {
 					String id = response.getId();
 					String content = response.getContent();
 					long timestamp = response.getTimestamp();
-					Msg responseMsg = new Msg(id, content, timestamp, true, true);
+					Msg responseMsg = new Msg(id, content, timestamp, true,
+							true);
 					if (responseMsg != null) {
 						Database db = new Database(context);
 						db.insertMsg(responseMsg.toContentValues());
@@ -195,21 +214,15 @@ public class ActivityMsg extends Activity {
 			scrollMyListViewToBottom();
 		}
 	}
-	
-	private void addMsg(Msg msg){
+
+	private void addMsg(Msg msg) {
 		this.list.add(msg);
 		adapter.notifyDataSetChanged();
 		scrollMyListViewToBottom();
 	}
 
 	private void scrollMyListViewToBottom() {
-		listView.post(new Runnable() {
-			@Override
-			public void run() {
-				// Select the last row so it will scroll into view...
-				listView.setSelection(adapter.getCount() - 1);
-			}
-		});
+		listView.setSelection(adapter.getCount() - 1);
 	}
 
 	@Override
@@ -217,6 +230,9 @@ public class ActivityMsg extends Activity {
 
 		// Inflate the menu; this adds items to the action bar if it is present.
 		getMenuInflater().inflate(R.menu.activity_msg, menu);
+		this.menu = menu;
+		Database db = new Database(context);
+		menu.getItem(0).setVisible(!db.contactAlreadyExists(sender));
 		return true;
 	}
 
@@ -225,19 +241,77 @@ public class ActivityMsg extends Activity {
 		// Handle action bar item clicks here. The action bar will
 		// automatically handle clicks on the Home/Up button, so long
 		// as you specify a parent activity in AndroidManifest.xml.
-		int id = item.getItemId();
-		if (id == R.id.action_settings) {
-			return true;
+		switch (item.getItemId()) {
+		case R.id.action_add_contact: doAddContact(sender);
+		default:
+			break;
 		}
 		return super.onOptionsItemSelected(item);
 	}
 
-	
+	private AddContactTaskListener addContactTaskListener = new AddContactTaskListener() {
+
+		@Override
+		public void onPreExecute() {
+			dialogAdd = new ProgressDialog(context);
+			dialogAdd.setCancelable(false);
+			dialogAdd.show();
+			dialogAdd.setContentView(new ProgressBar(context));
+		}
+
+		@Override
+		public void onPostExecute(AddContactResponse response) {
+			if (dialogAdd != null)
+				dialogAdd.dismiss();
+			if (response == null){
+				MToast.error(context, true);
+			}
+			else {
+
+				Log.d("AddContactResponse", "AddContactResponse is: \n" + response.toString());
+				if (response.isError())
+					MToast.errorAddContact(context, true);
+				else {
+					ContactStub contact_stub = response.getContact();
+					if (contact_stub != null) {
+						Contact contact = new Contact(contact_stub);
+						Database db = new Database(context);
+						if (db.insertContact(contact.toContentValues())) {
+							
+							if (menu != null)
+								menu.getItem(0).setVisible(false);
+						} else
+							MToast.error(context, true);
+					} else
+						MToast.errorAddContact(context, true);
+				}
+			}
+		}
+	};
+
+	protected void doAddContact(String id) {
+		
+		Database db = new Database(context);
+		if(db.contactAlreadyExists(id)){
+			MToast.errorUserAlreadyExists(context, true);
+			return;
+		}
+		
+		AddContactRequest request = new AddContactRequest();
+		request.setId(id);
+
+		MApp app = MApp.getApp(context);
+		ServerConnection connection = app.getServerConnection();
+
+		AddContactTask addContactTask = new AddContactTask(connection,
+				addContactTaskListener);
+		addContactTask.execute(request);
+	}
 	
 	@Override
 	protected void onResume() {
 		super.onResume();
-		loadMsgs(0);		
+		loadMsgs(0);
 	}
 
 	private void exitOnError() {

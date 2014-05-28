@@ -6,7 +6,8 @@
     android:paddingLeft="0dp"
     android:paddingRight="0dp"
     android:paddingTop="0dp"
-    tools:context=".ActivityMsg" >
+    tools:context=".ActivityMsg"
+    android:id="@+id/msg_view" >
 
     <LinearLayout
         android:layout_width="match_parent"
