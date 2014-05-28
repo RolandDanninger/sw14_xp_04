@@ -42,7 +42,7 @@ public class Database extends SQLiteOpenHelper {
 	public void onCreate(SQLiteDatabase db) {
 		String msg = String
 				.format("CREATE TABLE %s ("
-						+ "%s INTEGER PRIMARY KEY AUTOINCREMENT, %s TEXT, %s INTEGER, %s INTEGER, %s TEXT);",
+						+ "%s INTEGER PRIMARY KEY AUTOINCREMENT, %s TEXT, %s INTEGER, %s INTEGER, %s INTEGER, %s TEXT);",
 						MSG_TABLE, MSG_ID, MSG_SENDER_ID, MSG_TIMESTAMP,
 						MSG_FLAG_OWN, MSG_FLAG_READ, MSG_CONTENT);
 		try {

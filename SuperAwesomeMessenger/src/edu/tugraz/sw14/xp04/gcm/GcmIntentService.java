@@ -113,7 +113,7 @@ public class GcmIntentService extends IntentService {
 
 		Intent intent = new Intent(this, ActivityMsg.class);
 		intent.putExtra(ActivityMsg.EXTRA_EMAIL, sender);
-		intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
+		intent.setFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_SINGLE_TOP);
 		// intent.FLAG_ACTIVITY_NEW_TASK
 		PendingIntent contentIntent = PendingIntent.getActivity(this, id,
 				intent, 0);

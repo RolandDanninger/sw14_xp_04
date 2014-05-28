@@ -66,7 +66,7 @@ public class SendMessageControllerTest extends TestCase {
 				user);
 		expect(daoMock.existsByEmail(smRequest.getReceiverId())).andReturn(
 				true);
-		expect(gcmConMock.sendMessage(smRequest, sender, user.getGcmId()))
+		expect(gcmConMock.sendMessage(smRequest, sender, user.getGcmId(), System.currentTimeMillis()))
 				.andReturn(true);
 
 		EasyMock.replay(gcmConMock);

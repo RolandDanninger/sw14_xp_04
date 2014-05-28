@@ -17,6 +17,7 @@ import edu.tugraz.sw14.xp04.stubs.SendMessageResponse;
 import android.app.Activity;
 import android.app.ActionBar;
 import android.app.Fragment;
+import android.app.NotificationManager;
 import android.app.ProgressDialog;
 import android.content.Context;
 import android.content.Intent;
@@ -40,11 +41,11 @@ public class ActivityMsg extends Activity {
 	public static final int DEFAULT_LIMIT = 50;
 
 	private Context context;
-	
+
 	private String sender;
-	
+
 	private EditText etMsg;
-	
+
 	private ListView listView;
 	private ArrayList<Msg> list;
 	private MsgAdapter adapter;
@@ -63,7 +64,7 @@ public class ActivityMsg extends Activity {
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
 		setContentView(R.layout.activity_msg);
-		
+
 		this.context = this;
 
 		Intent intent = getIntent();
@@ -96,21 +97,21 @@ public class ActivityMsg extends Activity {
 
 				@Override
 				public void onClick(View v) {
-					if(etMsg == null){
+					if (etMsg == null) {
 						MToast.error(context, true);
 						return;
 					}
 					Editable eaMsg = etMsg.getText();
-					if(eaMsg == null){
+					if (eaMsg == null) {
 						MToast.error(context, true);
 						return;
 					}
 					String msg = eaMsg.toString();
-					if(msg == null){
+					if (msg == null) {
 						MToast.error(context, true);
 						return;
 					}
-					if(msg.isEmpty()){
+					if (msg.isEmpty()) {
 						MToast.error(context, true);
 						return;
 					}
@@ -119,8 +120,6 @@ public class ActivityMsg extends Activity {
 			});
 		}
 
-		
-		
 		this.list = new ArrayList<Msg>();
 		this.listView = (ListView) findViewById(R.id.msg_list);
 		this.adapter = new MsgAdapter(this, R.layout.item_msg, list);
@@ -151,28 +150,38 @@ public class ActivityMsg extends Activity {
 				if (response.isError())
 					MToast.errorSendMessage(context, true);
 				else {
-					if(etMsg != null){
+					if (etMsg != null) {
 						etMsg.setText("");
 					}
-					loadMsgs(0);
+					String id = response.getId();
+					String content = response.getContent();
+					long timestamp = response.getTimestamp();
+					Msg responseMsg = new Msg(id, content, timestamp, true, true);
+					if (responseMsg != null) {
+						Database db = new Database(context);
+						db.insertMsg(responseMsg.toContentValues());
+						addMsg(responseMsg);
+					} else
+						MToast.error(context, true);
 				}
 			}
 		}
 	};
 
 	private void sendMsg(String id, String msg) {
-	    
-	    MApp app = MApp.getApp(context);
-	    ServerConnection connection = app.getServerConnection();
-	    
-	    SendMessageRequest request = new SendMessageRequest();
-	    request.setReceiverId(id);
-	    request.setMessage(msg);
-	    
-	    SendMessageTask sendMessageTask = new SendMessageTask(connection, sendMessageTaskListener);
-	    sendMessageTask.execute(request);
-	  }
-	
+
+		MApp app = MApp.getApp(context);
+		ServerConnection connection = app.getServerConnection();
+
+		SendMessageRequest request = new SendMessageRequest();
+		request.setReceiverId(id);
+		request.setMessage(msg);
+
+		SendMessageTask sendMessageTask = new SendMessageTask(connection,
+				sendMessageTaskListener);
+		sendMessageTask.execute(request);
+	}
+
 	private void loadMsgs(int limit) {
 
 		this.list.clear();
@@ -185,6 +194,12 @@ public class ActivityMsg extends Activity {
 		if (limit <= 0) {
 			scrollMyListViewToBottom();
 		}
+	}
+	
+	private void addMsg(Msg msg){
+		this.list.add(msg);
+		adapter.notifyDataSetChanged();
+		scrollMyListViewToBottom();
 	}
 
 	private void scrollMyListViewToBottom() {
@@ -215,6 +230,14 @@ public class ActivityMsg extends Activity {
 			return true;
 		}
 		return super.onOptionsItemSelected(item);
+	}
+
+	
+	
+	@Override
+	protected void onResume() {
+		super.onResume();
+		loadMsgs(0);		
 	}
 
 	private void exitOnError() {
