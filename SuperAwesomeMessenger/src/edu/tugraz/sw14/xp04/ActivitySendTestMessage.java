@@ -14,117 +14,98 @@ import android.widget.EditText;
 import android.widget.ProgressBar;
 import edu.tugraz.sw14.xp04.helpers.MApp;
 import edu.tugraz.sw14.xp04.helpers.MToast;
+import edu.tugraz.sw14.xp04.server.SendMessageTask;
+import edu.tugraz.sw14.xp04.server.SendMessageTask.SendMessageTaskListener;
+import edu.tugraz.sw14.xp04.server.LoginTask;
 import edu.tugraz.sw14.xp04.server.ServerConnection;
 import edu.tugraz.sw14.xp04.server.ServerConnectionException;
+import edu.tugraz.sw14.xp04.server.LoginTask.LoginTaskListener;
 import edu.tugraz.sw14.xp04.stubs.LoginRequest;
+import edu.tugraz.sw14.xp04.stubs.LoginResponse;
 import edu.tugraz.sw14.xp04.stubs.SendMessageRequest;
 import edu.tugraz.sw14.xp04.stubs.SendMessageResponse;
 
 public class ActivitySendTestMessage extends Activity {
 
-	private Context context;
+  private Context context;
 
-	private EditText etId;
-	private EditText etMsg;
-	private Button btnSend;
+  private EditText etId;
+  private EditText etMsg;
+  private Button btnSend;
+  private ProgressDialog dialog;
 
-	@Override
-	protected void onCreate(Bundle savedInstanceState) {
-		super.onCreate(savedInstanceState);
-		setContentView(R.layout.activity_send_test_message);
-		this.context = this;
+  private SendMessageTaskListener sendMessageTaskListener = new SendMessageTaskListener() {
 
-		this.etId = (EditText) findViewById(R.id.a_sendtestmessage_txt_id);
-		this.etMsg = (EditText) findViewById(R.id.a_sendtestmessage_txt_message);
-		this.btnSend = (Button) findViewById(R.id.a_sendtestmessage_btn_send);
+    @Override
+    public void onPreExecute() {
+      
+      dialog = new ProgressDialog(context);
+      dialog.setCancelable(false);
+      dialog.show();
+      dialog.setContentView(new ProgressBar(context));
+    }
 
-		if (this.btnSend != null)
-			btnSend.setOnClickListener(new OnClickListener() {
+    @Override
+    public void onPostExecute(SendMessageResponse response) {
+      
+      if (dialog != null)
+        dialog.dismiss();
+      if (response == null)
+        MToast.error(context, true);
+      else {
+        if (response.isError())
+          MToast.errorSendMessage(context, true);
+        else {
+          MApp.goToActivity((Activity) context, ActivitySendTestMessage.class,
+              true);
+        }
+      }
+    }
+  };
 
-				@Override
-				public void onClick(View v) {
-					Editable eaId = etId.getText();
-					String strId = eaId.toString();
+  @Override
+  protected void onCreate(Bundle savedInstanceState) {
+    super.onCreate(savedInstanceState);
+    setContentView(R.layout.activity_send_test_message);
+    this.context = this;
 
-					Editable eaMsg = etMsg.getText();
-					String strMsg = eaMsg.toString();
+    this.etId = (EditText) findViewById(R.id.a_sendtestmessage_txt_id);
+    this.etMsg = (EditText) findViewById(R.id.a_sendtestmessage_txt_message);
+    this.btnSend = (Button) findViewById(R.id.a_sendtestmessage_btn_send);
 
-					sendMsg(strId, strMsg);
-				}
-			});
+    if (this.btnSend != null)
+      btnSend.setOnClickListener(new OnClickListener() {
 
-	}
-	
-	@Override
-	protected void onResume() {
-		super.onResume();
-	}
+        @Override
+        public void onClick(View v) {
+          Editable eaId = etId.getText();
+          String strId = eaId.toString();
 
-	private void sendMsg(String id, String msg) {
+          Editable eaMsg = etMsg.getText();
+          String strMsg = eaMsg.toString();
 
-		new SendMessageTask(id, msg).execute((Void[]) null);
-	}
+          sendMsg(strId, strMsg);
+        }
+      });
 
-	private class SendMessageTask extends
-			AsyncTask<Void, Void, SendMessageResponse> {
+  }
 
-		private ProgressDialog dialog;
-		private final String id;
-		private final String msg;
+  @Override
+  protected void onResume() {
+    super.onResume();
+  }
 
-		public SendMessageTask(String id, String msg) {
-			this.id = id;
-			this.msg = msg;
-		}
-
-		@Override
-		protected void onPreExecute() {
-			super.onPreExecute();
-			dialog = new ProgressDialog(context);
-			dialog.setCancelable(false);
-			dialog.show();
-			dialog.setContentView(new ProgressBar(context));
-		}
-
-		@Override
-		protected SendMessageResponse doInBackground(Void... params) {
-			SendMessageResponse response = null;
-			SendMessageRequest request = new SendMessageRequest();
-
-			request.setReceiverId(id);
-			request.setMessage(msg);
-
-			MApp app = MApp.getApp(context);
-			ServerConnection connection = app.getServerConnection();
-			if (connection != null) {
-				try {
-					response = connection.sendMessage(request);
-					return response;
-				} catch (ServerConnectionException e) {
-					// TODO Auto-generated catch block
-					e.printStackTrace();
-				}
-			}
-			return null;
-
-		}
-
-		@Override
-		protected void onPostExecute(SendMessageResponse response) {
-			super.onPostExecute(response);
-			if (dialog != null)
-				dialog.dismiss();
-			if (response == null)
-				MToast.error(context, true);
-			else {
-				if (response.isError())
-					MToast.errorSendMessage(context, true);
-				else {
-					MApp.goToActivity((Activity) context,
-							ActivitySendTestMessage.class, true);
-				}
-			}
-		}
-	}
+  private void sendMsg(String id, String msg) {
+    
+    MApp app = MApp.getApp(context);
+    ServerConnection connection = app.getServerConnection();
+    
+    SendMessageRequest request = new SendMessageRequest();
+    request.setReceiverId(id);
+    request.setMessage(msg);
+    
+    SendMessageTask sendMessageTask = new SendMessageTask(connection, sendMessageTaskListener);
+    sendMessageTask.execute(request);
+  }
 
 }
