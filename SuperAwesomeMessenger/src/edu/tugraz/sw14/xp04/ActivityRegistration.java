@@ -5,6 +5,7 @@ import android.app.ProgressDialog;
 import android.content.Context;
 import android.os.AsyncTask;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
@@ -38,42 +39,24 @@ public class ActivityRegistration extends Activity implements OnClickListener {
 	private TextView lblError = null;
 	private Button btnRegister = null;
 	private ProgressDialog dialog;
+	
+	private RegistrationController controller = null;
 
-	private final RegistrationTaskListener registrationTaskListener = new RegistrationTaskListener() {
-
-		@Override
-		public void onPreExecute() {
-			dialog = new ProgressDialog(context);
-			dialog.setCancelable(false);
-			dialog.show();
-			dialog.setContentView(new ProgressBar(context));
-		}
-
-		@Override
-		public void onPostExecute(RegistrationResponse response) {
-			if (dialog != null)
-				dialog.dismiss();
-			if (response == null)
-				MToast.error(context, true);
-			else {
-				if (response.isError())
-					MToast.errorRegister(context, true);
-				else {
-					Toast.makeText(ActivityRegistration.this,
-							R.string.a_registration_success, Toast.LENGTH_SHORT)
-							.show();
-					MApp.goToActivity((Activity) context, ActivityLogin.class,
-							true);
-				}
-			}
-		}
-	};
+	
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+		
+		Log.d("ActivityRegistration", "ONCREATE");
+		
 		setContentView(R.layout.activity_registration);
 		context = this;
+		
+		MApp app = MApp.getApp(context);
+		ServerConnection connection = app.getServerConnection();
+		
+		this.setController(new RegistrationController(this, connection));
 
 		txtId = (EditText) findViewById(R.id.a_registration_txt_id);
 		txtPassword = (EditText) findViewById(R.id.a_registration_txt_password);
@@ -148,22 +131,47 @@ public class ActivityRegistration extends Activity implements OnClickListener {
 			return;
 		}
 
-		doRegister(id, password);
+		startRegistrationTask(id, password);
 	}
 
-	private void doRegister(String email, String password) {
+	private void startRegistrationTask(String email, String password) {
+		this.setLoading();
+		controller.startRegistrationTask(email, password);
+	}
+	
+	public void setLoading() {
+		dialog = new ProgressDialog(context);
+		dialog.setCancelable(false);
+		dialog.show();
+		dialog.setContentView(new ProgressBar(context));
+	}
+	
+	public void onRegistrationTaskFinished(RegistrationResponse response) {
+		if (dialog != null)
+			dialog.dismiss();
+		if (response == null)
+			MToast.error(context, true);
+		else {
+			if (response.isError())
+				registrationFailed();
+			else {
+				registrationSuccessfull();
+			}
+		}
+	}
 
-		RegistrationRequest request = new RegistrationRequest();
+	private void registrationSuccessfull() {
+		Toast.makeText(ActivityRegistration.this,
+				R.string.a_registration_success, Toast.LENGTH_SHORT).show();
+		MApp.goToActivity((Activity) context, ActivityLogin.class, true);
+	}
 
-		request.setId(email);
-		request.setPassword(password);
-		request.setName(email);
-
-		MApp app = MApp.getApp(context);
-		ServerConnection connection = app.getServerConnection();
-
-		RegistrationTask task = new RegistrationTask(connection,
-				registrationTaskListener);
-		task.execute(request);
+	private void registrationFailed() {
+		MToast.errorRegister(context, true);
+	}
+	
+	public void setController(RegistrationController controller)
+	{
+		this.controller = controller;
 	}
 }

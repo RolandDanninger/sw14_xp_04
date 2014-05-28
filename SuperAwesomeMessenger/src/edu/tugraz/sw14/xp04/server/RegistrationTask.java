@@ -12,8 +12,6 @@ public class RegistrationTask extends
   private RegistrationTaskListener listener;
 
   public interface RegistrationTaskListener {
-    void onPreExecute();
-
     void onPostExecute(RegistrationResponse response);
   }
 
@@ -21,12 +19,6 @@ public class RegistrationTask extends
       RegistrationTaskListener listener) {
     this.connection = connection;
     this.listener = listener;
-  }
-
-  @Override
-  protected void onPreExecute() {
-    super.onPreExecute();
-    this.listener.onPreExecute();
   }
 
   @Override

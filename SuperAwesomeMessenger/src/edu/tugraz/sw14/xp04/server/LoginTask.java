@@ -12,7 +12,6 @@ public class LoginTask extends AsyncTask<LoginRequest, Void, LoginResponse> {
 
   public interface LoginTaskListener {
     void onPreExecute();
-
     void onPostExecute(LoginResponse response);
   }
 

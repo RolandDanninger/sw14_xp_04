@@ -18,10 +18,6 @@ public class RegisterTaskTest extends InstrumentationTestCase {
 
   RegistrationTaskListener registrationTaskListener = new RegistrationTaskListener() {
     @Override
-    public void onPreExecute() {
-    }
-
-    @Override
     public void onPostExecute(RegistrationResponse response) {
     }
   };
