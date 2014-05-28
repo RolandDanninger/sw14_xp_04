@@ -10,6 +10,7 @@ import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.os.SystemClock;
 import android.support.v4.app.NotificationCompat;
+import android.text.TextUtils;
 import android.util.Log;
 
 import com.google.android.gms.gcm.GoogleCloudMessaging;
@@ -112,21 +113,30 @@ public class GcmIntentService extends IntentService {
 
 		Intent intent = new Intent(this, ActivityMsg.class);
 		intent.putExtra(ActivityMsg.EXTRA_EMAIL, sender);
-
+		intent.setFlags(Intent.FLAG_ACTIVITY_SINGLE_TOP);
+		// intent.FLAG_ACTIVITY_NEW_TASK
 		PendingIntent contentIntent = PendingIntent.getActivity(this, id,
 				intent, 0);
+
+		// PendingIntent contentIntent = PendingIntent.getActivity(this, id,
+		// intent, PendingIntent.FLAG_UPDATE_CURRENT);
+
 		Notification.Builder mBuilder = new Notification.Builder(this)
 				.setAutoCancel(true)
 				.setSmallIcon(R.drawable.logo_sam)
 				.setWhen(timeStamp)
 				.setContentTitle(sender)
+				.setVibrate(new long[] { 700, 700, 1000, 700, 700 })
 				// .setStyle(new NotificationCompat.BigTextStyle().bigText(msg))
 				.setLargeIcon(
 						BitmapFactory.decodeResource(getResources(),
 								R.drawable.logo_sam)).setContentText(msg);
 
 		mBuilder.setContentIntent(contentIntent);
-		mNotificationManager.notify(id, mBuilder.build());
+		Notification note = mBuilder.build();
+		note.defaults |= Notification.DEFAULT_SOUND;
+
+		mNotificationManager.notify(id, note);
 
 	}
 }
