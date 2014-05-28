@@ -17,7 +17,7 @@
             android:layout_height="48dp"
             android:gravity="center_vertical"
             android:orientation="horizontal"
-            android:background="@color/bg_light" >
+            android:background="@drawable/bg_msg_own" >
 
             <EditText
                 android:id="@+id/nav_et_add_mail"
@@ -27,7 +27,7 @@
                 android:layout_marginLeft="4dp"
                 android:layout_marginRight="4dp"
                 android:textColorHint="@color/fnt_dark3"
-                android:textColor="@color/white"
+                android:textColor="@color/black"
                 android:fontFamily="sans-serif-light"
                 android:ems="10"
                 android:hint="@string/a_add_contact_txt_mail"

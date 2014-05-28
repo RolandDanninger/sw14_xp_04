@@ -94,6 +94,25 @@ public class Database extends SQLiteOpenHelper {
 		return result >= 0;
 	}
 
+	public int getContactId(String email) {
+		String sql = "SELECT * FROM " + CONTACT_TABLE + " WHERE "
+				+ CONTACT_USR_ID + "='" + email + "'";
+		int id = -1;
+		try {
+
+			SQLiteDatabase db = this.getReadableDatabase();
+			Cursor cursor = db.rawQuery(sql, null);
+			if (cursor != null && cursor.getCount() == 1) {
+				cursor.moveToNext();
+				id = cursor.getInt(cursor.getColumnIndex(CONTACT_ID));
+			}
+		} catch (SQLException ignore) {
+			Log.d(TAG, "error retrieving contactId");
+		}
+
+		return id;
+	}
+
 	public ArrayList<Contact> getAllContacts() {
 		ArrayList<Contact> list = new ArrayList<Contact>();
 		try {
