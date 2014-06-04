@@ -43,7 +43,7 @@ public class ActivityMain extends Activity implements
 	private int curr_fragment = NavigationDrawerOrder.BTN_START;
 
 	private Context context;
-	private MApp app = null;
+	private final MApp app = null;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
@@ -110,7 +110,7 @@ public class ActivityMain extends Activity implements
 
 	AlertDialog quit_dialog;
 	// * QUICK_QUIT
-	private long[] quick_quit = new long[] { 0, 0, 0 };;
+	private final long[] quick_quit = new long[] { 0, 0, 0 };;
 
 	@Override
 	public void onBackPressed() {
@@ -247,6 +247,8 @@ public class ActivityMain extends Activity implements
 	protected void onResume() {
 		Log.d("LIFECYCLE", "onResume");
 		super.onResume();
+		this.overridePendingTransition(android.R.anim.fade_in,
+				android.R.anim.fade_out);
 		loadFragment(FragmentMainStart.newInstance(null), null);
 		getCurrentFragment().refreshList();
 		updateUI(MApp.getNetworkState(context));

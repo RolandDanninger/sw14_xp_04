@@ -1,7 +1,5 @@
 package edu.tugraz.sw14.xp04.helpers;
 
-import org.junit.Ignore;
-
 import junit.framework.TestCase;
 
 public class EncryptionDESTest extends TestCase {
