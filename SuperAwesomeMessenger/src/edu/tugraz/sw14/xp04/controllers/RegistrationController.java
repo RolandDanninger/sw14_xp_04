@@ -1,5 +1,6 @@
-package edu.tugraz.sw14.xp04;
+package edu.tugraz.sw14.xp04.controllers;
 
+import edu.tugraz.sw14.xp04.ActivityRegistration;
 import edu.tugraz.sw14.xp04.server.RegistrationTask;
 import edu.tugraz.sw14.xp04.server.ServerConnection;
 import edu.tugraz.sw14.xp04.server.RegistrationTask.RegistrationTaskListener;
