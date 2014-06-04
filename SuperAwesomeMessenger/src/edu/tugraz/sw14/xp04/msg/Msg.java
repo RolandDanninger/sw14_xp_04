@@ -1,6 +1,7 @@
 package edu.tugraz.sw14.xp04.msg;
 
 import android.content.ContentValues;
+import edu.tugraz.sw14.xp04.contacts.Contact;
 import edu.tugraz.sw14.xp04.database.Database;
 
 public class Msg {
@@ -61,5 +62,25 @@ public class Msg {
         
         return v;
     }
+	@Override
+	public boolean equals(Object o) {
+		if (!(o instanceof Msg))
+            return false;
+        if (o == this)
+            return true;
+    	
+		boolean result = true;
+		Msg m = (Msg) o;
+		
+		if(this.timestamp != m.timestamp) return false;
+		
+		result &= this.id.equals(m.id);
+		result &= this.content.equals(m.content);
+		result &= this.flag_own && m.flag_own;
+		result &= this.flag_read && m.flag_read;
+		
+		return result;
+	}
 
+	
 }
