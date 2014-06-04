@@ -10,6 +10,7 @@ import edu.tugraz.sw14.xp04.helpers.Encryption;
 import edu.tugraz.sw14.xp04.helpers.EncryptionDES;
 import edu.tugraz.sw14.xp04.helpers.MApp;
 import edu.tugraz.sw14.xp04.helpers.MToast;
+import edu.tugraz.sw14.xp04.helpers.ShPref;
 import edu.tugraz.sw14.xp04.helpers.UIHelper;
 import edu.tugraz.sw14.xp04.msg.Msg;
 import edu.tugraz.sw14.xp04.server.AddContactTask;
@@ -32,6 +33,7 @@ import android.content.Intent;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.os.Handler;
+import android.os.Vibrator;
 import android.text.Editable;
 import android.util.Log;
 import android.view.LayoutInflater;
@@ -54,8 +56,10 @@ import android.os.Build;
 public class ActivityMsg extends Activity {
 
 	public static final String EXTRA_EMAIL = "extra_email";
-	public static final int DEFAULT_LIMIT = 50;
+	public static final int DEFAULT_LIMIT = 250;
 
+	public static final String KEY_CURRENT_SENDER = "key_current_sender";
+	
 	private Context context;
 
 	private String sender;
@@ -91,7 +95,11 @@ public class ActivityMsg extends Activity {
 		this.context = this;
 
 		encryptor = new EncryptionDES();
+		
+		init();
+	}
 
+	private void init(){
 		Intent intent = getIntent();
 		if (intent == null) {
 			exitOnError();
@@ -111,6 +119,9 @@ public class ActivityMsg extends Activity {
 		Database db = new Database(this);
 		String name = db.getContactName(sender);
 		db.setAsRead(sender);
+		NotificationManager nmgr = (NotificationManager) this
+		.getSystemService(Context.NOTIFICATION_SERVICE);
+		nmgr.cancel(db.getContactId(sender));
 		name = name != null ? name : sender;
 
 		UIHelper.setActionBarIco(this, R.drawable.ico_w_person);
@@ -152,9 +163,8 @@ public class ActivityMsg extends Activity {
 		this.listView.setAdapter(this.adapter);
 
 		loadMsgs(0);
-
 	}
-
+	
 	@Override
 	public void onBackPressed() {
 		MApp.finishActivity(this);
@@ -332,7 +342,16 @@ public class ActivityMsg extends Activity {
 	@Override
 	protected void onResume() {
 		super.onResume();
-		loadMsgs(0);
+		Log.d("test", "onResume() called ...");
+		init();
+		ShPref.setShPrefString(this, KEY_CURRENT_SENDER, sender);
+		
+	}
+
+	@Override
+	protected void onPause() {
+		super.onPause();
+		ShPref.setShPrefString(this, KEY_CURRENT_SENDER, null);
 	}
 
 	private void exitOnError() {
@@ -340,4 +359,14 @@ public class ActivityMsg extends Activity {
 		MApp.finishActivity(this);
 	}
 
+	
+	@Override
+	protected void onNewIntent(Intent intent) {
+		super.onNewIntent(intent);
+		this.setIntent(intent);
+//		Log.d("test", intent.getExtras().getString(ActivityMsg.EXTRA_EMAIL));
+	}
+
+	
+	
 }

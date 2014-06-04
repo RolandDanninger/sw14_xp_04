@@ -14,6 +14,7 @@ import android.content.pm.PackageManager.NameNotFoundException;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.os.SystemClock;
+import android.os.Vibrator;
 import android.support.v4.app.NotificationCompat;
 import android.util.Log;
 
@@ -29,6 +30,7 @@ import edu.tugraz.sw14.xp04.helpers.Encryption;
 import edu.tugraz.sw14.xp04.helpers.EncryptionDES;
 import edu.tugraz.sw14.xp04.helpers.EncryptionSimple;
 import edu.tugraz.sw14.xp04.helpers.MApp;
+import edu.tugraz.sw14.xp04.helpers.ShPref;
 import edu.tugraz.sw14.xp04.msg.Msg;
 
 public class GcmIntentService extends IntentService {
@@ -84,12 +86,31 @@ public class GcmIntentService extends IntentService {
 					sendNotification(extras);
 				} else {
 					if (appOnTop.contains("ActivityMsg")) {
-
+						String current = ShPref.getShPrefString(
+								getApplicationContext(),
+								ActivityMsg.KEY_CURRENT_SENDER);
+						if (current != null) {
+							String sender = encryptorz.decrypt(extras
+									.getString("sender"));
+							if (sender.equals(current)) {
+								Intent i = new Intent(this, ActivityMsg.class);
+								i.putExtra(ActivityMsg.EXTRA_EMAIL, sender);
+								i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK
+										| Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+								getApplicationContext().startActivity(i);
+								Vibrator vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+								vibrator.vibrate(500);
+							} else {
+								sendNotification(extras);
+							}
+						}
 					} else if (appOnTop.contains("ActivityMain")) {
 						Intent i = new Intent(this, ActivityMain.class);
 						i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK
 								| Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
 						getApplicationContext().startActivity(i);
+						Vibrator vibrator = (Vibrator) getSystemService(Context.VIBRATOR_SERVICE);
+						vibrator.vibrate(500);
 					}
 
 				}
@@ -166,14 +187,20 @@ public class GcmIntentService extends IntentService {
 		int id = db.getContactId(sender);
 		Log.d(TAG, "sender id is: " + id);
 
-		Intent intent = new Intent(this, ActivityLaunch.class);
+		// Intent i = new Intent(this, ActivityMsg.class);
+		// i.putExtra(ActivityMsg.EXTRA_EMAIL, sender);
+		// i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK
+		// | Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+		// getApplicationContext().startActivity(i);
+		//
+
+		Intent intent = new Intent(getApplicationContext(), ActivityMsg.class);
 		intent.putExtra(ActivityMsg.EXTRA_EMAIL, sender);
 		intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK
-				| Intent.FLAG_ACTIVITY_CLEAR_TASK
-				| Intent.FLAG_ACTIVITY_SINGLE_TOP);
+				| Intent.FLAG_ACTIVITY_CLEAR_TASK);
 
-		PendingIntent contentIntent = PendingIntent.getActivity(this, id,
-				intent, 0);
+		PendingIntent contentIntent = PendingIntent.getActivity(
+				getApplicationContext(), id, intent, 0);
 
 		// PendingIntent contentIntent = PendingIntent.getActivity(this, id,
 		// intent, PendingIntent.FLAG_UPDATE_CURRENT);

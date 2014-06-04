@@ -222,7 +222,7 @@ public class Database extends SQLiteOpenHelper {
 		try {
 			String sql = "SELECT * FROM " + MSG_TABLE + " " + "GROUP BY "
 					+ MSG_SENDER_ID + " " + "ORDER BY " + MSG_TIMESTAMP
-					+ " ASC";
+					+ " DESC";
 			if (limit > 0)
 				sql += " LIMIT " + limit;
 			sql += ";";
