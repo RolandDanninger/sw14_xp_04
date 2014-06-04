@@ -2,6 +2,7 @@ package edu.tugraz.sw14.xp04.database;
 
 import java.util.ArrayList;
 
+import edu.tugraz.sw14.xp04.R;
 import edu.tugraz.sw14.xp04.contacts.Contact;
 import edu.tugraz.sw14.xp04.helpers.ChatOverview;
 import edu.tugraz.sw14.xp04.msg.Msg;
@@ -34,9 +35,12 @@ public class Database extends SQLiteOpenHelper {
 	public static final String CONTACT_USR_ID = "contact_usr_id";
 	public static final String CONTACT_NAME = "contact_name";
 	public static final String CONTACT_IMG_URL = "contact_img_url";
+	
+	private static String me;
 
 	public Database(Context context) {
 		super(context, DATABASE_NAME, null, DATABASE_VERSION);
+		me = context.getResources().getString(R.string.a_msg_me);
 	}
 
 	@Override
@@ -216,6 +220,7 @@ public class Database extends SQLiteOpenHelper {
 					long timestamp = cursor.getLong(cursor.getColumnIndex(MSG_TIMESTAMP));
 					boolean flag_own = cursor.getInt(cursor.getColumnIndex(MSG_FLAG_OWN)) > 0;
 					boolean flag_read = cursor.getInt(cursor.getColumnIndex(MSG_FLAG_READ)) > 0;
+					desc = flag_own ? me + ": " + desc : desc;
 					ChatOverview c = new ChatOverview(title, desc, email, timestamp, imgUrl, new_msg);
 					list.add(c);
 				} while (cursor.moveToNext());

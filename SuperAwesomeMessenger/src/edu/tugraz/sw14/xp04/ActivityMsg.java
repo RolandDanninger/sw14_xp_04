@@ -73,6 +73,8 @@ public class ActivityMsg extends Activity {
 
 	private Menu menu;
 
+	private boolean contactAdded = false;
+
 	Encryption encryptor;
 
 	private boolean msgs_loaded = false;
@@ -152,6 +154,11 @@ public class ActivityMsg extends Activity {
 
 	}
 
+	@Override
+	public void onBackPressed() {
+		MApp.finishActivity(this);
+	}
+
 	private final SendMessageTaskListener sendMessageTaskListener = new SendMessageTaskListener() {
 
 		@Override
@@ -177,7 +184,7 @@ public class ActivityMsg extends Activity {
 					if (etMsg != null) {
 						etMsg.setText("");
 					}
-					String id = response.getId();
+					String id = encryptor.decrypt(response.getId());
 					String content = encryptor.decrypt(response.getContent());
 					long timestamp = response.getTimestamp();
 					Msg responseMsg = new Msg(id, content, timestamp, true,
@@ -290,7 +297,7 @@ public class ActivityMsg extends Activity {
 						Contact contact = new Contact(contact_stub);
 						Database db = new Database(context);
 						if (db.insertContact(contact.toContentValues())) {
-
+							contactAdded = true;
 							if (menu != null)
 								menu.getItem(0).setVisible(false);
 						} else

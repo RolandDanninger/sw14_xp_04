@@ -221,6 +221,10 @@ public class NavigationDrawerFragment extends Fragment {
 		this.contacts_loaded = true;
 	}
 
+	public void refreshList(){
+		loadContacts();
+	}
+	
 	public boolean isDrawerOpen() {
 		return mDrawerLayout != null
 				&& mDrawerLayout.isDrawerOpen(mFragmentContainerView);
