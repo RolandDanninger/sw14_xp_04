@@ -1,11 +1,16 @@
 package edu.tugraz.sw14.xp04.gcm;
 
+import android.app.Activity;
+import android.app.ActivityManager;
 import android.app.IntentService;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.ApplicationInfo;
+import android.content.pm.PackageManager;
+import android.content.pm.PackageManager.NameNotFoundException;
 import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.os.SystemClock;
@@ -23,6 +28,7 @@ import edu.tugraz.sw14.xp04.helpers.DateTime;
 import edu.tugraz.sw14.xp04.helpers.Encryption;
 import edu.tugraz.sw14.xp04.helpers.EncryptionDES;
 import edu.tugraz.sw14.xp04.helpers.EncryptionSimple;
+import edu.tugraz.sw14.xp04.helpers.MApp;
 import edu.tugraz.sw14.xp04.msg.Msg;
 
 public class GcmIntentService extends IntentService {
@@ -71,12 +77,48 @@ public class GcmIntentService extends IntentService {
 
 				storeMessageInDatabase(extras);
 				// Post notification of received message.
-				sendNotification(extras);
+
+				Log.i(TAG, "app on top is: " + getAppNameOnTop());
+				String appOnTop = getAppNameOnTop();
+				if (!appOnTop.contains("SuperAwesomeMessenger")) {
+					sendNotification(extras);
+				} else {
+					if (appOnTop.contains("ActivityMsg")) {
+
+					} else if (appOnTop.contains("ActivityMain")) {
+						Intent i = new Intent(this, ActivityMain.class);
+						i.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK
+								| Intent.FLAG_ACTIVITY_REORDER_TO_FRONT);
+						getApplicationContext().startActivity(i);
+					}
+
+				}
+
 				Log.i(TAG, "Received: " + extras.toString());
 			}
 		}
 		// Release the wake lock provided by the WakefulBroadcastReceiver.
 		GcmBroadcastReceiver.completeWakefulIntent(intent);
+	}
+
+	public String getAppNameOnTop() {
+		ActivityManager mActivityManager = (ActivityManager) getSystemService(Activity.ACTIVITY_SERVICE);
+		PackageManager mPackageManager = getPackageManager();
+		String packageName = mActivityManager.getRunningTasks(1).get(0).topActivity
+				.getPackageName();
+		ApplicationInfo mApplicationInfo;
+		try {
+			mApplicationInfo = mPackageManager.getApplicationInfo(packageName,
+					0);
+		} catch (NameNotFoundException e) {
+			mApplicationInfo = null;
+		}
+		String appName = (String) (mApplicationInfo != null ? mPackageManager
+				.getApplicationLabel(mApplicationInfo) : "(unknown)");
+
+		String className = mActivityManager.getRunningTasks(1).get(0).topActivity
+				.getClassName();
+		return appName + "-" + className;
 	}
 
 	private void storeMessageInDatabase(Bundle extras) {
@@ -129,7 +171,7 @@ public class GcmIntentService extends IntentService {
 		intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK
 				| Intent.FLAG_ACTIVITY_CLEAR_TASK
 				| Intent.FLAG_ACTIVITY_SINGLE_TOP);
-		// intent.FLAG_ACTIVITY_NEW_TASK
+
 		PendingIntent contentIntent = PendingIntent.getActivity(this, id,
 				intent, 0);
 
