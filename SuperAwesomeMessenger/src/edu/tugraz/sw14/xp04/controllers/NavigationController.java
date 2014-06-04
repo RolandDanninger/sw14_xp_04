@@ -67,7 +67,6 @@ public class NavigationController{
 		if (response == null) {
 			state = State.ERROR;
 		} else {
-
 			Log.d("AddContactResponse",
 					"AddContactResponse is: \n" + response.toString());
 			if (response.isError())

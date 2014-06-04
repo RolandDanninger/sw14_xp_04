@@ -36,7 +36,7 @@ public class ActivityRegistrationTest extends
 
 		ActivityRegistration activity = getActivity();
 
-		controllerMock = createMock(RegistrationController.class);
+		controllerMock = EasyMock.createMock(RegistrationController.class);
 		activity.setController(controllerMock);
 		
 		solo = new Solo(getInstrumentation(), activity);
@@ -86,7 +86,7 @@ public class ActivityRegistrationTest extends
 		controllerMock.startRegistrationTask(EasyMock.isA(String.class),
 				EasyMock.isA(String.class));
 		
-		PowerMock.replayAll();
+		EasyMock.replay(controllerMock);
 
 		ServerConnection connection = MApp.getApp(getActivity())
 				.getServerConnection();
@@ -107,7 +107,7 @@ public class ActivityRegistrationTest extends
 		for (int i = 0; i < Integer.MAX_VALUE / 8; i++) {
 		}
 
-		PowerMock.verifyAll();
+		EasyMock.verify(controllerMock);
 	}
 
 	public void testRegistrationFailedIDMissing() {
