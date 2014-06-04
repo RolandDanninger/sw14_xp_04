@@ -250,6 +250,7 @@ public class Database extends SQLiteOpenHelper {
 					if (flag_own)
 						desc = me + ": " + desc;
 					else {
+						
 						new_msg = countUnreadMsgs(email);
 						if (new_msg > 1)
 							desc = "(" + new_msg + ") messages";
