@@ -31,10 +31,12 @@ import android.widget.ImageButton;
 import android.widget.LinearLayout;
 import android.widget.ListView;
 import android.widget.ProgressBar;
+import edu.tugraz.sw14.xp04.ActivityMain;
 import edu.tugraz.sw14.xp04.ActivitySendTestMessage;
 import edu.tugraz.sw14.xp04.R;
 import edu.tugraz.sw14.xp04.adapters.ContactAdapter;
 import edu.tugraz.sw14.xp04.contacts.Contact;
+import edu.tugraz.sw14.xp04.controllers.NavigationController;
 import edu.tugraz.sw14.xp04.database.Database;
 import edu.tugraz.sw14.xp04.gcm.GCM;
 import edu.tugraz.sw14.xp04.helpers.MApp;
@@ -101,6 +103,8 @@ public class NavigationDrawerFragment extends Fragment {
 
 	private boolean contacts_loaded = false;
 
+	private NavigationController controller;
+
 	public boolean contactsLoaded() {
 		return this.contacts_loaded;
 	}
@@ -146,6 +150,11 @@ public class NavigationDrawerFragment extends Fragment {
 		if (mLayout == null)
 			return null;
 		this.context = getActivity();
+
+		MApp app = MApp.getApp(context);
+		ServerConnection connection = app.getServerConnection();
+
+		setController(new NavigationController(this, connection, new Database(context)));
 
 		this.addBtn = (Button) mLayout.findViewById(R.id.nav_btn_add);
 		if (this.addBtn != null) {
@@ -206,7 +215,7 @@ public class NavigationDrawerFragment extends Fragment {
 		// TODO read from database (sort by date??)
 		this.list.clear();
 		Database db = new Database(getActivity());
-		
+
 		this.list.addAll(db.getAllContacts());
 		this.adapter.notifyDataSetChanged();
 		this.contacts_loaded = true;
@@ -422,67 +431,45 @@ public class NavigationDrawerFragment extends Fragment {
 		void onNavigationDrawerItemSelected(int position);
 	}
 
-	private AddContactTaskListener addContactTaskListener = new AddContactTaskListener() {
-
-		@Override
-		public void onPreExecute() {
-			dialog = new ProgressDialog(context);
-			dialog.setCancelable(false);
-			dialog.show();
-			dialog.setContentView(new ProgressBar(context));
-		}
-
-		@Override
-		public void onPostExecute(AddContactResponse response) {
-			if (dialog != null)
-				dialog.dismiss();
-			if (response == null){
-				MToast.error(context, true);
-			}
-			else {
-
-				Log.d("AddContactResponse", "AddContactResponse is: \n" + response.toString());
-				if (response.isError())
-					MToast.errorAddContact(context, true);
-				else {
-					ContactStub contact_stub = response.getContact();
-					if (contact_stub != null) {
-						Contact contact = new Contact(contact_stub);
-						Database db = new Database(getActivity());
-						if (db.insertContact(contact.toContentValues())) {
-							if (form != null)
-								form.setVisibility(View.INVISIBLE);
-							if (etEmail != null)
-								etEmail.setText("");
-							if (addBtn != null)
-								addBtn.setVisibility(View.VISIBLE);
-							
-							loadContacts();
-						} else
-							MToast.error(getActivity(), true);
-					} else
-						MToast.errorAddContact(context, true);
-				}
-			}
-		}
-	};
-
+	public void setController(NavigationController controller){
+		this.controller = controller;
+	}
+	
 	protected void doAddContact(String id) {
+		controller.startAddContactTask(id);
+	}
+
+	public void onAddContactTaskStarted() {
+		dialog = new ProgressDialog(context);
+		dialog.setCancelable(false);
+		dialog.show();
+		dialog.setContentView(new ProgressBar(context));
+	}
+
+	public void onAddContactTaskFailed() {
+		MToast.errorUserAlreadyExists(getActivity(), true);
+	}
+
+	public void onAddContactTaskFinished(NavigationController.State state) {
+		if (dialog != null)
+			dialog.dismiss();
 		
-		Database db = new Database(getActivity());
-		if(db.contactAlreadyExists(id)){
-			MToast.errorUserAlreadyExists(getActivity(), true);
-			return;
+		switch(state){
+		
+		case SUCCESS:
+			if (form != null)
+				form.setVisibility(View.INVISIBLE);
+			if (etEmail != null)
+				etEmail.setText("");
+			if (addBtn != null)
+				addBtn.setVisibility(View.VISIBLE);
+
+			loadContacts();
+			break;
+		case ERROR: MToast.error(context, true);
+			break;
+		case FAILED: MToast.errorAddContact(context, true);
+			break;
 		}
-		
-		AddContactRequest request = new AddContactRequest();
-		request.setId(id);
-
-		MApp app = MApp.getApp(context);
-		ServerConnection connection = app.getServerConnection();
-
-		AddContactTask addContactTask = new AddContactTask(connection,
-				addContactTaskListener);
-		addContactTask.execute(request);
 	}
 }

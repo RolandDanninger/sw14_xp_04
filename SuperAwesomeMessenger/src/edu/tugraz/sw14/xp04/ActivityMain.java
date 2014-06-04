@@ -70,6 +70,10 @@ public class ActivityMain extends Activity implements
 		mNetworkStateReceiver = new MApp.NetworkStateReceiver(updateUICallable);
 	}
 
+	public NavigationDrawerFragment getCurrentFragment(){
+		return mNavigationDrawerFragment;
+	}
+	
 	// NETWORK UI
 	private void updateUI(final MApp.NetworkState state) {
 		Log.d(MApp.TAG_NetworkState, "updateUI(): State -> " + state);

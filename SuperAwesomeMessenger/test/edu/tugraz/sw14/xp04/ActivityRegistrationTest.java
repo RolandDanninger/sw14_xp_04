@@ -14,6 +14,7 @@ import android.widget.EditText;
 
 import com.robotium.solo.Solo;
 
+import edu.tugraz.sw14.xp04.controllers.RegistrationController;
 import edu.tugraz.sw14.xp04.helpers.MApp;
 import edu.tugraz.sw14.xp04.server.ServerConnection;
 import edu.tugraz.sw14.xp04.stubs.RegistrationResponse;

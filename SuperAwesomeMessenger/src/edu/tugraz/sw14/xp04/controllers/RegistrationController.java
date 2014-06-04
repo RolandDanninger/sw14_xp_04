@@ -1,6 +1,7 @@
-package edu.tugraz.sw14.xp04;
+package edu.tugraz.sw14.xp04.controllers;
 
 import android.util.Log;
+import edu.tugraz.sw14.xp04.ActivityRegistration;
 import edu.tugraz.sw14.xp04.helpers.Encryption;
 import edu.tugraz.sw14.xp04.helpers.EncryptionDES;
 import edu.tugraz.sw14.xp04.server.RegistrationTask;

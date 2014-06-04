@@ -14,6 +14,7 @@ import android.util.Log;
 
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 
+import edu.tugraz.sw14.xp04.ActivityLaunch;
 import edu.tugraz.sw14.xp04.ActivityMain;
 import edu.tugraz.sw14.xp04.ActivityMsg;
 import edu.tugraz.sw14.xp04.R;
@@ -123,7 +124,7 @@ public class GcmIntentService extends IntentService {
 		int id = db.getContactId(sender);
 		Log.d(TAG, "sender id is: " + id);
 
-		Intent intent = new Intent(this, ActivityMain.class);
+		Intent intent = new Intent(this, ActivityLaunch.class);
 		intent.putExtra(ActivityMsg.EXTRA_EMAIL, sender);
 		intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK
 				| Intent.FLAG_ACTIVITY_CLEAR_TASK

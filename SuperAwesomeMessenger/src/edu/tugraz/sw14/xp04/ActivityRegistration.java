@@ -15,6 +15,7 @@ import android.widget.EditText;
 import android.widget.ProgressBar;
 import android.widget.TextView;
 import android.widget.Toast;
+import edu.tugraz.sw14.xp04.controllers.RegistrationController;
 import edu.tugraz.sw14.xp04.gcm.GCM;
 import edu.tugraz.sw14.xp04.helpers.MApp;
 import edu.tugraz.sw14.xp04.helpers.MToast;

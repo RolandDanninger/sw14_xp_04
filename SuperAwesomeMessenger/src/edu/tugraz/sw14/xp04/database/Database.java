@@ -69,6 +69,9 @@ public class Database extends SQLiteOpenHelper {
 	}
 
 	public boolean insertMsg(ContentValues values) {
+		if (values == null) return false;
+		if((String)values.get(MSG_SENDER_ID) == null) return false;
+		if((String)values.get(MSG_CONTENT) == null) return false;
 		long result = -1;
 		try {
 			SQLiteDatabase db = this.getWritableDatabase();
@@ -83,6 +86,10 @@ public class Database extends SQLiteOpenHelper {
 	}
 
 	public boolean insertContact(ContentValues values) {
+		if (values == null) return false;
+		if(values.get(CONTACT_USR_ID) == null) return false;
+		if(values.get(CONTACT_NAME) == null) return false;
+		if(contactAlreadyExists((String)values.get(CONTACT_USR_ID))) return false;
 		long result = -1;
 		try {
 			SQLiteDatabase db = this.getWritableDatabase();
@@ -95,13 +102,13 @@ public class Database extends SQLiteOpenHelper {
 		}
 		return result >= 0;
 	}
-
+	
 	public int getContactId(String email) {
+		if (email == null) return -1;
 		String sql = "SELECT " + CONTACT_ID + " FROM " + CONTACT_TABLE + " WHERE "
 				+ CONTACT_USR_ID + "='" + email + "'";
 		int id = -1;
 		try {
-
 			SQLiteDatabase db = this.getReadableDatabase();
 			Cursor cursor = db.rawQuery(sql, null);
 			if (cursor != null && cursor.getCount() == 1) {
@@ -116,6 +123,7 @@ public class Database extends SQLiteOpenHelper {
 	}
 
 	public String getContactName(String email) {
+		if(email == null) return null;
 		String sql = "SELECT " + CONTACT_NAME + " FROM " + CONTACT_TABLE + " WHERE "
 				+ CONTACT_USR_ID + "='" + email + "'";
 		String name = null;
@@ -160,11 +168,13 @@ public class Database extends SQLiteOpenHelper {
 
 	public ArrayList<Msg> getMsgsBySender(String sender, int limit){
 		ArrayList<Msg> list = new ArrayList<Msg>();
+		if(sender == null) return list;
 		try {
 			String sql = "SELECT * FROM " + MSG_TABLE + " "
 					+ "WHERE " + MSG_SENDER_ID + "='" + sender + "' "
-					+ "ORDER BY " + MSG_TIMESTAMP + " ASC;";
-			// + " LIMIT " + limit + ";";
+					+ "ORDER BY " + MSG_TIMESTAMP + " ASC";
+			if(limit > 0) sql += " LIMIT " + limit;
+			sql += ";";
 			SQLiteDatabase db = this.getReadableDatabase();
 			Cursor cursor = db.rawQuery(sql, null);
 			if (cursor != null && cursor.getCount() > 0) {
@@ -189,8 +199,9 @@ public class Database extends SQLiteOpenHelper {
 		try {
 			String sql = "SELECT * FROM " + MSG_TABLE + " "
 					+ "GROUP BY " + MSG_SENDER_ID + " "
-					+ "ORDER BY " + MSG_TIMESTAMP + " ASC;";
-			// + " LIMIT " + limit + ";";
+					+ "ORDER BY " + MSG_TIMESTAMP + " ASC";
+			if(limit > 0) sql += " LIMIT " + limit;
+			sql += ";";
 			SQLiteDatabase db = this.getReadableDatabase();
 			Cursor cursor = db.rawQuery(sql, null);
 			if (cursor != null && cursor.getCount() > 0) {

@@ -103,6 +103,8 @@ public class Contact {
     }
 
     public ContentValues toContentValues(){
+    	if(this.name == null || this.email == null) return null;
+    	
         ContentValues v = new ContentValues();
         v.put(Database.CONTACT_USR_ID, this.email);
         v.put(Database.CONTACT_NAME, this.name);
@@ -111,4 +113,23 @@ public class Contact {
         return v;
     }
 
+	
+    @Override
+	public boolean equals(Object o) {
+    	
+    	if (!(o instanceof Contact))
+            return false;
+        if (o == this)
+            return true;
+    	
+		boolean result = true;
+		Contact c = (Contact) o;
+		
+		result &= this.name.equals(c.name);
+		result &= this.email.equals(c.email);
+		
+		return result;
+	}
+
+    
 }
