@@ -16,6 +16,8 @@ import com.google.android.gms.common.GooglePlayServicesUtil;
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 
 import edu.tugraz.sw14.xp04.gcm.GCM;
+import edu.tugraz.sw14.xp04.helpers.Encryption;
+import edu.tugraz.sw14.xp04.helpers.EncryptionDES;
 import edu.tugraz.sw14.xp04.helpers.MApp;
 import edu.tugraz.sw14.xp04.helpers.MToast;
 import edu.tugraz.sw14.xp04.helpers.ShPref;
@@ -149,6 +151,7 @@ public class ActivityLaunch extends Activity {
 
 	private void doAutoLogin(String email, String password) {
 		LoginRequest request = new LoginRequest();
+		Encryption encryptor = new EncryptionDES();
 		UserInfo info = GCM.loadIdPair(context);
 		if (info == null) {
 			Log.e("ActivityLogin", "UserInfo is null");
@@ -160,8 +163,8 @@ public class ActivityLaunch extends Activity {
 			return;
 		}
 		request.setGcmId(gmcId);
-		request.setId(email);
-		request.setPassword(password);
+		request.setId(encryptor.encrypt(email));
+		request.setPassword(encryptor.encrypt(password));
 
 		MApp app = MApp.getApp(context);
 		ServerConnection connection = app.getServerConnection();
@@ -170,7 +173,7 @@ public class ActivityLaunch extends Activity {
 		loginTask.execute(request);
 	}
 
-	private LoginTaskListener loginTaskListener = new LoginTaskListener() {
+	private final LoginTaskListener loginTaskListener = new LoginTaskListener() {
 
 		@Override
 		public void onPreExecute() {

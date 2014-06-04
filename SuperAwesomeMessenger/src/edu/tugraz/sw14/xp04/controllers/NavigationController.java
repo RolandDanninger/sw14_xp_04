@@ -6,6 +6,8 @@ import edu.tugraz.sw14.xp04.ActivityMain;
 import edu.tugraz.sw14.xp04.ActivityRegistration;
 import edu.tugraz.sw14.xp04.contacts.Contact;
 import edu.tugraz.sw14.xp04.database.Database;
+import edu.tugraz.sw14.xp04.helpers.Encryption;
+import edu.tugraz.sw14.xp04.helpers.EncryptionDES;
 import edu.tugraz.sw14.xp04.helpers.MApp;
 import edu.tugraz.sw14.xp04.helpers.MToast;
 import edu.tugraz.sw14.xp04.navigation.NavigationDrawerFragment;
@@ -20,49 +22,48 @@ import edu.tugraz.sw14.xp04.stubs.ContactStub;
 import edu.tugraz.sw14.xp04.stubs.RegistrationRequest;
 import edu.tugraz.sw14.xp04.stubs.RegistrationResponse;
 
-public class NavigationController{
-	
+public class NavigationController {
+
+	private Encryption encryptor;
+
 	public enum State {
-		SUCCESS,
-		FAILED,
-		ERROR
+		SUCCESS, FAILED, ERROR
 	}
-	
-	private NavigationDrawerFragment fragment;
-	private ServerConnection connection;
-	private Database db;
-	
+
+	private final NavigationDrawerFragment fragment;
+	private final ServerConnection connection;
+	private final Database db;
+
 	private final AddContactTaskListener addContactTaskListener = new AddContactTaskListener() {
-		
+
 		@Override
 		public void onPreExecute() {
 			onAddContactTaskStarted();
-			
+
 		}
-		
+
 		@Override
 		public void onPostExecute(AddContactResponse response) {
 			onAddContactTaskFinished(response);
 		}
 	};
-	
-	public NavigationController(NavigationDrawerFragment fragment, ServerConnection connection, Database db)
-	{
+
+	public NavigationController(NavigationDrawerFragment fragment,
+			ServerConnection connection, Database db) {
 		this.fragment = fragment;
 		this.connection = connection;
 		this.db = db;
 	}
-	
-	public void onAddContactTaskStarted()
-	{
+
+	public void onAddContactTaskStarted() {
 		fragment.onAddContactTaskStarted();
 	}
-	public void onAddContactTaskFailed()
-	{
+
+	public void onAddContactTaskFailed() {
 		fragment.onAddContactTaskFailed();
 	}
-	public void onAddContactTaskFinished(AddContactResponse response)
-	{
+
+	public void onAddContactTaskFinished(AddContactResponse response) {
 		State state = State.ERROR;
 		if (response == null) {
 			state = State.ERROR;
@@ -73,6 +74,9 @@ public class NavigationController{
 				state = State.FAILED;
 			else {
 				ContactStub contact_stub = response.getContact();
+				contact_stub
+						.setEmail(encryptor.decrypt(contact_stub.getEmail()));
+				contact_stub.setName(encryptor.decrypt(contact_stub.getName()));
 				if (contact_stub != null) {
 					Contact contact = new Contact(contact_stub);
 					if (db.insertContact(contact.toContentValues())) {
@@ -86,17 +90,17 @@ public class NavigationController{
 		}
 		fragment.onAddContactTaskFinished(state);
 	}
-	
-	
-	public void startAddContactTask(String id)
-	{
-		if(db.contactAlreadyExists(id)){
+
+	public void startAddContactTask(String id) {
+		if (db.contactAlreadyExists(id)) {
 			onAddContactTaskFailed();
 			return;
 		}
-		
+
+		encryptor = new EncryptionDES();
+
 		AddContactRequest request = new AddContactRequest();
-		request.setId(id);
+		request.setId(encryptor.encrypt(id));
 
 		AddContactTask addContactTask = new AddContactTask(connection,
 				addContactTaskListener);

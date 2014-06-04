@@ -11,6 +11,8 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ProgressBar;
 import edu.tugraz.sw14.xp04.gcm.GCM;
+import edu.tugraz.sw14.xp04.helpers.Encryption;
+import edu.tugraz.sw14.xp04.helpers.EncryptionDES;
 import edu.tugraz.sw14.xp04.helpers.MApp;
 import edu.tugraz.sw14.xp04.helpers.MToast;
 import edu.tugraz.sw14.xp04.helpers.ShPref;
@@ -30,7 +32,7 @@ public class ActivityLogin extends Activity {
 	private Button btnRegister;
 	private ProgressDialog dialog;
 
-	private LoginTaskListener loginTaskListener = new LoginTaskListener() {
+	private final LoginTaskListener loginTaskListener = new LoginTaskListener() {
 
 		@Override
 		public void onPreExecute() {
@@ -94,13 +96,13 @@ public class ActivityLogin extends Activity {
 		String email = ShPref.getShPrefString(context, "logininfo_email");
 		String password = ShPref.getShPrefString(context, "logininfo_password");
 		if (email != null && !email.isEmpty()) {
-			if (etEmail != null){
-//				etEmail.setText(email);
+			if (etEmail != null) {
+				// etEmail.setText(email);
 			}
 		}
 		if (password != null && !password.isEmpty()) {
-			if (etPassword != null){
-//				etPassword.setText(password);
+			if (etPassword != null) {
+				// etPassword.setText(password);
 			}
 		}
 
@@ -150,6 +152,7 @@ public class ActivityLogin extends Activity {
 
 	protected void doLogin(String email, String password) {
 		LoginRequest request = new LoginRequest();
+		Encryption encryptor = new EncryptionDES();
 		UserInfo info = GCM.loadIdPair(context);
 		if (info == null) {
 			Log.e("ActivityLogin", "UserInfo is null");
@@ -161,8 +164,8 @@ public class ActivityLogin extends Activity {
 			return;
 		}
 		request.setGcmId(gmcId);
-		request.setId(email);
-		request.setPassword(password);
+		request.setId(encryptor.encrypt(email));
+		request.setPassword(encryptor.encrypt(password));
 
 		MApp app = MApp.getApp(context);
 		ServerConnection connection = app.getServerConnection();
