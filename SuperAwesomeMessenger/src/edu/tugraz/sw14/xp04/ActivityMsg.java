@@ -6,6 +6,8 @@ import edu.tugraz.sw14.xp04.adapters.ChatOverviewAdapter;
 import edu.tugraz.sw14.xp04.adapters.MsgAdapter;
 import edu.tugraz.sw14.xp04.contacts.Contact;
 import edu.tugraz.sw14.xp04.database.Database;
+import edu.tugraz.sw14.xp04.helpers.Encryption;
+import edu.tugraz.sw14.xp04.helpers.EncryptionDES;
 import edu.tugraz.sw14.xp04.helpers.MApp;
 import edu.tugraz.sw14.xp04.helpers.MToast;
 import edu.tugraz.sw14.xp04.helpers.UIHelper;
@@ -68,8 +70,10 @@ public class ActivityMsg extends Activity {
 
 	private ProgressDialog dialog;
 	private ProgressDialog dialogAdd;
-	
+
 	private Menu menu;
+
+	Encryption encryptor;
 
 	private boolean msgs_loaded = false;
 
@@ -83,6 +87,8 @@ public class ActivityMsg extends Activity {
 		setContentView(R.layout.activity_msg);
 
 		this.context = this;
+
+		encryptor = new EncryptionDES();
 
 		Intent intent = getIntent();
 		if (intent == null) {
@@ -146,7 +152,7 @@ public class ActivityMsg extends Activity {
 
 	}
 
-	private SendMessageTaskListener sendMessageTaskListener = new SendMessageTaskListener() {
+	private final SendMessageTaskListener sendMessageTaskListener = new SendMessageTaskListener() {
 
 		@Override
 		public void onPreExecute() {
@@ -172,7 +178,7 @@ public class ActivityMsg extends Activity {
 						etMsg.setText("");
 					}
 					String id = response.getId();
-					String content = response.getContent();
+					String content = encryptor.decrypt(response.getContent());
 					long timestamp = response.getTimestamp();
 					Msg responseMsg = new Msg(id, content, timestamp, true,
 							true);
@@ -193,8 +199,9 @@ public class ActivityMsg extends Activity {
 		ServerConnection connection = app.getServerConnection();
 
 		SendMessageRequest request = new SendMessageRequest();
-		request.setReceiverId(id);
-		request.setMessage(msg);
+
+		request.setReceiverId(encryptor.encrypt(id));
+		request.setMessage(encryptor.encrypt(msg));
 
 		SendMessageTask sendMessageTask = new SendMessageTask(connection,
 				sendMessageTaskListener);
@@ -242,14 +249,15 @@ public class ActivityMsg extends Activity {
 		// automatically handle clicks on the Home/Up button, so long
 		// as you specify a parent activity in AndroidManifest.xml.
 		switch (item.getItemId()) {
-		case R.id.action_add_contact: doAddContact(sender);
+		case R.id.action_add_contact:
+			doAddContact(sender);
 		default:
 			break;
 		}
 		return super.onOptionsItemSelected(item);
 	}
 
-	private AddContactTaskListener addContactTaskListener = new AddContactTaskListener() {
+	private final AddContactTaskListener addContactTaskListener = new AddContactTaskListener() {
 
 		@Override
 		public void onPreExecute() {
@@ -263,21 +271,26 @@ public class ActivityMsg extends Activity {
 		public void onPostExecute(AddContactResponse response) {
 			if (dialogAdd != null)
 				dialogAdd.dismiss();
-			if (response == null){
+			if (response == null) {
 				MToast.error(context, true);
-			}
-			else {
+			} else {
 
-				Log.d("AddContactResponse", "AddContactResponse is: \n" + response.toString());
+				Log.d("AddContactResponse", "AddContactResponse is: \n"
+						+ response.toString());
 				if (response.isError())
 					MToast.errorAddContact(context, true);
 				else {
 					ContactStub contact_stub = response.getContact();
+					contact_stub.setEmail(encryptor.decrypt(contact_stub
+							.getEmail()));
+					contact_stub.setName(encryptor.decrypt(contact_stub
+							.getName()));
+
 					if (contact_stub != null) {
 						Contact contact = new Contact(contact_stub);
 						Database db = new Database(context);
 						if (db.insertContact(contact.toContentValues())) {
-							
+
 							if (menu != null)
 								menu.getItem(0).setVisible(false);
 						} else
@@ -290,15 +303,15 @@ public class ActivityMsg extends Activity {
 	};
 
 	protected void doAddContact(String id) {
-		
+
 		Database db = new Database(context);
-		if(db.contactAlreadyExists(id)){
+		if (db.contactAlreadyExists(id)) {
 			MToast.errorUserAlreadyExists(context, true);
 			return;
 		}
-		
+
 		AddContactRequest request = new AddContactRequest();
-		request.setId(id);
+		request.setId(encryptor.encrypt(id));
 
 		MApp app = MApp.getApp(context);
 		ServerConnection connection = app.getServerConnection();
@@ -307,7 +320,7 @@ public class ActivityMsg extends Activity {
 				addContactTaskListener);
 		addContactTask.execute(request);
 	}
-	
+
 	@Override
 	protected void onResume() {
 		super.onResume();
