@@ -110,6 +110,7 @@ public class ActivityMsg extends Activity {
 
 		Database db = new Database(this);
 		String name = db.getContactName(sender);
+		db.setAsRead(sender);
 		name = name != null ? name : sender;
 
 		UIHelper.setActionBarIco(this, R.drawable.ico_w_person);

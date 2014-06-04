@@ -35,7 +35,7 @@ public class Database extends SQLiteOpenHelper {
 	public static final String CONTACT_USR_ID = "contact_usr_id";
 	public static final String CONTACT_NAME = "contact_name";
 	public static final String CONTACT_IMG_URL = "contact_img_url";
-	
+
 	private static String me;
 
 	public Database(Context context) {
@@ -73,9 +73,12 @@ public class Database extends SQLiteOpenHelper {
 	}
 
 	public boolean insertMsg(ContentValues values) {
-		if (values == null) return false;
-		if((String)values.get(MSG_SENDER_ID) == null) return false;
-		if((String)values.get(MSG_CONTENT) == null) return false;
+		if (values == null)
+			return false;
+		if ((String) values.get(MSG_SENDER_ID) == null)
+			return false;
+		if ((String) values.get(MSG_CONTENT) == null)
+			return false;
 		long result = -1;
 		try {
 			SQLiteDatabase db = this.getWritableDatabase();
@@ -90,10 +93,14 @@ public class Database extends SQLiteOpenHelper {
 	}
 
 	public boolean insertContact(ContentValues values) {
-		if (values == null) return false;
-		if(values.get(CONTACT_USR_ID) == null) return false;
-		if(values.get(CONTACT_NAME) == null) return false;
-		if(contactAlreadyExists((String)values.get(CONTACT_USR_ID))) return false;
+		if (values == null)
+			return false;
+		if (values.get(CONTACT_USR_ID) == null)
+			return false;
+		if (values.get(CONTACT_NAME) == null)
+			return false;
+		if (contactAlreadyExists((String) values.get(CONTACT_USR_ID)))
+			return false;
 		long result = -1;
 		try {
 			SQLiteDatabase db = this.getWritableDatabase();
@@ -106,11 +113,12 @@ public class Database extends SQLiteOpenHelper {
 		}
 		return result >= 0;
 	}
-	
+
 	public int getContactId(String email) {
-		if (email == null) return -1;
-		String sql = "SELECT " + CONTACT_ID + " FROM " + CONTACT_TABLE + " WHERE "
-				+ CONTACT_USR_ID + "='" + email + "'";
+		if (email == null)
+			return -1;
+		String sql = "SELECT " + CONTACT_ID + " FROM " + CONTACT_TABLE
+				+ " WHERE " + CONTACT_USR_ID + "='" + email + "'";
 		int id = -1;
 		try {
 			SQLiteDatabase db = this.getReadableDatabase();
@@ -127,9 +135,10 @@ public class Database extends SQLiteOpenHelper {
 	}
 
 	public String getContactName(String email) {
-		if(email == null) return null;
-		String sql = "SELECT " + CONTACT_NAME + " FROM " + CONTACT_TABLE + " WHERE "
-				+ CONTACT_USR_ID + "='" + email + "'";
+		if (email == null)
+			return null;
+		String sql = "SELECT " + CONTACT_NAME + " FROM " + CONTACT_TABLE
+				+ " WHERE " + CONTACT_USR_ID + "='" + email + "'";
 		String name = null;
 		try {
 
@@ -145,7 +154,7 @@ public class Database extends SQLiteOpenHelper {
 
 		return name;
 	}
-	
+
 	public ArrayList<Contact> getAllContacts() {
 		ArrayList<Contact> list = new ArrayList<Contact>();
 		try {
@@ -157,9 +166,12 @@ public class Database extends SQLiteOpenHelper {
 			if (cursor != null && cursor.getCount() > 0) {
 				cursor.moveToFirst();
 				do {
-					String email = cursor.getString(cursor.getColumnIndex(CONTACT_USR_ID));
-					String name = cursor.getString(cursor.getColumnIndex(CONTACT_NAME));
-					String img_url = cursor.getString(cursor.getColumnIndex(CONTACT_IMG_URL));
+					String email = cursor.getString(cursor
+							.getColumnIndex(CONTACT_USR_ID));
+					String name = cursor.getString(cursor
+							.getColumnIndex(CONTACT_NAME));
+					String img_url = cursor.getString(cursor
+							.getColumnIndex(CONTACT_IMG_URL));
 					Contact c = new Contact(name, email, img_url);
 					list.add(c);
 				} while (cursor.moveToNext());
@@ -170,25 +182,32 @@ public class Database extends SQLiteOpenHelper {
 		}
 	}
 
-	public ArrayList<Msg> getMsgsBySender(String sender, int limit){
+	public ArrayList<Msg> getMsgsBySender(String sender, int limit) {
 		ArrayList<Msg> list = new ArrayList<Msg>();
-		if(sender == null) return list;
+		if (sender == null)
+			return list;
 		try {
-			String sql = "SELECT * FROM " + MSG_TABLE + " "
-					+ "WHERE " + MSG_SENDER_ID + "='" + sender + "' "
-					+ "ORDER BY " + MSG_TIMESTAMP + " ASC";
-			if(limit > 0) sql += " LIMIT " + limit;
+			String sql = "SELECT * FROM " + MSG_TABLE + " " + "WHERE "
+					+ MSG_SENDER_ID + "='" + sender + "' " + "ORDER BY "
+					+ MSG_TIMESTAMP + " ASC";
+			if (limit > 0)
+				sql += " LIMIT " + limit;
 			sql += ";";
 			SQLiteDatabase db = this.getReadableDatabase();
 			Cursor cursor = db.rawQuery(sql, null);
 			if (cursor != null && cursor.getCount() > 0) {
 				cursor.moveToFirst();
 				do {
-					String content = cursor.getString(cursor.getColumnIndex(MSG_CONTENT));
-					long timestamp = cursor.getLong(cursor.getColumnIndex(MSG_TIMESTAMP));
-					boolean flag_own = cursor.getInt(cursor.getColumnIndex(MSG_FLAG_OWN)) > 0;
-					boolean flag_read = cursor.getInt(cursor.getColumnIndex(MSG_FLAG_READ)) > 0;
-					Msg m = new Msg(sender, content, timestamp, flag_own, flag_read);
+					String content = cursor.getString(cursor
+							.getColumnIndex(MSG_CONTENT));
+					long timestamp = cursor.getLong(cursor
+							.getColumnIndex(MSG_TIMESTAMP));
+					boolean flag_own = cursor.getInt(cursor
+							.getColumnIndex(MSG_FLAG_OWN)) > 0;
+					boolean flag_read = cursor.getInt(cursor
+							.getColumnIndex(MSG_FLAG_READ)) > 0;
+					Msg m = new Msg(sender, content, timestamp, flag_own,
+							flag_read);
 					list.add(m);
 				} while (cursor.moveToNext());
 			}
@@ -197,31 +216,46 @@ public class Database extends SQLiteOpenHelper {
 			return list;
 		}
 	}
-	
-	public ArrayList<ChatOverview> getAllMsgs(int limit){
+
+	public ArrayList<ChatOverview> getAllMsgs(int limit) {
 		ArrayList<ChatOverview> list = new ArrayList<ChatOverview>();
 		try {
-			String sql = "SELECT * FROM " + MSG_TABLE + " "
-					+ "GROUP BY " + MSG_SENDER_ID + " "
-					+ "ORDER BY " + MSG_TIMESTAMP + " ASC";
-			if(limit > 0) sql += " LIMIT " + limit;
+			String sql = "SELECT * FROM " + MSG_TABLE + " " + "GROUP BY "
+					+ MSG_SENDER_ID + " " + "ORDER BY " + MSG_TIMESTAMP
+					+ " ASC";
+			if (limit > 0)
+				sql += " LIMIT " + limit;
 			sql += ";";
 			SQLiteDatabase db = this.getReadableDatabase();
 			Cursor cursor = db.rawQuery(sql, null);
 			if (cursor != null && cursor.getCount() > 0) {
 				cursor.moveToFirst();
 				do {
-					String email = cursor.getString(cursor.getColumnIndex(MSG_SENDER_ID));
+					String email = cursor.getString(cursor
+							.getColumnIndex(MSG_SENDER_ID));
 					String title = email;
-					String content = cursor.getString(cursor.getColumnIndex(MSG_CONTENT));
-					String desc = content.length() > 30 ? content.substring(0, 30) : content;
+					String content = cursor.getString(cursor
+							.getColumnIndex(MSG_CONTENT));
+					String desc = content.length() > 30 ? content.substring(0,
+							30) : content;
 					String imgUrl = null;
+
+					long timestamp = cursor.getLong(cursor
+							.getColumnIndex(MSG_TIMESTAMP));
+					boolean flag_own = cursor.getInt(cursor
+							.getColumnIndex(MSG_FLAG_OWN)) > 0;
+					boolean flag_read = cursor.getInt(cursor
+							.getColumnIndex(MSG_FLAG_READ)) > 0;
 					int new_msg = 0;
-					long timestamp = cursor.getLong(cursor.getColumnIndex(MSG_TIMESTAMP));
-					boolean flag_own = cursor.getInt(cursor.getColumnIndex(MSG_FLAG_OWN)) > 0;
-					boolean flag_read = cursor.getInt(cursor.getColumnIndex(MSG_FLAG_READ)) > 0;
-					desc = flag_own ? me + ": " + desc : desc;
-					ChatOverview c = new ChatOverview(title, desc, email, timestamp, imgUrl, new_msg);
+					if (flag_own)
+						desc = me + ": " + desc;
+					else {
+						new_msg = countUnreadMsgs(email);
+						if (new_msg > 1)
+							desc = "(" + new_msg + ") messages";
+					}
+					ChatOverview c = new ChatOverview(title, desc, email,
+							timestamp, imgUrl, new_msg);
 					list.add(c);
 				} while (cursor.moveToNext());
 			}
@@ -230,7 +264,7 @@ public class Database extends SQLiteOpenHelper {
 			return list;
 		}
 	}
-	
+
 	public boolean contactAlreadyExists(String id) {
 		try {
 			String sql = "SELECT * FROM " + CONTACT_TABLE + " " + "WHERE \""
@@ -243,6 +277,35 @@ public class Database extends SQLiteOpenHelper {
 				return false;
 		} catch (SQLException ignore) {
 			return false;
+		}
+	}
+
+	public int countUnreadMsgs(String id) {
+		int result = 0;
+		try {
+			String sql = "SELECT count(*) FROM " + MSG_TABLE + " " + "WHERE \""
+					+ MSG_SENDER_ID + "\" = \"" + id + "\" AND "
+					+ MSG_FLAG_READ + " = 0;";
+			SQLiteDatabase db = this.getReadableDatabase();
+			Cursor cursor = db.rawQuery(sql, null);
+			if (cursor != null && cursor.getCount() > 0)
+				cursor.moveToFirst();
+			do {
+				result = cursor.getInt(0);
+			} while (cursor.moveToNext());
+		} catch (SQLException ignore) {
+			return 0;
+		}
+		return result;
+	}
+
+	public void setAsRead(String id) {
+		String sql = "UPDATE " + MSG_TABLE + " SET " + MSG_FLAG_READ + "=1 "
+				+ "WHERE \"" + MSG_SENDER_ID + "\" = \"" + id + "\";";
+		try {
+			SQLiteDatabase db = this.getWritableDatabase();
+			db.execSQL(sql);
+		} catch (Exception ignore) {
 		}
 	}
 }

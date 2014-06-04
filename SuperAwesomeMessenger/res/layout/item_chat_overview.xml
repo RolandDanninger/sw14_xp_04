@@ -13,6 +13,7 @@
             android:layout_width="40dp"
             android:layout_height="40dp"
             android:layout_margin="4dp"
+            android:layout_marginLeft="8dp"
             android:background="@color/highlight_light"
             android:src="@drawable/ico_w_person" />
 
@@ -103,7 +104,8 @@
         android:layout_width="4dp"
         android:layout_marginTop="4dp"
         android:layout_marginBottom="4dp"
+        android:layout_marginLeft="2dp"
         android:layout_height="match_parent"
-        android:background="@color/highlight_dark"/>
+        android:background="@android:color/holo_green_light"/>
 
 </FrameLayout>
