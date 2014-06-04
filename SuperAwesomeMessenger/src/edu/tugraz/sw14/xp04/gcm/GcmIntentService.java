@@ -10,22 +10,24 @@ import android.graphics.BitmapFactory;
 import android.os.Bundle;
 import android.os.SystemClock;
 import android.support.v4.app.NotificationCompat;
-import android.text.TextUtils;
 import android.util.Log;
 
 import com.google.android.gms.gcm.GoogleCloudMessaging;
 
 import edu.tugraz.sw14.xp04.ActivityMain;
 import edu.tugraz.sw14.xp04.ActivityMsg;
-import edu.tugraz.sw14.xp04.ActivitySendTestMessage;
 import edu.tugraz.sw14.xp04.R;
 import edu.tugraz.sw14.xp04.database.Database;
 import edu.tugraz.sw14.xp04.helpers.DateTime;
+import edu.tugraz.sw14.xp04.helpers.Encryption;
+import edu.tugraz.sw14.xp04.helpers.EncryptionDES;
+import edu.tugraz.sw14.xp04.helpers.EncryptionSimple;
 import edu.tugraz.sw14.xp04.msg.Msg;
 
 public class GcmIntentService extends IntentService {
 
 	public static final String TAG = "GcmIntentService";
+	private final Encryption encryptorz;
 
 	public static final int NOTIFICATION_ID = 1;
 	private NotificationManager mNotificationManager;
@@ -33,6 +35,7 @@ public class GcmIntentService extends IntentService {
 
 	public GcmIntentService() {
 		super("GcmIntentService");
+		encryptorz = new EncryptionDES();
 	}
 
 	@Override
@@ -64,6 +67,7 @@ public class GcmIntentService extends IntentService {
 				// This loop represents the service doing some work.
 
 				Log.i(TAG, "Completed work @ " + SystemClock.elapsedRealtime());
+
 				storeMessageInDatabase(extras);
 				// Post notification of received message.
 				sendNotification(extras);
@@ -75,22 +79,27 @@ public class GcmIntentService extends IntentService {
 	}
 
 	private void storeMessageInDatabase(Bundle extras) {
-		String sender = extras.getString("sender");
-		String msg = extras.getString("message");
+		String sender = encryptorz.decrypt(extras.getString("sender"));
+		String msg = encryptorz.decrypt(extras.getString("message"));
+		// String msg = extras.getString("message");
+
 		long timeStamp = Long.valueOf(extras.getString("timestamp"));
 
-		if (sender == null || sender == "")
+		if (sender == null || sender == "") {
 			Log.d(TAG, "sender email was empty or null");
+		} else if (msg == null) {
+			Log.d(TAG, "decode error, not storing message");
+		} else {
+			Msg toStore = new Msg(sender, msg, timeStamp, false, false);
+			Log.d(TAG, "time in ms: " + timeStamp);
+			Log.d(TAG, "time sent: " + DateTime.dateFromStamp(timeStamp) + " "
+					+ DateTime.timeFromStamp(timeStamp));
 
-		Msg toStore = new Msg(sender, msg, timeStamp, false, false);
-		Log.d(TAG, "time in ms: " + timeStamp);
-		Log.d(TAG, "time sent: " + DateTime.dateFromStamp(timeStamp) + " "
-				+ DateTime.timeFromStamp(timeStamp));
-
-		Database db = new Database(this);
-		boolean result = db.insertMsg(toStore.toContentValues());
-		if (result == false)
-			Log.d(TAG, "failed to store message");
+			Database db = new Database(this);
+			boolean result = db.insertMsg(toStore.toContentValues());
+			if (result == false)
+				Log.d(TAG, "failed to store message");
+		}
 
 	}
 
@@ -101,8 +110,10 @@ public class GcmIntentService extends IntentService {
 		mNotificationManager = (NotificationManager) this
 				.getSystemService(Context.NOTIFICATION_SERVICE);
 
-		String sender = extras.getString("sender");
-		String msg = extras.getString("message");
+		String sender = encryptorz.decrypt(extras.getString("sender"));
+		String msg = encryptorz.decrypt(extras.getString("message"));
+		// String msg = extras.getString("message");
+
 		long timeStamp = Long.valueOf(extras.getString("timestamp"));
 
 		if (sender == null || sender == "")
@@ -114,7 +125,9 @@ public class GcmIntentService extends IntentService {
 
 		Intent intent = new Intent(this, ActivityMain.class);
 		intent.putExtra(ActivityMsg.EXTRA_EMAIL, sender);
-		intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TASK | Intent.FLAG_ACTIVITY_SINGLE_TOP);
+		intent.setFlags(Intent.FLAG_ACTIVITY_NEW_TASK
+				| Intent.FLAG_ACTIVITY_CLEAR_TASK
+				| Intent.FLAG_ACTIVITY_SINGLE_TOP);
 		// intent.FLAG_ACTIVITY_NEW_TASK
 		PendingIntent contentIntent = PendingIntent.getActivity(this, id,
 				intent, 0);

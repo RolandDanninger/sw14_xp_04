@@ -1,37 +1,36 @@
 package edu.tugraz.sw14.xp04.helpers;
 
-
 public class EncryptionSimple implements Encryption {
 
-  private int key;
+	private final int key;
 
-  EncryptionSimple(int key2) throws Exception {
+	public EncryptionSimple(int key2) {
 
-    this.key = key2;
-  }
+		this.key = key2;
+	}
 
-  @Override
-  public String encrypt(String data) throws Exception {
+	@Override
+	public String encrypt(String data) {
 
-    String encrypted = "";
-    
-    for (char ch: data.toCharArray()) {
-      encrypted += (char) (ch+key);
-    }
-    
-    return encrypted;
-  }
+		String encrypted = "";
 
-  @Override
-  public String decrypt(String data) throws Exception {
+		for (char ch : data.toCharArray()) {
+			encrypted += (char) (ch + key);
+		}
 
-    String decrypted = "";
-    
-    for (char ch: data.toCharArray()) {
-      decrypted += (char) (ch-key);
-    }
-    
-    return decrypted;
-  }
+		return encrypted;
+	}
+
+	@Override
+	public String decrypt(String data) {
+
+		String decrypted = "";
+
+		for (char ch : data.toCharArray()) {
+			decrypted += (char) (ch - key);
+		}
+
+		return decrypted;
+	}
 
 }
