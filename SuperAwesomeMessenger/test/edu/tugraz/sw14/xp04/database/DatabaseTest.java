@@ -16,7 +16,9 @@ public class DatabaseTest extends AndroidTestCase {
 	private static final String name = "Hauns";
 	private static final String mail = "mail";
 	private static final String content = "this is a msg";
+	private static final String content2 = "this is a msg number 2";
 	private static final long timestamp = 1;
+	private static final long timestamp2 = 2;
 	private static final Msg msg = new Msg(mail, content, timestamp, true, true);
 
 	public void setUp() {
@@ -336,10 +338,10 @@ public class DatabaseTest extends AndroidTestCase {
 	}
 
 	public void testCountUnreadMsgs() {
-		Msg msg1 = new Msg(mail, content, timestamp, false, true);
+		Msg msg1 = new Msg(mail, content, timestamp, false, false);
 		boolean result = db.insertMsg(msg1.toContentValues());
 		assertEquals(true, result);
-		Msg msg2 = new Msg(mail, content, timestamp, false, true);
+		Msg msg2 = new Msg(mail, content2, timestamp2, false, false);
 		result = db.insertMsg(msg2.toContentValues());
 		assertEquals(true, result);
 		int count = db.countUnreadMsgs(mail);
@@ -357,7 +359,7 @@ public class DatabaseTest extends AndroidTestCase {
 	}
 
 	public void testSetAsRead() {
-		Msg msg1 = new Msg(mail, content, timestamp, false, true);
+		Msg msg1 = new Msg(mail, content, timestamp, false, false);
 		boolean result = db.insertMsg(msg1.toContentValues());
 		assertEquals(true, result);
 		int count = db.countUnreadMsgs(mail);
@@ -368,7 +370,7 @@ public class DatabaseTest extends AndroidTestCase {
 	}
 
 	public void testSetAsReadEmptyId() {
-		Msg msg1 = new Msg(mail, content, timestamp, false, true);
+		Msg msg1 = new Msg(mail, content, timestamp, false, false);
 		boolean result = db.insertMsg(msg1.toContentValues());
 		assertEquals(true, result);
 		int count = db.countUnreadMsgs(mail);

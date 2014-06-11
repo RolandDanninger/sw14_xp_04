@@ -8,6 +8,7 @@ import edu.tugraz.sw14.xp04.helpers.ChatOverview;
 import edu.tugraz.sw14.xp04.msg.Msg;
 import android.content.ContentValues;
 import android.content.Context;
+import android.content.res.Resources;
 import android.database.Cursor;
 import android.database.SQLException;
 import android.database.sqlite.SQLiteDatabase;
@@ -36,11 +37,16 @@ public class Database extends SQLiteOpenHelper {
 	public static final String CONTACT_NAME = "contact_name";
 	public static final String CONTACT_IMG_URL = "contact_img_url";
 
-	private static String me;
+	private String me = "";
 
 	public Database(Context context) {
 		super(context, DATABASE_NAME, null, DATABASE_VERSION);
-		me = context.getResources().getString(R.string.a_msg_me);
+		if(context != null){
+			Resources res = context.getResources();
+			if(res != null){
+				me = res.getString(R.string.a_msg_me);
+			}
+		}
 	}
 
 	@Override

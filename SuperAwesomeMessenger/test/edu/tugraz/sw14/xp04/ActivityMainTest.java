@@ -44,7 +44,7 @@ public class ActivityMainTest extends ActivityInstrumentationTestCase2<ActivityM
 	
 	
 	public void testAddContactValidEmail(){
-		String email = "a@b.com";
+		String email = "a@bu.com";
 		
 		controllerMock.startAddContactTask(email);
 		EasyMock.replay(controllerMock);
@@ -55,7 +55,9 @@ public class ActivityMainTest extends ActivityInstrumentationTestCase2<ActivityM
 		EditText etMail = (EditText)ndf.findViewById(R.id.nav_et_add_mail);
 		ImageButton btnAddGo = (ImageButton)ndf.findViewById(R.id.nav_btn_add_go);
 		
-		solo.clickOnMenuItem(solo.getString(R.string.menu));		
+		
+		
+		solo.clickOnMenuItem(solo.getString(R.string.menu));
 		solo.clickOnView(btnAdd);
 		solo.enterText(etMail, email);	
 		solo.clickOnView(btnAddGo);
