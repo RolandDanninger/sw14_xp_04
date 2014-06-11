@@ -10,6 +10,15 @@
         android:showAsAction="always"
         android:title="@string/error_network"
         android:visible="false"/>
+    
+    <item android:id="@+id/action_msg_network_error"
+        android:title="@string/error_network"
+        android:orderInCategory="100"
+        android:icon="@drawable/ico_not_connected"
+        android:showAsAction="always"
+        android:enabled="false"
+        android:visible="false"/>
+    
     <item
         android:id="@+id/action_msg_state"
         android:enabled="false"

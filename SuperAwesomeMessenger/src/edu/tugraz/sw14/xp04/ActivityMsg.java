@@ -1,6 +1,7 @@
 package edu.tugraz.sw14.xp04;
 
 import java.util.ArrayList;
+import java.util.concurrent.Callable;
 
 import edu.tugraz.sw14.xp04.adapters.ChatOverviewAdapter;
 import edu.tugraz.sw14.xp04.adapters.MsgAdapter;
@@ -59,12 +60,18 @@ import android.widget.ListView;
 import android.widget.ProgressBar;
 import android.os.Build;
 
+
+import java.util.concurrent.Callable;
+
 public class ActivityMsg extends Activity {
 
 	public static final String EXTRA_EMAIL = "extra_email";
 	public static final int DEFAULT_LIMIT = 250;
 
 	public static final String KEY_CURRENT_SENDER = "key_current_sender";
+
+	private MApp.NetworkStateReceiver mNetworkStateReceiver;
+	private MApp.NetworkState networkState = MApp.NetworkState.UNKNOWN;
 
 	private Context context;
 
@@ -101,6 +108,15 @@ public class ActivityMsg extends Activity {
 		this.context = this;
 
 		encryptor = new EncryptionDES();
+
+		Callable updateUICallable = new Callable() {
+			@Override
+			public Object call() throws Exception {
+				updateUI(MApp.getNetworkState(context));
+				return null;
+			}
+		};
+		mNetworkStateReceiver = new MApp.NetworkStateReceiver(updateUICallable);
 
 		init();
 	}
@@ -174,6 +190,50 @@ public class ActivityMsg extends Activity {
 	@Override
 	public void onBackPressed() {
 		MApp.finishActivity(this);
+	}
+
+	// NETWORK UI
+	private void updateUI(final MApp.NetworkState state) {
+		Log.d(MApp.TAG_NetworkState, "updateUI(): State -> " + state);
+		switch (state) {
+		case DISCONNECTED:
+			notConnectedUI();
+			break;
+		case CONNECTED:
+			connectedUI();
+			break;
+		default:
+			break;
+		}
+		networkState = state;
+	}
+
+	private void notConnectedUI() {
+		Log.d(MApp.TAG_NetworkState, "notConnectedUI()");
+		if (this.menu != null) {
+			MenuItem item = this.menu.findItem(R.id.action_msg_network_error);
+			if (item != null)
+				item.setVisible(true);
+			MenuItem item2 = menu.findItem(R.id.action_msg_state);
+			if (item2 != null) {
+				item2.setIcon(R.drawable.ico_state_fail);
+				item2.setVisible(false);
+			}
+		}
+	}
+
+	private void connectedUI() {
+		Log.d(MApp.TAG_NetworkState, "connected()");
+		if (this.menu != null) {
+			MenuItem item = this.menu.findItem(R.id.action_msg_network_error);
+			if (item != null)
+				item.setVisible(false);
+			MenuItem item2 = menu.findItem(R.id.action_msg_state);
+			if (item2 != null) {
+				item2.setIcon(R.drawable.ico_state_ready);
+				item2.setVisible(true);
+			}
+		}
 	}
 
 	private final SendMessageTaskListener sendMessageTaskListener = new SendMessageTaskListener() {
@@ -419,12 +479,16 @@ public class ActivityMsg extends Activity {
 		} else
 			doAutoLogin();
 
+		updateUI(MApp.getNetworkState(context));
+		MApp.registerNetworkStateReceiver(this, mNetworkStateReceiver);
 	}
 
 	@Override
 	protected void onPause() {
+		Log.d("LIFECYCLE", "onPause");
 		super.onPause();
 		ShPref.setShPrefString(this, KEY_CURRENT_SENDER, null);
+		MApp.unregisterNetworkStateReceiver(this, mNetworkStateReceiver);
 	}
 
 	private void exitOnError() {

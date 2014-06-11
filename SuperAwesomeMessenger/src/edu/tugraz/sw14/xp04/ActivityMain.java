@@ -107,6 +107,11 @@ public class ActivityMain extends Activity implements
 			MenuItem item = this.menu.getItem(0);
 			if (item != null)
 				item.setVisible(true);
+			MenuItem item2 = menu.findItem(R.id.action_msg_state);
+			if (item2 != null) {
+				item2.setIcon(R.drawable.ico_state_fail);
+				item2.setVisible(false);
+			}
 		}
 	}
 
@@ -116,6 +121,11 @@ public class ActivityMain extends Activity implements
 			MenuItem item = this.menu.getItem(0);
 			if (item != null)
 				item.setVisible(false);
+			MenuItem item2 = menu.findItem(R.id.action_msg_state);
+			if (item2 != null) {
+				item2.setIcon(R.drawable.ico_state_ready);
+				item2.setVisible(true);
+			}
 		}
 	}
 
