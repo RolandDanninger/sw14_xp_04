@@ -282,6 +282,7 @@ public class Database extends SQLiteOpenHelper {
 	}
 
 	public int countUnreadMsgs(String id) {
+		if(id == null) return 0;
 		int result = 0;
 		try {
 			String sql = "SELECT count(*) FROM " + MSG_TABLE + " " + "WHERE \""

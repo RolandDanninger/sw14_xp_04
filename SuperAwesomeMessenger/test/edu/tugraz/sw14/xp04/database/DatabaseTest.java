@@ -335,6 +335,49 @@ public class DatabaseTest extends AndroidTestCase {
 		assertEquals(1, list.size());
 	}
 
+	public void testCountUnreadMsgs() {
+		Msg msg1 = new Msg(mail, content, timestamp, false, true);
+		boolean result = db.insertMsg(msg1.toContentValues());
+		assertEquals(true, result);
+		Msg msg2 = new Msg(mail, content, timestamp, false, true);
+		result = db.insertMsg(msg2.toContentValues());
+		assertEquals(true, result);
+		int count = db.countUnreadMsgs(mail);
+		assertEquals(2, count);
+	}
+
+	public void testCountUnreadMsgsNoMsgs() {
+		int count = db.countUnreadMsgs(mail);
+		assertEquals(0, count);
+	}
+
+	public void testCountUnreadMsgsEmptyId() {
+		int count = db.countUnreadMsgs(null);
+		assertEquals(0, count);
+	}
+
+	public void testSetAsRead() {
+		Msg msg1 = new Msg(mail, content, timestamp, false, true);
+		boolean result = db.insertMsg(msg1.toContentValues());
+		assertEquals(true, result);
+		int count = db.countUnreadMsgs(mail);
+		assertEquals(1, count);
+		db.setAsRead(mail);
+		count = db.countUnreadMsgs(mail);
+		assertEquals(0, count);
+	}
+
+	public void testSetAsReadEmptyId() {
+		Msg msg1 = new Msg(mail, content, timestamp, false, true);
+		boolean result = db.insertMsg(msg1.toContentValues());
+		assertEquals(true, result);
+		int count = db.countUnreadMsgs(mail);
+		assertEquals(1, count);
+		db.setAsRead(null);
+		count = db.countUnreadMsgs(mail);
+		assertEquals(1, count);
+	}
+
 	public void tearDown() throws Exception {
 		db.close();
 		super.tearDown();
