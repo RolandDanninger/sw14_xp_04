@@ -8,7 +8,13 @@
         android:icon="@drawable/ico_not_connected"
         android:showAsAction="always"
         android:enabled="false"
-        android:visible="false"
-        android:numericShortcut="0"/>
+        android:visible="false"/>
+    
+    <item android:id="@+id/action_state"
+        android:title="@string/state"
+        android:orderInCategory="100"
+        android:icon="@drawable/ico_state_fail"
+        android:showAsAction="always"
+        android:enabled="false"/>
 
 </menu>

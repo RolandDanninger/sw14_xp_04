@@ -54,6 +54,7 @@ public class ActivityLaunch extends Activity {
 			else {
 				regid = pair.getGcmRegId();
 			}
+			
 			if (regid == null)
 				registerInBackground();
 			else {
@@ -197,6 +198,8 @@ public class ActivityLaunch extends Activity {
 				} else {
 					MApp.goToActivity((Activity) context, ActivityMain.class,
 							true);
+					MApp app = MApp.getApp(context);
+					app.setLoggedIn();
 				}
 			}
 		}

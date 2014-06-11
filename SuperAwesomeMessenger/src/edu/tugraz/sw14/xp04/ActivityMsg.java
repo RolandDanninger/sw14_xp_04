@@ -6,21 +6,27 @@ import edu.tugraz.sw14.xp04.adapters.ChatOverviewAdapter;
 import edu.tugraz.sw14.xp04.adapters.MsgAdapter;
 import edu.tugraz.sw14.xp04.contacts.Contact;
 import edu.tugraz.sw14.xp04.database.Database;
+import edu.tugraz.sw14.xp04.gcm.GCM;
 import edu.tugraz.sw14.xp04.helpers.Encryption;
 import edu.tugraz.sw14.xp04.helpers.EncryptionDES;
 import edu.tugraz.sw14.xp04.helpers.MApp;
 import edu.tugraz.sw14.xp04.helpers.MToast;
 import edu.tugraz.sw14.xp04.helpers.ShPref;
 import edu.tugraz.sw14.xp04.helpers.UIHelper;
+import edu.tugraz.sw14.xp04.helpers.UserInfo;
 import edu.tugraz.sw14.xp04.msg.Msg;
 import edu.tugraz.sw14.xp04.server.AddContactTask;
+import edu.tugraz.sw14.xp04.server.LoginTask;
 import edu.tugraz.sw14.xp04.server.SendMessageTask;
 import edu.tugraz.sw14.xp04.server.ServerConnection;
 import edu.tugraz.sw14.xp04.server.AddContactTask.AddContactTaskListener;
+import edu.tugraz.sw14.xp04.server.LoginTask.LoginTaskListener;
 import edu.tugraz.sw14.xp04.server.SendMessageTask.SendMessageTaskListener;
 import edu.tugraz.sw14.xp04.stubs.AddContactRequest;
 import edu.tugraz.sw14.xp04.stubs.AddContactResponse;
 import edu.tugraz.sw14.xp04.stubs.ContactStub;
+import edu.tugraz.sw14.xp04.stubs.LoginRequest;
+import edu.tugraz.sw14.xp04.stubs.LoginResponse;
 import edu.tugraz.sw14.xp04.stubs.SendMessageRequest;
 import edu.tugraz.sw14.xp04.stubs.SendMessageResponse;
 import android.app.Activity;
@@ -59,7 +65,7 @@ public class ActivityMsg extends Activity {
 	public static final int DEFAULT_LIMIT = 250;
 
 	public static final String KEY_CURRENT_SENDER = "key_current_sender";
-	
+
 	private Context context;
 
 	private String sender;
@@ -95,11 +101,11 @@ public class ActivityMsg extends Activity {
 		this.context = this;
 
 		encryptor = new EncryptionDES();
-		
+
 		init();
 	}
 
-	private void init(){
+	private void init() {
 		Intent intent = getIntent();
 		if (intent == null) {
 			exitOnError();
@@ -120,7 +126,7 @@ public class ActivityMsg extends Activity {
 		String name = db.getContactName(sender);
 		db.setAsRead(sender);
 		NotificationManager nmgr = (NotificationManager) this
-		.getSystemService(Context.NOTIFICATION_SERVICE);
+				.getSystemService(Context.NOTIFICATION_SERVICE);
 		nmgr.cancel(db.getContactId(sender));
 		name = name != null ? name : sender;
 
@@ -164,7 +170,7 @@ public class ActivityMsg extends Activity {
 
 		loadMsgs(0);
 	}
-	
+
 	@Override
 	public void onBackPressed() {
 		MApp.finishActivity(this);
@@ -258,6 +264,12 @@ public class ActivityMsg extends Activity {
 		this.menu = menu;
 		Database db = new Database(context);
 		menu.getItem(0).setVisible(!db.contactAlreadyExists(sender));
+		MApp app = MApp.getApp(context);
+		if (app.isLoggedIn()) {
+			MenuItem item = menu.findItem(R.id.action_msg_state);
+			if (item != null)
+				item.setIcon(R.drawable.ico_state_ready);
+		}
 		return true;
 	}
 
@@ -339,13 +351,74 @@ public class ActivityMsg extends Activity {
 		addContactTask.execute(request);
 	}
 
+	private void doAutoLogin() {
+		String email = ShPref.getShPrefString(context, "logininfo_email");
+		String password = ShPref.getShPrefString(context, "logininfo_password");
+		if ((email != null && !email.isEmpty())
+				&& (password != null && !password.isEmpty())) {
+
+			LoginRequest request = new LoginRequest();
+			Encryption encryptor = new EncryptionDES();
+			UserInfo info = GCM.loadIdPair(context);
+			if (info == null) {
+				Log.e("ActivityLogin", "UserInfo is null");
+				return;
+			}
+			String gmcId = info.getGcmRegId();
+			if (gmcId == null) {
+				Log.e("ActivityLogin", "gmcId is null");
+				return;
+			}
+			request.setGcmId(gmcId);
+			request.setId(encryptor.encrypt(email));
+			request.setPassword(encryptor.encrypt(password));
+
+			MApp app = MApp.getApp(context);
+			ServerConnection connection = app.getServerConnection();
+
+			LoginTask loginTask = new LoginTask(connection, loginTaskListener);
+			loginTask.execute(request);
+		}
+	}
+
+	private final LoginTaskListener loginTaskListener = new LoginTaskListener() {
+
+		@Override
+		public void onPreExecute() {
+
+		}
+
+		@Override
+		public void onPostExecute(LoginResponse response) {
+			if (response != null) {
+				if (!response.isError()) {
+					MApp app = MApp.getApp(context);
+					app.setLoggedIn();
+					if (menu != null) {
+						MenuItem item = menu.findItem(R.id.action_msg_state);
+						if (item != null)
+							item.setIcon(R.drawable.ico_state_ready);
+					}
+				}
+			}
+		}
+	};
+
 	@Override
 	protected void onResume() {
 		super.onResume();
-		Log.d("test", "onResume() called ...");
 		init();
 		ShPref.setShPrefString(this, KEY_CURRENT_SENDER, sender);
-		
+		MApp app = MApp.getApp(this);
+		if (app.isLoggedIn()) {
+			if (menu != null) {
+				MenuItem item = menu.findItem(R.id.action_msg_state);
+				if (item != null)
+					item.setIcon(R.drawable.ico_state_ready);
+			}
+		} else
+			doAutoLogin();
+
 	}
 
 	@Override
@@ -359,14 +432,11 @@ public class ActivityMsg extends Activity {
 		MApp.finishActivity(this);
 	}
 
-	
 	@Override
 	protected void onNewIntent(Intent intent) {
 		super.onNewIntent(intent);
 		this.setIntent(intent);
-//		Log.d("test", intent.getExtras().getString(ActivityMsg.EXTRA_EMAIL));
+		// Log.d("test", intent.getExtras().getString(ActivityMsg.EXTRA_EMAIL));
 	}
 
-	
-	
 }

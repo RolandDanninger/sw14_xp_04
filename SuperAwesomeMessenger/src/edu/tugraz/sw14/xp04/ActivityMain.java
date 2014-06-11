@@ -23,9 +23,20 @@ import android.support.v4.widget.DrawerLayout;
 import android.view.View;
 import android.widget.ProgressBar;
 import android.widget.Toast;
+import edu.tugraz.sw14.xp04.gcm.GCM;
+import edu.tugraz.sw14.xp04.helpers.Encryption;
+import edu.tugraz.sw14.xp04.helpers.EncryptionDES;
 import edu.tugraz.sw14.xp04.helpers.MApp;
+import edu.tugraz.sw14.xp04.helpers.MToast;
+import edu.tugraz.sw14.xp04.helpers.ShPref;
+import edu.tugraz.sw14.xp04.helpers.UserInfo;
 import edu.tugraz.sw14.xp04.navigation.NavigationDrawerFragment;
 import edu.tugraz.sw14.xp04.navigation.NavigationDrawerOrder;
+import edu.tugraz.sw14.xp04.server.LoginTask;
+import edu.tugraz.sw14.xp04.server.ServerConnection;
+import edu.tugraz.sw14.xp04.server.LoginTask.LoginTaskListener;
+import edu.tugraz.sw14.xp04.stubs.LoginRequest;
+import edu.tugraz.sw14.xp04.stubs.LoginResponse;
 
 import java.util.concurrent.Callable;
 
@@ -193,6 +204,13 @@ public class ActivityMain extends Activity implements
 			getMenuInflater().inflate(R.menu.activity_main, menu);
 			this.menu = menu;
 			restoreActionBar();
+			MApp app = MApp.getApp(context);
+			if (app.isLoggedIn()) {
+				MenuItem item = menu.findItem(R.id.action_state);
+				if (item != null)
+					item.setIcon(R.drawable.ico_state_ready);
+			}
+
 			return true;
 		}
 		return super.onCreateOptionsMenu(menu);
@@ -243,9 +261,73 @@ public class ActivityMain extends Activity implements
 
 	}
 
+	private void doAutoLogin() {
+		String email = ShPref.getShPrefString(context, "logininfo_email");
+		String password = ShPref.getShPrefString(context, "logininfo_password");
+		if ((email != null && !email.isEmpty())
+				&& (password != null && !password.isEmpty())) {
+
+			LoginRequest request = new LoginRequest();
+			Encryption encryptor = new EncryptionDES();
+			UserInfo info = GCM.loadIdPair(context);
+			if (info == null) {
+				Log.e("ActivityLogin", "UserInfo is null");
+				return;
+			}
+			String gmcId = info.getGcmRegId();
+			if (gmcId == null) {
+				Log.e("ActivityLogin", "gmcId is null");
+				return;
+			}
+			request.setGcmId(gmcId);
+			request.setId(encryptor.encrypt(email));
+			request.setPassword(encryptor.encrypt(password));
+
+			MApp app = MApp.getApp(context);
+			ServerConnection connection = app.getServerConnection();
+
+			LoginTask loginTask = new LoginTask(connection, loginTaskListener);
+			loginTask.execute(request);
+		}
+	}
+
+	private final LoginTaskListener loginTaskListener = new LoginTaskListener() {
+
+		@Override
+		public void onPreExecute() {
+
+		}
+
+		@Override
+		public void onPostExecute(LoginResponse response) {
+			if (response != null) {
+				if (!response.isError()) {
+					MApp app = MApp.getApp(context);
+					app.setLoggedIn();
+					if (menu != null) {
+						MenuItem item = menu.findItem(R.id.action_state);
+						if (item != null)
+							item.setIcon(R.drawable.ico_state_ready);
+					}
+				}
+			}
+		}
+	};
+
 	@Override
 	protected void onResume() {
 		Log.d("LIFECYCLE", "onResume");
+
+		MApp app = MApp.getApp(this);
+		if (app.isLoggedIn()) {
+			if (menu != null) {
+				MenuItem item = menu.findItem(R.id.action_state);
+				if (item != null)
+					item.setIcon(R.drawable.ico_state_ready);
+			}
+		} else
+			doAutoLogin();
+
 		super.onResume();
 		this.overridePendingTransition(android.R.anim.fade_in,
 				android.R.anim.fade_out);

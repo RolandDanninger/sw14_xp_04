@@ -11,6 +11,7 @@
     <string name="navigation_drawer_open">Navigation Open</string>
     <string name="navigation_drawer_close">Navigation Close</string>
     <string name="menu">Contacts</string>
+    <string name="state">State</string>
     <string name="a_quit">QUIT</string>
     <string name="title_activity_activity_launch">ActivityLaunch</string>
     <string name="title_activity_activity_main">ActivityMain</string>

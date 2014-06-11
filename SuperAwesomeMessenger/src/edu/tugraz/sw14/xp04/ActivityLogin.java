@@ -55,6 +55,8 @@ public class ActivityLogin extends Activity {
 					saveLoginInfo();
 					MApp.goToActivity((Activity) context, ActivityMain.class,
 							true);
+					MApp app = MApp.getApp(context);
+					app.setLoggedIn();
 				}
 			}
 		}
@@ -125,9 +127,9 @@ public class ActivityLogin extends Activity {
 			MToast.errorLoginPassword(context, true);
 			return;
 		}
-
-		doLogin(email, password);
-
+		if(MApp.isNetworkAvailable(context))
+			doLogin(email, password);
+		else MToast.errorNetwork(context, true);
 	}
 
 	private void saveLoginInfo() {
