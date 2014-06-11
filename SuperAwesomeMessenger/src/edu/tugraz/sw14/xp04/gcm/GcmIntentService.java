@@ -82,7 +82,9 @@ public class GcmIntentService extends IntentService {
 
 				Log.i(TAG, "app on top is: " + getAppNameOnTop());
 				String appOnTop = getAppNameOnTop();
-				if (!appOnTop.contains("SuperAwesomeMessenger")) {
+				String name = getApplicationContext().getResources().getString(
+						R.string.app_name_short);
+				if (!appOnTop.contains(name)) {
 					sendNotification(extras);
 				} else {
 					if (appOnTop.contains("ActivityMsg")) {
