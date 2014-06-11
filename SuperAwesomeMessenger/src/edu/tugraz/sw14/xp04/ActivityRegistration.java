@@ -40,23 +40,21 @@ public class ActivityRegistration extends Activity implements OnClickListener {
 	private TextView lblError = null;
 	private Button btnRegister = null;
 	private ProgressDialog dialog;
-	
-	private RegistrationController controller = null;
 
-	
+	private RegistrationController controller = null;
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-		
+
 		Log.d("ActivityRegistration", "ONCREATE");
-		
+
 		setContentView(R.layout.activity_registration);
 		context = this;
-		
+
 		MApp app = MApp.getApp(context);
 		ServerConnection connection = app.getServerConnection();
-		
+
 		this.setController(new RegistrationController(this, connection));
 
 		txtId = (EditText) findViewById(R.id.a_registration_txt_id);
@@ -139,14 +137,14 @@ public class ActivityRegistration extends Activity implements OnClickListener {
 		this.setLoading();
 		controller.startRegistrationTask(email, password);
 	}
-	
+
 	public void setLoading() {
 		dialog = new ProgressDialog(context);
 		dialog.setCancelable(false);
 		dialog.show();
 		dialog.setContentView(new ProgressBar(context));
 	}
-	
+
 	public void onRegistrationTaskFinished(RegistrationResponse response) {
 		if (dialog != null)
 			dialog.dismiss();
@@ -170,9 +168,8 @@ public class ActivityRegistration extends Activity implements OnClickListener {
 	private void registrationFailed() {
 		MToast.errorRegister(context, true);
 	}
-	
-	public void setController(RegistrationController controller)
-	{
+
+	public void setController(RegistrationController controller) {
 		this.controller = controller;
 	}
 }
