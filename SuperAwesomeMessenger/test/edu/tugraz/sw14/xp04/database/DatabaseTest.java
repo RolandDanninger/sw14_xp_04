@@ -16,7 +16,9 @@ public class DatabaseTest extends AndroidTestCase {
 	private static final String name = "Hauns";
 	private static final String mail = "mail";
 	private static final String content = "this is a msg";
+	private static final String content2 = "this is a msg number 2";
 	private static final long timestamp = 1;
+	private static final long timestamp2 = 2;
 	private static final Msg msg = new Msg(mail, content, timestamp, true, true);
 
 	public void setUp() {
@@ -333,6 +335,49 @@ public class DatabaseTest extends AndroidTestCase {
 		assertEquals(true, result);
 		ArrayList<ChatOverview> list = db.getAllMsgs(1);
 		assertEquals(1, list.size());
+	}
+
+	public void testCountUnreadMsgs() {
+		Msg msg1 = new Msg(mail, content, timestamp, false, false);
+		boolean result = db.insertMsg(msg1.toContentValues());
+		assertEquals(true, result);
+		Msg msg2 = new Msg(mail, content2, timestamp2, false, false);
+		result = db.insertMsg(msg2.toContentValues());
+		assertEquals(true, result);
+		int count = db.countUnreadMsgs(mail);
+		assertEquals(2, count);
+	}
+
+	public void testCountUnreadMsgsNoMsgs() {
+		int count = db.countUnreadMsgs(mail);
+		assertEquals(0, count);
+	}
+
+	public void testCountUnreadMsgsEmptyId() {
+		int count = db.countUnreadMsgs(null);
+		assertEquals(0, count);
+	}
+
+	public void testSetAsRead() {
+		Msg msg1 = new Msg(mail, content, timestamp, false, false);
+		boolean result = db.insertMsg(msg1.toContentValues());
+		assertEquals(true, result);
+		int count = db.countUnreadMsgs(mail);
+		assertEquals(1, count);
+		db.setAsRead(mail);
+		count = db.countUnreadMsgs(mail);
+		assertEquals(0, count);
+	}
+
+	public void testSetAsReadEmptyId() {
+		Msg msg1 = new Msg(mail, content, timestamp, false, false);
+		boolean result = db.insertMsg(msg1.toContentValues());
+		assertEquals(true, result);
+		int count = db.countUnreadMsgs(mail);
+		assertEquals(1, count);
+		db.setAsRead(null);
+		count = db.countUnreadMsgs(mail);
+		assertEquals(1, count);
 	}
 
 	public void tearDown() throws Exception {
